@@ -7,9 +7,9 @@ export type UserDocument = User &
     validatePassword(password: string): Promise<boolean>;
   };
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   username: string;
 
   @Prop({ required: true, unique: true })
@@ -17,6 +17,24 @@ export class User {
 
   @Prop({ required: true })
   password: string;
+
+  @Prop({ required: true })
+  phone: string;
+
+  @Prop({ default: 'customer', enum: ['customer', 'service_provider', 'admin'] })
+  role: string;
+
+  @Prop({ required: true })
+  address: string;
+
+  @Prop()
+  serviceCategory?: string;
+
+  @Prop()
+  experience?: number;
+
+  @Prop()
+  description?: string;
 
   @Prop({ default: true })
   isActive: boolean;
@@ -27,7 +45,7 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-// Add pre-save hook for password hashing
+// Password Hashing Pre-save Hook
 UserSchema.pre('save', async function (next) {
   try {
     if (!this.isModified('password')) {
@@ -43,7 +61,7 @@ UserSchema.pre('save', async function (next) {
   }
 });
 
-// Add method to validate password
+// Method for Password Validation
 UserSchema.methods.validatePassword = function (password: string): Promise<boolean> {
   return bcrypt.compare(password, this.password);
 };

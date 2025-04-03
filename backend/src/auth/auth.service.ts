@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
@@ -20,18 +15,14 @@ export class AuthService {
 
   async register(createUserDto: CreateUserDto): Promise<{ message: string }> {
     // Check if user with email already exists
-    const emailExists = await this.userModel
-      .findOne({ email: createUserDto.email })
-      .exec();
+    const emailExists = await this.userModel.findOne({ email: createUserDto.email }).exec();
 
     if (emailExists) {
       throw new ConflictException('Email already exists');
     }
 
     // Check if username already exists
-    const usernameExists = await this.userModel
-      .findOne({ username: createUserDto.username })
-      .exec();
+    const usernameExists = await this.userModel.findOne({ username: createUserDto.username }).exec();
 
     if (usernameExists) {
       throw new ConflictException('Username already exists');
@@ -44,9 +35,7 @@ export class AuthService {
     return { message: 'User registered successfully' };
   }
 
-  async login(
-    loginUserDto: LoginUserDto,
-  ): Promise<{ token: string; user: any }> {
+  async login(loginUserDto: LoginUserDto): Promise<{ token: string; user: any }> {
     const { email, password } = loginUserDto;
 
     // Find user by email

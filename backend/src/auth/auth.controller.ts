@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  UseGuards,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -31,10 +23,7 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(
-    @Body() loginUserDto: LoginUserDto,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  async login(@Body() loginUserDto: LoginUserDto, @Res({ passthrough: true }) response: Response) {
     const { token, user } = await this.authService.login(loginUserDto);
 
     // Set JWT as HTTP-only cookie

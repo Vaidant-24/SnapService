@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsEnum, IsOptional, MinLength, IsNumber } from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -10,4 +10,26 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(6)
   password: string;
+
+  @IsNotEmpty()
+  phone: string;
+
+  @IsEnum(['customer', 'service_provider', 'admin'])
+  role: string;
+
+  @IsNotEmpty()
+  address: string;
+
+  // Service Provider Specific Fields
+  @IsOptional()
+  @IsNotEmpty()
+  serviceCategory?: string;
+
+  @IsOptional()
+  @IsNumber()
+  experience?: number;
+
+  @IsOptional()
+  @IsNotEmpty()
+  description?: string;
 }
