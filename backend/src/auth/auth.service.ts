@@ -2,9 +2,9 @@ import { Injectable, ConflictException, NotFoundException, UnauthorizedException
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import { User, UserDocument } from './schemas/user.schema';
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginUserDto } from './dto/login-user.dto';
+import { User, UserDocument } from '../schemas/user.schema';
+import { CreateUserDto } from './auth-dto/create-user.dto';
+import { LoginUserDto } from './auth-dto/login-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +13,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  // register-
   async register(createUserDto: CreateUserDto): Promise<{ message: string }> {
     // Check if user with email already exists
     const emailExists = await this.userModel.findOne({ email: createUserDto.email }).exec();
@@ -35,6 +36,7 @@ export class AuthService {
     return { message: 'User registered successfully' };
   }
 
+  // login -
   async login(loginUserDto: LoginUserDto): Promise<{ token: string; user: any }> {
     const { email, password } = loginUserDto;
 
@@ -57,6 +59,7 @@ export class AuthService {
       sub: user._id,
       username: user.username,
       email: user.email,
+      role: user.role,
     };
 
     return {
@@ -65,6 +68,7 @@ export class AuthService {
         id: user._id,
         username: user.username,
         email: user.email,
+        role: user.role,
       },
     };
   }

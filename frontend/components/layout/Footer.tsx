@@ -2,19 +2,20 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-white py-6 px-6">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4">
+    <footer className="bg-gray-800 text-white py-12 px-6">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Company Info */}
         <div className="col-span-1 md:col-span-1">
-          <h3 className="text-lg font-bold mb-2">SnapService</h3>
-          <p className="text-gray-300 text-sm mb-2">
-            Connecting homeowners with trusted professionals.
+          <h3 className="text-xl font-bold mb-4">SnapService</h3>
+          <p className="text-gray-300 mb-4">
+            Connecting homeowners with trusted professionals for all your home
+            service needs.
           </p>
-          <div className="flex space-x-3">
+          <div className="flex space-x-4">
             <a href="#" className="text-gray-300 hover:text-white">
               <span className="sr-only">Facebook</span>
               <svg
-                className="h-5 w-5"
+                className="h-6 w-6"
                 fill="currentColor"
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -29,7 +30,7 @@ const Footer = () => {
             <a href="#" className="text-gray-300 hover:text-white">
               <span className="sr-only">Instagram</span>
               <svg
-                className="h-5 w-5"
+                className="h-6 w-6"
                 fill="currentColor"
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -44,7 +45,7 @@ const Footer = () => {
             <a href="#" className="text-gray-300 hover:text-white">
               <span className="sr-only">Twitter</span>
               <svg
-                className="h-5 w-5"
+                className="h-6 w-6"
                 fill="currentColor"
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -57,8 +58,8 @@ const Footer = () => {
 
         {/* Quick Links */}
         <div>
-          <h3 className="text-sm font-semibold mb-2">Quick Links</h3>
-          <ul className="space-y-1 text-sm">
+          <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+          <ul className="space-y-2">
             <li>
               <Link href="/about" className="text-gray-300 hover:text-white">
                 About Us
@@ -87,8 +88,8 @@ const Footer = () => {
 
         {/* Services */}
         <div>
-          <h3 className="text-sm font-semibold mb-2">Services</h3>
-          <ul className="space-y-1 text-sm">
+          <h3 className="text-lg font-semibold mb-4">Services</h3>
+          <ul className="space-y-2">
             <li>
               <Link
                 href="/services/cleaning"
@@ -134,11 +135,11 @@ const Footer = () => {
 
         {/* Contact */}
         <div>
-          <h3 className="text-sm font-semibold mb-2">Contact Us</h3>
-          <ul className="space-y-1 text-sm text-gray-300">
+          <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+          <ul className="space-y-2 text-gray-300">
             <li className="flex items-start">
               <svg
-                className="h-4 w-4 mr-1 mt-1 text-orange-500"
+                className="h-6 w-6 mr-2 text-orange-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -156,11 +157,11 @@ const Footer = () => {
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              <span>123 Service Street, City</span>
+              <span>123 Service Street, City, Country</span>
             </li>
             <li className="flex items-start">
               <svg
-                className="h-4 w-4 mr-1 mt-1 text-orange-500"
+                className="h-6 w-6 mr-2 text-orange-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -176,7 +177,7 @@ const Footer = () => {
             </li>
             <li className="flex items-start">
               <svg
-                className="h-4 w-4 mr-1 mt-1 text-orange-500"
+                className="h-6 w-6 mr-2 text-orange-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -194,8 +195,8 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto mt-4 pt-3 border-t border-gray-700">
-        <p className="text-gray-400 text-center text-xs">
+      <div className="max-w-6xl mx-auto mt-8 pt-8 border-t border-gray-700">
+        <p className="text-gray-400 text-center">
           &copy; {new Date().getFullYear()} SnapService. All rights reserved.
         </p>
       </div>
