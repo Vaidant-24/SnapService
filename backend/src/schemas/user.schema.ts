@@ -21,12 +21,13 @@ export class User {
   @Prop({ required: true })
   phone: string;
 
-  @Prop({ default: 'customer', enum: ['customer', 'service_provider', 'admin'] })
+  @Prop({ default: 'customer', enum: ['customer', 'service_provider'] })
   role: string;
 
   @Prop({ required: true })
   address: string;
 
+  // Service Provider Specific Fields
   @Prop()
   serviceCategory?: string;
 
@@ -35,6 +36,18 @@ export class User {
 
   @Prop()
   description?: string;
+
+  @Prop()
+  profileImage?: string; // URL or filename for provider profile picture
+
+  @Prop({ default: 0 })
+  totalBookings?: number; // Track how many bookings a provider has completed
+
+  @Prop({ default: 0 })
+  rating?: number; // Average rating out of 5
+
+  @Prop({ default: 0 })
+  reviewCount?: number; // How many reviews the provider has received
 
   @Prop({ default: true })
   isActive: boolean;

@@ -8,11 +8,15 @@ import { BookingService } from './booking/booking.service';
 import { BookingController } from './booking/booking.controller';
 import { Service, ServiceSchema } from './schemas/service.schema';
 import { Booking, BookingSchema } from './schemas/booking.schema';
+import { UserService } from './user/user.service';
+import { UserController } from './user/user.controller';
+import { User, UserSchema } from './schemas/user.schema';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     AuthModule,
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Service.name, schema: ServiceSchema }]),
     MongooseModule.forFeature([{ name: Booking.name, schema: BookingSchema }]),
     MongooseModule.forRootAsync({
@@ -26,7 +30,7 @@ import { Booking, BookingSchema } from './schemas/booking.schema';
       inject: [ConfigService],
     }),
   ],
-  providers: [ServiceService, BookingService],
-  controllers: [ServiceController, BookingController],
+  providers: [ServiceService, BookingService, UserService],
+  controllers: [ServiceController, BookingController, UserController],
 })
 export class AppModule {}

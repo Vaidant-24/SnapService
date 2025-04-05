@@ -13,7 +13,9 @@ export class ServiceService {
   }
 
   async findById(serviceId: string): Promise<Service> {
-    const service = await this.serviceModel.findById(serviceId).populate('providerId', 'username email');
+    const service = await this.serviceModel
+      .findById(serviceId)
+      .populate('providerId', 'username email phone address experience');
     if (!service) throw new NotFoundException('Service not found');
     return service;
   }

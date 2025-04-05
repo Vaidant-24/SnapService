@@ -14,7 +14,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   phone: string;
 
-  @IsEnum(['customer', 'service_provider', 'admin'])
+  @IsEnum(['customer', 'service_provider'])
   role: string;
 
   @IsNotEmpty()

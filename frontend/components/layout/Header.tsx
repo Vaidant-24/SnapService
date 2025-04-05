@@ -1,25 +1,54 @@
 "use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { user, logout } = useAuth();
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
+  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const dashboardPath =
+    user?.role === "customer"
+      ? "/customer-dashboard"
+      : "/service-provider-dashboard";
+
+  const profilePath =
+    user?.role === "customer"
+      ? "/customer-profile"
+      : "/service-provider-profile";
 
   return (
-    <header className="flex items-center justify-between py-4 px-6 md:px-12 bg-transparent">
+    <header className="flex items-center justify-between py-4 px-6 md:px-12 bg-transparent relative z-50">
       {/* Logo and Brand Name */}
       <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
-        {/* Brand Logo using Image Component */}
         <Image
           src="/zap.svg"
           alt="SnapService Logo"
           width={40}
           height={40}
-          className="object-contain "
+          className="object-contain"
         />
         <span>SnapService</span>
       </Link>
@@ -32,6 +61,14 @@ const Header = () => {
         >
           Home
         </Link>
+        {user && (
+          <Link
+            href={dashboardPath}
+            className="text-white hover:text-orange-500 transition duration-300"
+          >
+            Dashboard
+          </Link>
+        )}
         <Link
           href="/services"
           className="text-white hover:text-orange-500 transition duration-300"
@@ -52,20 +89,67 @@ const Header = () => {
         </Link>
       </nav>
 
-      {/* Desktop Action Buttons */}
-      <div className="hidden md:flex gap-4">
-        <Link
-          href="/sign-in"
-          className="px-4 py-2 border border-orange-500 text-orange-500 rounded-md hover:bg-orange-50 hover:text-orange-600 transition duration-300"
-        >
-          Login
-        </Link>
-        <Link
-          href="/sign-up"
-          className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition duration-300"
-        >
-          Register
-        </Link>
+      {/* Desktop Right Side */}
+      <div className="hidden md:flex items-center gap-4 relative">
+        {user ? (
+          <div ref={dropdownRef} className="relative">
+            <button
+              onClick={toggleDropdown}
+              className="flex items-center gap-2 text-white hover:text-orange-500 transition"
+            >
+              <Image
+                src="avatar.svg"
+                alt="User Avatar"
+                width={32}
+                height={32}
+                className="rounded-full object-cover"
+              />
+              <ChevronDown size={18} />
+            </button>
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 rounded-md bg-gray-900 shadow-lg border border-gray-700">
+                <Link
+                  href={dashboardPath}
+                  className="block px-4 py-2 text-sm text-white hover:bg-gray-800"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href={profilePath}
+                  className="block px-4 py-2 text-sm text-white hover:bg-gray-800"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={() => {
+                    logout();
+                    setDropdownOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-800"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <Link
+              href="/sign-in"
+              className="px-4 py-2 border border-orange-500 text-orange-500 rounded-md hover:bg-orange-50 hover:text-orange-600 transition duration-300"
+            >
+              Login
+            </Link>
+            <Link
+              href="/sign-up"
+              className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition duration-300"
+            >
+              Register
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Mobile Menu Toggle */}
@@ -78,49 +162,72 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="absolute top-16 left-0 w-full bg-black text-white flex flex-col gap-4 p-6 md:hidden">
+        <div className="absolute top-16 left-0 w-full bg-black text-white flex flex-col gap-4 p-6 md:hidden z-50">
           <Link
             href="/"
-            className="hover:text-orange-500 transition duration-300"
             onClick={toggleMenu}
+            className="hover:text-orange-500 transition duration-300"
           >
             Home
           </Link>
+          {user && (
+            <Link
+              href={dashboardPath}
+              onClick={toggleMenu}
+              className="hover:text-orange-500 transition duration-300"
+            >
+              Dashboard
+            </Link>
+          )}
           <Link
             href="/services"
-            className="hover:text-orange-500 transition duration-300"
             onClick={toggleMenu}
+            className="hover:text-orange-500 transition duration-300"
           >
             Services
           </Link>
           <Link
             href="/about"
-            className="hover:text-orange-500 transition duration-300"
             onClick={toggleMenu}
+            className="hover:text-orange-500 transition duration-300"
           >
             About Us
           </Link>
           <Link
             href="/contact"
-            className="hover:text-orange-500 transition duration-300"
             onClick={toggleMenu}
+            className="hover:text-orange-500 transition duration-300"
           >
             Contact
           </Link>
-          <Link
-            href="/sign-in"
-            className="hover:text-orange-500 transition duration-300"
-            onClick={toggleMenu}
-          >
-            Login
-          </Link>
-          <Link
-            href="/sign-up"
-            className="hover:text-orange-500 transition duration-300"
-            onClick={toggleMenu}
-          >
-            Register
-          </Link>
+          {user ? (
+            <button
+              onClick={() => {
+                logout();
+                toggleMenu();
+              }}
+              className="text-left hover:text-orange-500 transition duration-300"
+            >
+              Logout
+            </button>
+          ) : (
+            <>
+              <Link
+                href="/sign-in"
+                onClick={toggleMenu}
+                className="hover:text-orange-500 transition duration-300"
+              >
+                Login
+              </Link>
+              <Link
+                href="/sign-up"
+                onClick={toggleMenu}
+                className="hover:text-orange-500 transition duration-300"
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
       )}
     </header>

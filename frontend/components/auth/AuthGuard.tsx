@@ -1,42 +1,20 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-interface AuthGuardProps {
-  children: React.ReactNode;
-}
-
-export default function AuthGuard({ children }: AuthGuardProps) {
+export default function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
   const router = useRouter();
-  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    // Check authentication status by verifying the cookie
-    const verifyAuth = async () => {
-      try {
-        const response = await fetch("http://localhost:3001/auth/verify", {
-          method: "GET",
-          credentials: "include", // Important for cookies
-        });
+    if (!loading && !user) {
+      router.push("/sign-in");
+    }
+  }, [user, loading, router]);
 
-        if (!response.ok) {
-          // Not authenticated, redirect to login
-          router.push("/sign-in");
-          return;
-        }
+  if (loading) return <div className="text-center text-white">Loading...</div>;
+  if (!user) return null;
 
-        // User is authenticated
-        setAuthorized(true);
-      } catch (error) {
-        if (error instanceof Error) {
-        }
-        // Error verifying authentication, redirect to login
-        router.push("/sign-in");
-      }
-    };
-
-    verifyAuth();
-  }, [router]);
-
-  return authorized ? <>{children}</> : null;
+  return <>{children}</>;
 }

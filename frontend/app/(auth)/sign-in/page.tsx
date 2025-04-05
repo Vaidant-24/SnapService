@@ -1,12 +1,15 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { setUser } = useAuth(); // ✅ Get setUser from AuthContext
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,17 +31,22 @@ export default function Login() {
       });
 
       const data = await response.json();
+
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
 
-      // Redirect based on user role
-      if (data.user.role === "customer") {
-        router.push("/customer-dashboard");
-      } else if (data.user.role === "service_provider") {
-        router.push("/service-provider-dashboard");
-      } else {
-        router.push("/dashboard"); // Default route
+      setUser(data.user);
+
+      switch (data.user.role) {
+        case "customer":
+          router.push("/customer-dashboard");
+          break;
+        case "service_provider":
+          router.push("/service-provider-dashboard");
+          break;
+        default:
+          router.push("/dashboard");
       }
     } catch (err) {
       if (err instanceof Error) {

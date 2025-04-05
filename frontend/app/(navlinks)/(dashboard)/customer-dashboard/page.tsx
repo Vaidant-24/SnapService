@@ -34,6 +34,7 @@ export default function CustomerDashboard() {
   const [error, setError] = useState("");
   const router = useRouter();
 
+  // Fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -48,6 +49,11 @@ export default function CustomerDashboard() {
       }
     };
 
+    fetchUserData();
+  }, []);
+
+  // Fetch services
+  useEffect(() => {
     const fetchServices = async () => {
       try {
         const response = await fetch("http://localhost:3001/services");
@@ -59,8 +65,14 @@ export default function CustomerDashboard() {
       }
     };
 
+    fetchServices();
+  }, []);
+
+  // Fetch bookings only when userData is available
+  useEffect(() => {
+    if (!userData) return;
+
     const fetchBookings = async () => {
-      if (!userData) return;
       try {
         const response = await fetch(
           `http://localhost:3001/bookings/customer/${userData.id}`
@@ -75,14 +87,10 @@ export default function CustomerDashboard() {
       }
     };
 
-    fetchUserData();
-    fetchServices();
-    if (userData) fetchBookings();
+    fetchBookings();
   }, [userData]);
 
   const handleBookNow = (serviceId: string) => {
-    console.log("---debug---");
-    console.log("bookings", bookings);
     router.push(
       `/book-service?serviceId=${serviceId}&customerId=${userData?.id}`
     );
@@ -90,9 +98,11 @@ export default function CustomerDashboard() {
 
   return (
     <AuthGuard>
-      <div className="container mx-auto px-4 py-8 bg-black text-white min-h-screen">
+      <div className="container mx-8 px-8 py-16 bg-black text-white min-h-screen">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Customer Dashboard</h1>
+          <h1 className="text-3xl text-orange-500 font-bold">
+            Customer Dashboard
+          </h1>
         </div>
 
         {loading ? (
@@ -101,17 +111,19 @@ export default function CustomerDashboard() {
           <p className="text-red-500">{error}</p>
         ) : userData ? (
           <>
-            <h2 className="text-xl font-semibold mb-4">
-              Welcome, {userData.username}
+            <h2 className="text-xl  mb-4">
+              Welcome,{" "}
+              <span className="text-2xl text-orange-500">
+                {userData.username}
+              </span>
             </h2>
-            <p className="text-gray-400 mb-6">
-              Explore and book services below:
-            </p>
 
-            {/* Available Services */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {services.length > 0 ? (
-                services.map((service) => (
+            {/* Featured Services Section */}
+            <div className="mt-10">
+              <h2 className="text-xl font-semibold mb-4">Featured Services</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {services.slice(0, 3).map((service) => (
                   <div
                     key={service._id}
                     className="bg-gray-900 p-6 rounded-lg shadow"
@@ -130,15 +142,23 @@ export default function CustomerDashboard() {
 
                     <button
                       onClick={() => handleBookNow(service._id)}
-                      className="mt-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-md w-full"
+                      className="mt-4 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md w-full"
                     >
                       Book Now
                     </button>
                   </div>
-                ))
-              ) : (
-                <p>No services available.</p>
-              )}
+                ))}
+              </div>
+
+              {/* Button to navigate to full Services Page */}
+              <div className="text-center mt-6">
+                <button
+                  onClick={() => router.push("/services")}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md"
+                >
+                  View All Services
+                </button>
+              </div>
             </div>
 
             {/* Customer's Bookings */}

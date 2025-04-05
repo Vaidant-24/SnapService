@@ -6,22 +6,43 @@ export type BookingDocument = Booking & Document;
 @Schema({ timestamps: true })
 export class Booking {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  customerId: Types.ObjectId; // Customer who booked the service
+  customerId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  providerId: Types.ObjectId; // Service provider
+  providerId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Service', required: true })
-  serviceId: Types.ObjectId; // Service being booked
+  serviceId: Types.ObjectId;
 
   @Prop({ required: true })
   date: Date;
 
   @Prop({ default: 'Pending', enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'] })
-  status: string; // Booking status
+  status: string;
 
   @Prop({ default: false })
-  isPaid: boolean; // Payment status
+  isPaid: boolean;
+
+  @Prop({ default: 0 })
+  amountPaid?: number; // Total amount paid for the booking
+
+  @Prop({ default: 'Cash', enum: ['Cash', 'Online', 'UPI', 'Card'] })
+  paymentMethod?: string; // Optional: payment mode
+
+  @Prop({ default: '' })
+  customerNote?: string; // Any extra instruction from customer
+
+  @Prop({ default: '' })
+  providerNote?: string; // Internal notes added by provider (e.g., reschedule reason)
+
+  @Prop({ default: false })
+  isRated?: boolean; // Whether the customer has rated the booking
+
+  @Prop({ default: 0 })
+  rating?: number; // Rating given by customer
+
+  @Prop()
+  review?: string; // Optional review by customer
 }
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);
