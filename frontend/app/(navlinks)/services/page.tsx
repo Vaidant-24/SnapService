@@ -47,7 +47,7 @@ export default function ServicesPage() {
     if (!user) {
       router.push("/sign-in");
     } else {
-      router.push(`/book-service?serviceId=${serviceId}&customerId=${user.id}`);
+      router.push(`/book-service?serviceId=${serviceId}`);
     }
   };
 

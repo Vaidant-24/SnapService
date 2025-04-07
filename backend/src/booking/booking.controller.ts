@@ -11,6 +11,11 @@ export class BookingController {
     return this.bookingService.findAllByCustomer(customerId);
   }
 
+  // @Get('provider/:providerId')
+  // async getBookingsByProvider(@Param('providerId') providerId: string) {
+  //   return this.bookingService.findAllByProvider(providerId);
+  // }
+
   @Get()
   async getAllBookings() {
     return this.bookingService.findAllBookings();

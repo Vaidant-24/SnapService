@@ -69,12 +69,15 @@ const Header = () => {
             Dashboard
           </Link>
         )}
-        <Link
-          href="/services"
-          className="text-white hover:text-orange-500 transition duration-300"
-        >
-          Services
-        </Link>
+        {user?.role !== "service_provider" && (
+          <Link
+            href="/services"
+            className="text-white hover:text-orange-500 transition duration-300"
+          >
+            Services
+          </Link>
+        )}
+
         <Link
           href="/about"
           className="text-white hover:text-orange-500 transition duration-300"
@@ -179,13 +182,16 @@ const Header = () => {
               Dashboard
             </Link>
           )}
-          <Link
-            href="/services"
-            onClick={toggleMenu}
-            className="hover:text-orange-500 transition duration-300"
-          >
-            Services
-          </Link>
+          {user?.role !== "service_provider" && (
+            <Link
+              href="/services"
+              onClick={toggleMenu}
+              className="hover:text-orange-500 transition duration-300"
+            >
+              Services
+            </Link>
+          )}
+
           <Link
             href="/about"
             onClick={toggleMenu}

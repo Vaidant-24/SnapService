@@ -9,10 +9,19 @@ export class Booking {
   customerId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  providerId: Types.ObjectId;
+  providerDetails: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Service', required: true })
   serviceId: Types.ObjectId;
+
+  @Prop({ required: true })
+  customerName: string;
+
+  @Prop({ required: true })
+  serviceName: string;
+
+  @Prop({ required: true })
+  customerEmail: string;
 
   @Prop({ required: true })
   date: Date;

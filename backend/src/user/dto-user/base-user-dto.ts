@@ -7,6 +7,10 @@ export class BaseUserUpdateDto {
   username?: string;
 
   @IsOptional()
+  @IsString()
+  email?: string;
+
+  @IsOptional()
   @IsPhoneNumber()
   phone?: string;
 

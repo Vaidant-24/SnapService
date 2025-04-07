@@ -91,9 +91,7 @@ export default function CustomerDashboard() {
   }, [userData]);
 
   const handleBookNow = (serviceId: string) => {
-    router.push(
-      `/book-service?serviceId=${serviceId}&customerId=${userData?.id}`
-    );
+    router.push(`/book-service?serviceId=${serviceId}`);
   };
 
   return (

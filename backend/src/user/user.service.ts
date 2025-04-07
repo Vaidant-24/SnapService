@@ -14,6 +14,8 @@ export class UserService {
       userId,
       {
         $set: {
+          username: dto.username,
+          email: dto.email,
           phone: dto.phone,
           address: dto.address,
         },
@@ -31,6 +33,8 @@ export class UserService {
       userId,
       {
         $set: {
+          username: dto.username,
+          email: dto.email,
           phone: dto.phone,
           address: dto.address,
           serviceCategory: dto.serviceCategory,

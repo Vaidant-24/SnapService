@@ -12,8 +12,15 @@ export class BookingService {
     return this.bookingModel
       .find({ customerId })
       .populate('serviceId', 'name description price')
-      .populate('providerId', 'username email');
+      .populate('providerDetails', 'username email');
   }
+
+  // async findAllByProvider(providerId: string): Promise<Booking[]> {
+  //   return this.bookingModel
+  //     .find({ providerId })
+  //     .populate('serviceId', 'name description price')
+  //     .populate('providerDetails', 'username email');
+  // }
 
   async findAllBookings(): Promise<Booking[]> {
     return this.bookingModel.find();

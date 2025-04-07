@@ -87,6 +87,10 @@ export class AuthService {
       email: user.email,
       phone: user.phone,
       address: user.address,
+      serviceCategory: user.serviceCategory,
+      experience: user.experience,
+      description: user.description,
+      createdAt: user.createdAt,
     };
   }
 

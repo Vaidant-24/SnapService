@@ -1,6 +1,9 @@
 export class CreateBookingDto {
   customerId: string;
-  providerId: string;
+  customerName: string;
+  customerEmail: string;
+  providerDetails: string;
+  serviceName: string;
   serviceId: string;
   date: Date;
   time: string;

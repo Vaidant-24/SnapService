@@ -1,20 +1,14 @@
 "use client";
 
-import AuthGuard from "@/components/auth/AuthGuard";
 import React, { useEffect, useState } from "react";
+import AuthGuard from "@/components/auth/AuthGuard";
 
 const CustomerProfile = () => {
-  const [initialData, setInitialData] = useState({
-    username: "",
-    email: "",
-    phone: "",
-    address: "",
-  });
-
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
+  const [customer, setCustomer] = useState<any>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState<any>({});
+  const [message, setMessage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("profile");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -23,30 +17,23 @@ const CustomerProfile = () => {
           credentials: "include",
         });
         const data = await res.json();
-        setInitialData({
-          username: data.username,
-          email: data.email,
-          phone: data.phone,
-          address: data.address,
-        });
+        setCustomer(data);
+        setFormData(data);
       } catch (err) {
-        console.error("Failed to fetch profile:", err);
-        setMessage({ type: "error", text: "Failed to load profile." });
+        console.error("Failed to fetch customer profile:", err);
       }
     };
 
     fetchProfile();
   }, []);
 
-  const handleUpdate = async (formData: FormData) => {
-    const updatedData = {
-      username: formData.get("username"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
-      address: formData.get("address"),
-    };
-    // console.log("Updated data:", updatedData);
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
+  const handleSave = async () => {
     try {
       const res = await fetch("http://localhost:3001/user/profile", {
         method: "PATCH",
@@ -54,90 +41,132 @@ const CustomerProfile = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedData),
+        body: JSON.stringify(formData),
       });
-      // const data = await res.json();
-      // console.log("Response data:", data);
 
-      if (!res.ok) throw new Error("Update failed");
+      if (!res.ok) throw new Error("Failed to update");
 
-      setMessage({ type: "success", text: "Profile updated successfully!" });
-    } catch (error) {
-      console.error(error);
-      setMessage({
-        type: "error",
-        text: "Something went wrong during update.",
-      });
+      const updated = await res.json();
+      setCustomer(updated);
+      setEditMode(false);
+      setMessage("Profile updated successfully!");
+    } catch (err) {
+      console.error(err);
+      setMessage("Error updating profile.");
     }
+  };
+
+  const handleCancel = () => {
+    setFormData(customer);
+    setEditMode(false);
+    setMessage(null);
   };
 
   return (
     <AuthGuard>
-      <div className="max-w-xl mx-auto mt-10 p-6 bg-gray-900 text-white rounded-lg shadow">
-        <h1 className="text-2xl font-bold mb-4">Customer Profile</h1>
+      <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-900 text-white rounded-lg shadow-md">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Customer Profile</h1>
+          {!editMode ? (
+            <button
+              onClick={() => setEditMode(true)}
+              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-semibold"
+            >
+              Edit Profile
+            </button>
+          ) : (
+            <div className="space-x-2">
+              <button
+                onClick={handleSave}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+              >
+                Save
+              </button>
+              <button
+                onClick={handleCancel}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
 
-        {message && (
-          <p
-            className={`mb-4 ${
-              message.type === "success" ? "text-green-400" : "text-red-500"
+        <div className="flex space-x-4 mb-6">
+          <button
+            onClick={() => setActiveTab("profile")}
+            className={`px-4 py-2 rounded ${
+              activeTab === "profile"
+                ? "bg-gray-800 text-white"
+                : "bg-gray-700 text-gray-300"
             }`}
           >
-            {message.text}
-          </p>
+            Profile Information
+          </button>
+          <button
+            onClick={() => setActiveTab("stats")}
+            className={`px-4 py-2 rounded ${
+              activeTab === "stats"
+                ? "bg-gray-800 text-white"
+                : "bg-gray-700 text-gray-300"
+            }`}
+          >
+            Stats & History
+          </button>
+        </div>
+
+        {message && (
+          <p className="mb-4 text-sm text-center text-green-400">{message}</p>
         )}
 
-        <form action={handleUpdate} className="space-y-4">
-          <div>
-            <label className="block mb-1">Username</label>
-            <input
-              type="text"
-              name="username"
-              defaultValue={initialData.username}
-              className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600"
-              required
-            />
-          </div>
+        {activeTab === "profile" && customer && (
+          <div className="flex gap-6">
+            {/* Avatar Card */}
+            <div className="bg-gray-800 rounded-lg p-6 w-1/3 text-center">
+              <div className="w-24 h-24 mx-auto rounded-full bg-gray-600 mb-4" />
+              <h2 className="text-xl font-semibold">{customer.username}</h2>
+              <p className="text-orange-400">Valued Customer</p>
+              <p className="text-sm text-gray-400 mt-2">
+                Member since {new Date(customer.createdAt).toLocaleDateString()}
+              </p>
+            </div>
 
-          <div>
-            <label className="block mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              defaultValue={initialData.email}
-              className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600"
-              required
-            />
+            {/* Info Card */}
+            <div className="bg-gray-800 rounded-lg p-6 w-2/3 space-y-3">
+              <h3 className="text-lg font-semibold mb-2">
+                Personal Information
+              </h3>
+              {[
+                { label: "Username", name: "username", type: "username" },
+                { label: "Email", name: "email", type: "email" },
+                { label: "Phone", name: "phone", type: "text" },
+                { label: "Address", name: "address", type: "text" },
+              ].map(({ label, name, type }) => (
+                <div key={name}>
+                  <label className="block text-sm text-gray-400 mb-1">
+                    {label}
+                  </label>
+                  <input
+                    type={type}
+                    name={name}
+                    value={formData[name] || ""}
+                    onChange={handleInputChange}
+                    className={`w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 ${
+                      editMode ? "text-white" : "text-gray-400"
+                    }`}
+                    disabled={!editMode}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
+        )}
 
-          <div>
-            <label className="block mb-1">Phone</label>
-            <input
-              type="text"
-              name="phone"
-              defaultValue={initialData.phone}
-              className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600"
-              required
-            />
+        {activeTab === "stats" && (
+          <div className="bg-gray-800 p-6 rounded text-gray-400">
+            <p>Booking history, reviews, or usage stats will appear here.</p>
           </div>
-
-          <div>
-            <label className="block mb-1">Address</label>
-            <input
-              type="text"
-              name="address"
-              defaultValue={initialData.address}
-              className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-600"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 rounded"
-          >
-            Update Profile
-          </button>
-        </form>
+        )}
       </div>
     </AuthGuard>
   );

@@ -3,8 +3,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type User = {
-  id: string;
-  name: string;
+  userId: string;
+  username: string;
   email: string;
   role: "customer" | "service_provider";
 };
