@@ -19,7 +19,6 @@ export default function Register() {
     const password = formData.get("password");
     const phone = formData.get("phone");
     const address = formData.get("address");
-    const serviceCategory = formData.get("serviceCategory");
     const experience = formData.get("experience");
     const description = formData.get("description");
 
@@ -36,8 +35,7 @@ export default function Register() {
           phone,
           address,
           role,
-          serviceCategory,
-          experience: parseInt(experience),
+          experience: parseInt((experience as string) || "0"),
           description,
         }),
         credentials: "include",
@@ -143,22 +141,6 @@ export default function Register() {
           </div>
           {role === "service_provider" && (
             <>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-400">
-                  Service Category
-                </label>
-                <select
-                  name="serviceCategory"
-                  required
-                  className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"
-                >
-                  <option value="plumbing">Plumbing</option>
-                  <option value="electrical">Electrical</option>
-                  <option value="cleaning">Cleaning</option>
-                  <option value="painting">Painting</option>
-                  <option value="appliance_repair">Appliance Repair</option>
-                </select>
-              </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-400">
                   Experience

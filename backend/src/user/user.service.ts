@@ -37,7 +37,6 @@ export class UserService {
           email: dto.email,
           phone: dto.phone,
           address: dto.address,
-          serviceCategory: dto.serviceCategory,
           experience: dto.experience,
           description: dto.description,
         },

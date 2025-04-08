@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { CreateBookingDto, UpdateBookingDto } from './dto-booking/booking.dto';
 
@@ -26,7 +26,7 @@ export class BookingController {
     return this.bookingService.create(createBookingDto);
   }
 
-  @Put(':id')
+  @Patch(':id')
   async updateBooking(@Param('id') id: string, @Body() updateBookingDto: UpdateBookingDto) {
     return this.bookingService.update(id, updateBookingDto);
   }

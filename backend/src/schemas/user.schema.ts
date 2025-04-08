@@ -28,8 +28,6 @@ export class User {
   address: string;
 
   // Service Provider Specific Fields
-  @Prop()
-  serviceCategory?: string;
 
   @Prop()
   experience?: number;

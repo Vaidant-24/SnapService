@@ -21,9 +21,6 @@ export class CreateUserDto {
   address: string;
 
   // Service Provider Specific Fields
-  @IsOptional()
-  @IsNotEmpty()
-  serviceCategory?: string;
 
   @IsOptional()
   @IsNumber()

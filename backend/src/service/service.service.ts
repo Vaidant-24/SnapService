@@ -9,7 +9,7 @@ export class ServiceService {
   constructor(@InjectModel(Service.name) private serviceModel: Model<ServiceDocument>) {}
 
   async findAll(): Promise<Service[]> {
-    return this.serviceModel.find({ isActive: true }).populate('providerId', 'username email');
+    return this.serviceModel.find({ isActive: true }).populate('providerId', 'username email phone address');
   }
 
   async findById(serviceId: string): Promise<Service> {

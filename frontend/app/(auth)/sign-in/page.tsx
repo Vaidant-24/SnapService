@@ -9,7 +9,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { setUser } = useAuth(); // ✅ Get setUser from AuthContext
+  const { setUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,18 +31,19 @@ export default function Login() {
       });
 
       const data = await response.json();
+      // console.log("--debug--", data);
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
 
-      setUser(data.user);
-
       switch (data.user.role) {
         case "customer":
+          setUser(data.user);
           router.push("/customer-dashboard");
           break;
         case "service_provider":
+          setUser(data.user);
           router.push("/service-provider-dashboard");
           break;
         default:

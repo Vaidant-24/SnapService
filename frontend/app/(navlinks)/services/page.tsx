@@ -44,7 +44,7 @@ export default function ServicesPage() {
   }, []);
 
   const handleBookNow = (serviceId: string) => {
-    if (!user) {
+    if (user?.role !== "customer") {
       router.push("/sign-in");
     } else {
       router.push(`/book-service?serviceId=${serviceId}`);

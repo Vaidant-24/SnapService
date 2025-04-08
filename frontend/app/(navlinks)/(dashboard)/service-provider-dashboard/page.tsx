@@ -1,231 +1,106 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import AuthGuard from "@/components/auth/AuthGuard";
 
-type UserData = {
-  id: string;
+import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import AuthGuard from "@/components/auth/AuthGuard";
+import AddServiceForm from "@/components/service-provider-dashboard/AddServiceForm";
+import ProviderServices from "@/components/service-provider-dashboard/ProviderServices";
+import ProviderBookings from "@/components/service-provider-dashboard/ProviderBookings";
+
+// Interface definitions
+interface UserData {
+  userId: string;
   username: string;
   email: string;
-};
+  role: string;
+}
 
-type Booking = {
+interface Service {
   _id: string;
-  customerId: string;
-  serviceId: string;
-  date: string;
-  status: string;
-  isPaid: boolean;
-  createdAt: string;
-  providerDetails: { _id: string; username: string; email: string };
-};
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  providerId: string | { _id: string };
+}
 
 export default function ServiceProviderDashboard() {
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
-  const router = useRouter();
-
-  const [newService, setNewService] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-  });
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch("http://localhost:3001/auth/profile", {
-          credentials: "include",
-        });
-        if (!response.ok) throw new Error("Failed to fetch user data");
-        const data = await response.json();
-        setUserData(data);
-      } catch (error) {
-        console.error("Error fetching user data", error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
+  const { user: userData } = useAuth();
+  const [showAddForm, setShowAddForm] = useState<boolean>(false);
+  const [myServices, setMyServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (!userData) return;
 
-    const fetchBookings = async () => {
+    const fetchServices = async () => {
       try {
-        const response = await fetch("http://localhost:3001/bookings");
-        if (!response.ok) throw new Error("Failed to fetch bookings");
-        const data = await response.json();
+        const servicesRes = await fetch("http://localhost:3001/services");
 
-        const providerBookings = data.filter(
-          (booking: Booking) => booking.providerDetails._id === userData.id
-        );
-        setBookings(providerBookings);
+        if (!servicesRes.ok) throw new Error("Failed to fetch services");
+
+        const servicesData = await servicesRes.json();
+
+        const myServicesData = servicesData.filter((service: Service) => {
+          const providerId =
+            typeof service.providerId === "object"
+              ? service.providerId._id
+              : service.providerId;
+          return providerId === userData.userId;
+        });
+
+        setMyServices(myServicesData);
       } catch (error) {
-        console.error("Error fetching bookings", error);
+        console.error("Fetch error:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBookings();
+    fetchServices();
   }, [userData]);
 
-  const handleAddService = async () => {
-    if (!userData) return;
-    // console.log("Adding service with data:", newService);
-    // console.log("User ID:", userData.id);
-
-    try {
-      const response = await fetch("http://localhost:3001/services", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          ...newService,
-          price: Number(newService.price),
-          providerId: userData.id,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to add service");
-      const result = await response.json();
-
-      setSubmitMessage("Service added successfully!");
-      setShowAddForm(false);
-      setNewService({
-        name: "",
-        description: "",
-        price: "",
-        category: "",
-      });
-
-      // Optionally refresh bookings or services list here
-    } catch (error) {
-      console.error("Add service error:", error);
-      setSubmitMessage("Something went wrong while adding the service.");
-    }
+  const handleServiceAdded = (newService: Service) => {
+    setMyServices((prev) => [...prev, newService]);
   };
 
   return (
     <AuthGuard>
-      <div className="container mx-auto px-4 py-8 bg-black text-white min-h-screen">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Service Provider Dashboard</h1>
+      <div className="container mx-auto px-6 py-12 bg-black text-white min-h-screen">
+        <header className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl text-orange-500 font-bold">
+            Service Provider Dashboard
+          </h1>
           <button
             onClick={() => setShowAddForm(true)}
             className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-semibold"
           >
-            + Add New Service
+            Add New Service
           </button>
-        </div>
+        </header>
 
         {loading ? (
           <p>Loading...</p>
         ) : (
           <>
-            <h2 className="text-xl font-semibold mb-4">
-              Welcome, {userData?.username}
-            </h2>
+            <section className="mb-6">
+              <h2 className="text-2xl  mb-2">
+                Welcome,{" "}
+                <span className="text-2xl text-green-500 font-bold">
+                  {userData?.username}
+                </span>
+              </h2>
+            </section>
 
             {showAddForm && (
-              <div className="bg-gray-900 p-6 rounded-lg mb-6">
-                <h3 className="text-lg font-bold mb-4">Add New Service</h3>
-                <div className="space-y-4">
-                  <input
-                    type="text"
-                    placeholder="Service Title"
-                    value={newService.name}
-                    onChange={(e) =>
-                      setNewService({ ...newService, name: e.target.value })
-                    }
-                    className="w-full p-2 bg-gray-800 text-white border border-gray-700 rounded"
-                  />
-                  <textarea
-                    placeholder="Description"
-                    value={newService.description}
-                    onChange={(e) =>
-                      setNewService({
-                        ...newService,
-                        description: e.target.value,
-                      })
-                    }
-                    className="w-full p-2 bg-gray-800 text-white border border-gray-700 rounded"
-                    rows={3}
-                  />
-                  <input
-                    type="number"
-                    placeholder="Price"
-                    value={newService.price}
-                    onChange={(e) =>
-                      setNewService({
-                        ...newService,
-                        price: e.target.value,
-                      })
-                    }
-                    className="w-full p-2 bg-gray-800 text-white border border-gray-700 rounded"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Category"
-                    value={newService.category}
-                    onChange={(e) =>
-                      setNewService({ ...newService, category: e.target.value })
-                    }
-                    className="w-full p-2 bg-gray-800 text-white border border-gray-700 rounded"
-                  />
-
-                  <div className="flex space-x-4">
-                    <button
-                      onClick={handleAddService}
-                      className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setShowAddForm(false)}
-                      className="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-                {submitMessage && (
-                  <p className="mt-4 text-sm text-green-400">{submitMessage}</p>
-                )}
-              </div>
+              <AddServiceForm
+                onServiceAdded={handleServiceAdded}
+                onCancel={() => setShowAddForm(false)}
+              />
             )}
 
-            <h3 className="text-lg font-semibold mt-6 mb-4">Bookings</h3>
-            {bookings.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {bookings.map((booking) => (
-                  <div key={booking._id} className="bg-gray-900 p-6 rounded-lg">
-                    <p className="text-gray-300">
-                      Customer ID: {booking.customerId}
-                    </p>
-                    <p className="text-gray-300">
-                      Service ID: {booking.serviceId}
-                    </p>
-                    <p className="text-gray-300">
-                      Date: {new Date(booking.date).toDateString()}
-                    </p>
-                    <p className="text-gray-300">Status: {booking.status}</p>
-                    <p className="text-gray-300">
-                      Payment: {booking.isPaid ? "Paid" : "Pending"}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p>No bookings yet.</p>
-            )}
+            <ProviderServices services={myServices} />
+            {userData && <ProviderBookings providerId={userData?.userId} />}
           </>
         )}
       </div>

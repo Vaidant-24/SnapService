@@ -144,11 +144,6 @@ const ServiceProviderProfile = () => {
                 { label: "Phone", name: "phone", type: "text" },
                 { label: "Address", name: "address", type: "text" },
                 {
-                  label: "Service Category",
-                  name: "serviceCategory",
-                  type: "text",
-                },
-                {
                   label: "Experience (years)",
                   name: "experience",
                   type: "number",

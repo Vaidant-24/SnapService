@@ -5,10 +5,6 @@ import { BaseUserUpdateDto } from './base-user-dto';
 
 export class UpdateProviderDto extends PartialType(BaseUserUpdateDto) {
   @IsOptional()
-  @IsString()
-  serviceCategory?: string;
-
-  @IsOptional()
   @IsInt()
   @Min(0)
   experience?: number;
