@@ -2,7 +2,10 @@ import { IsEmail, IsNotEmpty, IsEnum, IsOptional, MinLength, IsNumber } from 'cl
 
 export class CreateUserDto {
   @IsNotEmpty()
-  username: string;
+  firstName: string;
+
+  @IsNotEmpty()
+  lastName: string;
 
   @IsEmail()
   email: string;

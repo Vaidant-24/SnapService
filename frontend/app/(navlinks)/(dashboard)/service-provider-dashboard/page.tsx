@@ -5,12 +5,13 @@ import { useAuth } from "@/context/AuthContext";
 import AuthGuard from "@/components/auth/AuthGuard";
 import AddServiceForm from "@/components/service-provider-dashboard/AddServiceForm";
 import ProviderServices from "@/components/service-provider-dashboard/ProviderServices";
-import ProviderBookings from "@/components/service-provider-dashboard/ProviderBookings";
+import ProviderTopBookings from "@/components/service-provider-dashboard/TopBookings";
 
 // Interface definitions
 interface UserData {
   userId: string;
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: string;
 }
@@ -87,20 +88,20 @@ export default function ServiceProviderDashboard() {
               <h2 className="text-2xl  mb-2">
                 Welcome,{" "}
                 <span className="text-2xl text-green-500 font-bold">
-                  {userData?.username}
+                  {userData?.firstName + " " + userData?.lastName}
                 </span>
               </h2>
             </section>
-
             {showAddForm && (
               <AddServiceForm
                 onServiceAdded={handleServiceAdded}
                 onCancel={() => setShowAddForm(false)}
               />
             )}
-
+            {/* // Provider Services Component */}
             <ProviderServices services={myServices} />
-            {userData && <ProviderBookings providerId={userData?.userId} />}
+            {/* // Provider Bookings Component */}
+            {userData && <ProviderTopBookings providerId={userData?.userId} />}
           </>
         )}
       </div>

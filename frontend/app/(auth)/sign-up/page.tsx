@@ -14,7 +14,8 @@ export default function Register() {
     setError("");
 
     const formData = new FormData(e.target as HTMLFormElement);
-    const username = formData.get("name");
+    const firstName = formData.get("firstName");
+    const lastName = formData.get("lastName");
     const email = formData.get("email");
     const password = formData.get("password");
     const phone = formData.get("phone");
@@ -29,7 +30,8 @@ export default function Register() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username,
+          firstName,
+          lastName,
           email,
           password,
           phone,
@@ -73,10 +75,21 @@ export default function Register() {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-400">
-              Name
+              First Name
             </label>
             <input
-              name="name"
+              name="firstName"
+              type="text"
+              required
+              className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-400">
+              Last Name
+            </label>
+            <input
+              name="lastName"
               type="text"
               required
               className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"

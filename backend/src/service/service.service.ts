@@ -9,13 +9,13 @@ export class ServiceService {
   constructor(@InjectModel(Service.name) private serviceModel: Model<ServiceDocument>) {}
 
   async findAll(): Promise<Service[]> {
-    return this.serviceModel.find({ isActive: true }).populate('providerId', 'username email phone address');
+    return this.serviceModel.find({ isActive: true }).populate('providerId', 'firstName lastName email phone address');
   }
 
   async findById(serviceId: string): Promise<Service> {
     const service = await this.serviceModel
       .findById(serviceId)
-      .populate('providerId', 'username email phone address experience');
+      .populate('providerId', 'firstName lastName email phone address experience');
     if (!service) throw new NotFoundException('Service not found');
     return service;
   }

@@ -11,12 +11,23 @@ type Service = {
   price: number;
   category: string;
   providerId: {
-    username: string;
+    firstName: string;
+    lastName: string;
     email: string;
     phone: string;
     address: string;
     experience?: string;
   };
+};
+
+type User = {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: "customer" | "service_provider";
+  phone?: string;
+  address?: string;
 };
 
 export default function BookService() {
@@ -28,6 +39,7 @@ export default function BookService() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const serviceId = searchParams.get("serviceId");
+  const [userData, setUserData] = useState<User>({} as User);
 
   const { user: customer, loading: loadingUser } = useAuth();
 
@@ -55,8 +67,22 @@ export default function BookService() {
         setLoadingService(false);
       }
     };
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/auth/profile", {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Unauthorized");
+
+        const userData = await res.json();
+        setUserData(userData);
+      } catch (error) {
+        setError("Error fetching user data:");
+      }
+    };
 
     fetchService();
+    fetchUser();
   }, [serviceId]);
 
   const handleBooking = async () => {
@@ -69,6 +95,8 @@ export default function BookService() {
       alert("Please select a date and time for your booking.");
       return;
     }
+    // console.log("userData", userData);
+    console.log("date", date);
 
     try {
       const response = await fetch("http://localhost:3001/bookings", {
@@ -79,8 +107,10 @@ export default function BookService() {
           customerId: customer.userId,
           serviceId,
           providerDetails: service?.providerId,
-          customerName: customer.username,
+          customerName: customer.firstName + " " + customer.lastName,
           customerEmail: customer.email,
+          customerPhone: userData.phone,
+          customerAddress: userData.address,
           serviceName: service?.name,
           date,
           time,
@@ -148,7 +178,9 @@ export default function BookService() {
                 <div className="grid sm:grid-cols-2 gap-4 text-sm">
                   <p>
                     <span className="text-gray-300">Name:</span>{" "}
-                    {service.providerId?.username}
+                    {service.providerId?.firstName +
+                      " " +
+                      service.providerId.lastName}
                   </p>
                   <p>
                     <span className="text-gray-300">Phone:</span>{" "}

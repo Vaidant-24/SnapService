@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Service = {
   _id: string;
@@ -8,7 +9,7 @@ type Service = {
   description: string;
   price: number;
   category: string;
-  providerId: { username: string };
+  providerId: { firstName: string; lastName: string };
 };
 
 export default function FeaturedServices() {
@@ -46,14 +47,17 @@ export default function FeaturedServices() {
       <h2 className="text-xl font-semibold mb-4">Featured Services</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {services.slice(0, 3).map((service) => (
-          <div key={service._id} className="bg-gray-900 p-6 rounded-lg shadow">
-            <h3 className="text-lg font-bold">{service.name}</h3>
-            <p className="text-gray-400">{service.description}</p>
+        {services.slice(0, 6).map((service) => (
+          <div key={service._id} className="bg-gray-800 p-6 rounded-lg shadow">
+            <h3 className="text-lg font-bold">Name: {service.name}</h3>
+            <p className="text-gray-400">Description: {service.description}</p>
             <p className="text-gray-300">Category: {service.category}</p>
-            <p className="text-orange-400 font-bold">₹{service.price}</p>
+            <p className="text-orange-400 font-bold">Price: ₹{service.price}</p>
             <p className="text-gray-400">
-              Provider: {service.providerId?.username || "N/A"}
+              Provider:{" "}
+              {service.providerId?.firstName +
+                " " +
+                service.providerId.lastName || "N/A"}
             </p>
 
             <button
@@ -67,13 +71,12 @@ export default function FeaturedServices() {
       </div>
 
       {/* Button to navigate to full Services Page */}
-      <div className="text-center mt-6">
-        <button
-          onClick={() => router.push("/services")}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md"
-        >
-          View All Services
-        </button>
+      <div className="mt-6 text-center">
+        <Link href="/services">
+          <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md">
+            View All Services
+          </button>
+        </Link>
       </div>
     </div>
   );

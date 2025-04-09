@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: string; username: string; email: string; role: string }) {
+  async validate(payload: { sub: string; firstName: string; lastName: string; email: string; role: string }) {
     const isValid = await this.authService.verifyToken(payload.sub);
 
     if (!isValid) {
@@ -27,7 +27,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     return {
       userId: payload.sub,
-      username: payload.username,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
       email: payload.email,
       role: payload.role,
     };

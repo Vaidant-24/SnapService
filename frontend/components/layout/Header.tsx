@@ -69,6 +69,26 @@ const Header = () => {
             Dashboard
           </Link>
         )}
+
+        {user?.role === "customer" && (
+          <Link
+            href="/customer-bookings"
+            onClick={toggleMenu}
+            className="hover:text-orange-500 transition duration-300"
+          >
+            Bookings
+          </Link>
+        )}
+
+        {user?.role === "service_provider" && (
+          <Link
+            href="/service-provider-bookings"
+            onClick={toggleMenu}
+            className="hover:text-orange-500 transition duration-300"
+          >
+            Bookings
+          </Link>
+        )}
         {user?.role !== "service_provider" && (
           <Link
             href="/services"
@@ -189,6 +209,26 @@ const Header = () => {
               className="hover:text-orange-500 transition duration-300"
             >
               Services
+            </Link>
+          )}
+
+          {user?.role === "customer" && (
+            <Link
+              href="/customer-bookings"
+              onClick={toggleMenu}
+              className="hover:text-orange-500 transition duration-300"
+            >
+              Bookings
+            </Link>
+          )}
+
+          {user?.role === "service_provider" && (
+            <Link
+              href="/service-provider-bookings"
+              onClick={toggleMenu}
+              className="hover:text-orange-500 transition duration-300"
+            >
+              Bookings
             </Link>
           )}
 

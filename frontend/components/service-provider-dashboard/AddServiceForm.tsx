@@ -93,7 +93,7 @@ export default function AddServiceForm({
   };
 
   return (
-    <section className="bg-gray-900 p-6 rounded-lg mb-6">
+    <section className="bg-gray-800 p-6 rounded-lg mb-6">
       <h3 className="text-lg font-bold mb-4">Add New Service</h3>
       <form onSubmit={handleFormSubmit} className="space-y-4">
         <input

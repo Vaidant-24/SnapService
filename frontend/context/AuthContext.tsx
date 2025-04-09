@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 
 type User = {
   userId: string;
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: "customer" | "service_provider";
 };

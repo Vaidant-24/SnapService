@@ -11,7 +11,8 @@ type Service = {
   price: number;
   category: string;
   providerId: {
-    username: string;
+    firstName: string;
+    lastName: string;
     email: string;
     phone: string;
     address: string;
@@ -21,6 +22,10 @@ type Service = {
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
+  const [filteredServices, setFilteredServices] = useState<Service[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -31,8 +36,15 @@ export default function ServicesPage() {
       try {
         const response = await fetch("http://localhost:3001/services");
         if (!response.ok) throw new Error("Failed to fetch services");
-        const data = await response.json();
+        const data: Service[] = await response.json();
         setServices(data);
+        setFilteredServices(data);
+
+        // Extract unique categories
+        const uniqueCategories = Array.from(
+          new Set(data.map((service: Service) => service.category))
+        );
+        setCategories(uniqueCategories);
       } catch (error) {
         setError("Unable to load services.");
       } finally {
@@ -43,12 +55,28 @@ export default function ServicesPage() {
     fetchServices();
   }, []);
 
+  useEffect(() => {
+    if (selectedCategory === "All") {
+      setFilteredServices(services);
+    } else {
+      const filtered = services.filter(
+        (service) => service.category === selectedCategory
+      );
+      setFilteredServices(filtered);
+    }
+  }, [selectedCategory, services]);
+
   const handleBookNow = (serviceId: string) => {
     if (user?.role !== "customer") {
       router.push("/sign-in");
     } else {
       router.push(`/book-service?serviceId=${serviceId}`);
     }
+  };
+
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    setIsDropdownOpen(false);
   };
 
   return (
@@ -68,16 +96,74 @@ export default function ServicesPage() {
           )}
         </div>
 
+        <div className="mb-6 flex justify-end">
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md flex items-center border border-gray-700"
+            >
+              Category: {selectedCategory}
+              <svg
+                className="w-4 h-4 ml-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d={isDropdownOpen ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"}
+                ></path>
+              </svg>
+            </button>
+
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-10 border border-gray-700">
+                <ul className="py-1">
+                  <li key="all-categories">
+                    <button
+                      onClick={() => handleCategorySelect("All")}
+                      className={`block w-full text-left px-4 py-2 hover:bg-gray-700 ${
+                        selectedCategory === "All"
+                          ? "bg-gray-700 text-white"
+                          : "text-gray-300"
+                      }`}
+                    >
+                      All
+                    </button>
+                  </li>
+                  {categories.map((category) => (
+                    <li key={category}>
+                      <button
+                        onClick={() => handleCategorySelect(category)}
+                        className={`block w-full text-left px-4 py-2 hover:bg-gray-700 ${
+                          selectedCategory === category
+                            ? "bg-gray-700 text-white"
+                            : "text-gray-300"
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+
         {loading ? (
           <p className="text-center text-gray-400">Loading services...</p>
         ) : error ? (
           <p className="text-center text-red-500">{error}</p>
-        ) : services.length > 0 ? (
+        ) : filteredServices.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service) => (
+            {filteredServices.map((service) => (
               <div
                 key={service._id}
-                className="bg-gray-900 p-6 rounded-xl shadow hover:shadow-orange-500/20 transition-all duration-300"
+                className="bg-gray-800 p-6 rounded-xl shadow hover:shadow-orange-500/20 transition-all duration-300"
               >
                 <h2 className="text-xl font-semibold text-white mb-2">
                   {service.name}
@@ -92,7 +178,9 @@ export default function ServicesPage() {
                 <p className="text-sm text-gray-400 mb-4">
                   Provider:{" "}
                   <span className="text-white">
-                    {service.providerId?.username || "N/A"}
+                    {service.providerId?.firstName +
+                      " " +
+                      service.providerId.lastName || "N/A"}
                   </span>
                 </p>
                 <button
@@ -105,7 +193,11 @@ export default function ServicesPage() {
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-400">No services available.</p>
+          <p className="text-center text-gray-400">
+            {services.length > 0
+              ? `No services available in the "${selectedCategory}" category.`
+              : "No services available."}
+          </p>
         )}
       </div>
     </div>

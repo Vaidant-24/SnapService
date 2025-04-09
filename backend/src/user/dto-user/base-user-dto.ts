@@ -4,7 +4,11 @@ import { IsOptional, IsString, IsPhoneNumber } from 'class-validator';
 export class BaseUserUpdateDto {
   @IsOptional()
   @IsString()
-  username?: string;
+  firstName?: string;
+
+  @IsOptional()
+  @IsString()
+  lastName?: string;
 
   @IsOptional()
   @IsString()

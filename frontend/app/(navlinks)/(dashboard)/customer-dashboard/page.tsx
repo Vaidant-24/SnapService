@@ -2,7 +2,7 @@
 import { useAuth } from "@/context/AuthContext";
 import AuthGuard from "@/components/auth/AuthGuard";
 import FeaturedServices from "@/components/customer-dashboard/FeaturedServices";
-import CustomerBookings from "@/components/customer-dashboard/CustomerBookings";
+import CustomerTopBookings from "@/components/customer-dashboard/TopBooking";
 
 export default function CustomerDashboard() {
   const { user: userData } = useAuth();
@@ -11,7 +11,7 @@ export default function CustomerDashboard() {
     <AuthGuard>
       <div className="container mx-8 px-8 py-16 bg-black text-white min-h-screen">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl text-orange-500 font-bold">
+          <h1 className="text-3xl text-orange-500 font-medium">
             Customer Dashboard
           </h1>
         </div>
@@ -20,10 +20,10 @@ export default function CustomerDashboard() {
           <p>Unable to load user data.</p>
         ) : (
           <>
-            <h2 className="text-xl mb-4">
+            <h2 className="text-xl  mb-4">
               Welcome,{" "}
-              <span className="text-2xl text-orange-500">
-                {userData.username}
+              <span className="text-2xl text-green-400 font-semibold">
+                {userData.firstName + " " + userData.lastName}
               </span>
             </h2>
 
@@ -31,7 +31,7 @@ export default function CustomerDashboard() {
             <FeaturedServices />
 
             {/* Customer's Bookings Component */}
-            <CustomerBookings userId={userData.userId} />
+            <CustomerTopBookings userId={userData.userId} limit={5} />
           </>
         )}
       </div>

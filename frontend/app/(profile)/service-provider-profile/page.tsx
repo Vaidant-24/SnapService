@@ -124,7 +124,9 @@ const ServiceProviderProfile = () => {
             {/* Avatar Card */}
             <div className="bg-gray-800 rounded-lg p-6 w-1/3 text-center">
               <div className="w-24 h-24 mx-auto rounded-full bg-gray-600 mb-4" />
-              <h2 className="text-xl font-semibold">{provider.username}</h2>
+              <h2 className="text-xl font-semibold">
+                {provider.firstName + " " + provider.lastName}
+              </h2>
               <p className="text-orange-400">
                 {provider.serviceCategory || "Not set"}
               </p>
@@ -139,7 +141,8 @@ const ServiceProviderProfile = () => {
                 Personal Information
               </h3>
               {[
-                { label: "Username", name: "username", type: "username" },
+                { label: "First Name", name: "firstName", type: "firstName" },
+                { label: "Last Name", name: "lastName", type: "lastName" },
                 { label: "Email", name: "email", type: "email" },
                 { label: "Phone", name: "phone", type: "text" },
                 { label: "Address", name: "address", type: "text" },

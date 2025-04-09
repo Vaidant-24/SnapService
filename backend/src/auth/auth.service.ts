@@ -22,15 +22,9 @@ export class AuthService {
       throw new ConflictException('Email already exists');
     }
 
-    // Check if username already exists
-    const usernameExists = await this.userModel.findOne({ username: createUserDto.username }).exec();
-
-    if (usernameExists) {
-      throw new ConflictException('Username already exists');
-    }
-
     // Create new user
     const createdUser = new this.userModel(createUserDto);
+
     await createdUser.save();
 
     return { message: 'User registered successfully' };
@@ -57,7 +51,8 @@ export class AuthService {
     // Generate JWT token
     const payload = {
       sub: user._id,
-      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       role: user.role,
     };
@@ -66,7 +61,8 @@ export class AuthService {
       token: this.jwtService.sign(payload),
       user: {
         userId: user._id,
-        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
         role: user.role,
       },
@@ -83,7 +79,8 @@ export class AuthService {
 
     return {
       userId: user._id,
-      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       phone: user.phone,
       address: user.address,

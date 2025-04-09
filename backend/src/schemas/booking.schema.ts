@@ -24,7 +24,16 @@ export class Booking {
   customerEmail: string;
 
   @Prop({ required: true })
+  customerPhone: string;
+
+  @Prop({ required: true })
+  customerAddress: string;
+
+  @Prop({ required: true })
   date: Date;
+
+  @Prop({ required: true })
+  time: string;
 
   @Prop({ default: 'Pending', enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'] })
   status: string;
