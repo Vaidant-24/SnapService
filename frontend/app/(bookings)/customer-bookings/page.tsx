@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
 import AuthGuard from "@/components/auth/AuthGuard";
-import CustomerBookings from "@/components/customer-dashboard/AllBookings";
+import CustomerBookings from "@/components/customer-dashboard/CustomerBookings";
 
 export default function CustomerAllBookings() {
   const { user: userData } = useAuth();

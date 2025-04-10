@@ -44,7 +44,7 @@ export class Booking {
   @Prop({ default: 0 })
   amountPaid?: number; // Total amount paid for the booking
 
-  @Prop({ default: 'Cash', enum: ['Cash', 'Online', 'UPI', 'Card'] })
+  @Prop({ default: 'Cash', enum: ['Cash', 'Online'] })
   paymentMethod?: string; // Optional: payment mode
 
   @Prop({ default: '' })

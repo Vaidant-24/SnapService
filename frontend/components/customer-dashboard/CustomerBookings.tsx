@@ -1,21 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-
-type Service = {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  providerId: { username: string };
-};
-
-type Booking = {
-  _id: string;
-  serviceId: Service;
-  date: string;
-  status: "Pending" | "Confirmed" | "Cancelled";
-};
+import { Booking } from "../type/Booking";
 
 type FilterOption = "All" | "Pending" | "Confirmed" | "Cancelled";
 
@@ -81,7 +66,7 @@ export default function CustomerBookings({ userId }: CustomerBookingsProps) {
         <div className="relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center"
+            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md flex items-center"
           >
             Filter: {filterStatus}
             <svg
@@ -130,26 +115,51 @@ export default function CustomerBookings({ userId }: CustomerBookingsProps) {
               key={booking._id}
               className="bg-gray-800 p-6 rounded-lg shadow"
             >
-              <h3 className="text-lg font-bold">{booking.serviceId.name}</h3>
-              <p className="text-gray-400">{booking.serviceId.description}</p>
-              <p className="text-orange-400 font-bold">
-                ₹{booking.serviceId.price}
+              <p className="text-lg ">
+                Service:{" "}
+                <span className="text-md">{booking.serviceId.name}</span>
               </p>
-              <p className="text-gray-300">
+              <p className="text-lg">
+                Description:{" "}
+                <span className=" text-md">
+                  {booking.serviceId.description}
+                </span>
+              </p>
+
+              <p className="text-lg">
+                Price:{" "}
+                <span className="text-orange-400 text-md">
+                  ₹{booking.serviceId.price}
+                </span>
+              </p>
+              <p className="text-lg">
                 Date: {new Date(booking.date).toLocaleDateString()}
               </p>
-              <p
-                className={`text-sm font-semibold ${
-                  booking.status === "Pending"
-                    ? "text-yellow-400"
-                    : booking.status === "Confirmed"
-                    ? "text-green-400"
-                    : booking.status === "Cancelled"
-                    ? "text-red-400"
-                    : "text-blue-400"
-                }`}
-              >
-                Status: {booking.status}
+              <p className="text-lg">
+                Status:{" "}
+                <span
+                  className={`text-md ${
+                    booking.status === "Pending"
+                      ? "text-yellow-400"
+                      : booking.status === "Confirmed"
+                      ? "text-green-400"
+                      : booking.status === "Cancelled"
+                      ? "text-red-400"
+                      : "text-blue-400"
+                  }`}
+                >
+                  {booking.status}
+                </span>
+              </p>
+              <p className="text-lg">
+                Payment:{" "}
+                <span
+                  className={`text-md ${
+                    booking.isPaid ? "text-green-400" : "text-red-400"
+                  }`}
+                >
+                  {booking.isPaid ? "Paid" : "Not Paid"}
+                </span>
               </p>
             </div>
           ))}

@@ -2,7 +2,7 @@
 import { useAuth } from "@/context/AuthContext";
 import AuthGuard from "@/components/auth/AuthGuard";
 import FeaturedServices from "@/components/customer-dashboard/FeaturedServices";
-import CustomerTopBookings from "@/components/customer-dashboard/TopBooking";
+import CustomerUpcomingBooking from "@/components/customer-dashboard/UpcomingBookings";
 
 export default function CustomerDashboard() {
   const { user: userData } = useAuth();
@@ -31,7 +31,7 @@ export default function CustomerDashboard() {
             <FeaturedServices />
 
             {/* Customer's Bookings Component */}
-            <CustomerTopBookings userId={userData.userId} limit={5} />
+            <CustomerUpcomingBooking userId={userData.userId} limit={3} />
           </>
         )}
       </div>

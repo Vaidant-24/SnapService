@@ -3,32 +3,13 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import AuthGuard from "@/components/auth/AuthGuard";
-
-type Service = {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  providerId: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    address: string;
-    experience?: string;
-  };
-};
-
-type User = {
-  userId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: "customer" | "service_provider";
-  phone?: string;
-  address?: string;
-};
+import { Service } from "@/components/type/Service";
+import { User } from "@/components/type/User";
+import ServiceInfo from "@/components/book-service/ServiceInfo";
+import ProviderInfo from "@/components/book-service/ProviderInfo";
+import BookingForm, {
+  PaymentMethod,
+} from "@/components/book-service/BookingForm";
 
 export default function BookService() {
   const [service, setService] = useState<Service | null>(null);
@@ -40,6 +21,9 @@ export default function BookService() {
   const searchParams = useSearchParams();
   const serviceId = searchParams.get("serviceId");
   const [userData, setUserData] = useState<User>({} as User);
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("Cash");
 
   const { user: customer, loading: loadingUser } = useAuth();
 
@@ -76,6 +60,8 @@ export default function BookService() {
 
         const userData = await res.json();
         setUserData(userData);
+        setAddress(userData.address || "");
+        setPhone(userData.phone || "");
       } catch (error) {
         setError("Error fetching user data:");
       }
@@ -96,7 +82,6 @@ export default function BookService() {
       return;
     }
     // console.log("userData", userData);
-    console.log("date", date);
 
     try {
       const response = await fetch("http://localhost:3001/bookings", {
@@ -109,8 +94,9 @@ export default function BookService() {
           providerDetails: service?.providerId,
           customerName: customer.firstName + " " + customer.lastName,
           customerEmail: customer.email,
-          customerPhone: userData.phone,
-          customerAddress: userData.address,
+          customerPhone: phone,
+          customerAddress: address,
+          paymentMethod: paymentMethod,
           serviceName: service?.name,
           date,
           time,
@@ -149,92 +135,25 @@ export default function BookService() {
           ) : service ? (
             <div className="space-y-6">
               {/* Service Info */}
-              <div>
-                <h2 className="text-xl font-semibold text-orange-400 mb-2 border-b border-gray-700 pb-1">
-                  Service Information
-                </h2>
-                <p>
-                  <span className="font-semibold">Name:</span> {service.name}
-                </p>
-                <p>
-                  <span className="font-semibold">Description:</span>{" "}
-                  {service.description}
-                </p>
-                <p>
-                  <span className="font-semibold">Category:</span>{" "}
-                  {service.category}
-                </p>
-                <p>
-                  <span className="font-semibold text-orange-400">Price:</span>{" "}
-                  ₹{service.price}
-                </p>
-              </div>
+              <ServiceInfo service={service} />
 
               {/* Provider Info */}
-              <div>
-                <h2 className="text-xl font-semibold text-orange-400 mb-2 border-b border-gray-700 pb-1">
-                  Provider Details
-                </h2>
-                <div className="grid sm:grid-cols-2 gap-4 text-sm">
-                  <p>
-                    <span className="text-gray-300">Name:</span>{" "}
-                    {service.providerId?.firstName +
-                      " " +
-                      service.providerId.lastName}
-                  </p>
-                  <p>
-                    <span className="text-gray-300">Phone:</span>{" "}
-                    {service.providerId?.phone}
-                  </p>
-                  <p>
-                    <span className="text-gray-300">Email:</span>{" "}
-                    {service.providerId?.email}
-                  </p>
-                  <p>
-                    <span className="text-gray-300">Experience:</span>{" "}
-                    {service.providerId?.experience ?? "N/A"} yr
-                  </p>
-                </div>
-              </div>
+              <ProviderInfo service={service} />
 
               {/* Booking Form */}
-              <div>
-                <h2 className="text-xl font-semibold text-orange-400 mb-2 border-b border-gray-700 pb-1">
-                  Choose Date & Time
-                </h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block mb-1 text-sm text-gray-400">
-                      Select Date:
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full bg-gray-800 p-2 rounded-md text-white focus:ring-2 focus:ring-orange-500"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-1 text-sm text-gray-400">
-                      Select Time:
-                    </label>
-                    <input
-                      type="time"
-                      className="w-full bg-gray-800 p-2 rounded-md text-white focus:ring-2 focus:ring-orange-500"
-                      value={time}
-                      onChange={(e) => setTime(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Button */}
-              <button
-                onClick={handleBooking}
-                className="w-full mt-6 bg-orange-500 hover:bg-orange-600 transition-all duration-300 text-white py-3 rounded-lg text-lg font-semibold"
-              >
-                Confirm Booking
-              </button>
+              <BookingForm
+                date={date}
+                time={time}
+                address={address}
+                phone={phone}
+                paymentMethod={paymentMethod}
+                setDate={setDate}
+                setTime={setTime}
+                setAddress={setAddress}
+                setPhone={setPhone}
+                setPaymentMethod={setPaymentMethod}
+                onSubmit={handleBooking}
+              />
             </div>
           ) : (
             <p className="text-center text-gray-400">Service not found.</p>

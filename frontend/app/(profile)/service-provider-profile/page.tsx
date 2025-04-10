@@ -9,6 +9,8 @@ const ServiceProviderProfile = () => {
   const [formData, setFormData] = useState<any>({});
   const [message, setMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("profile");
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [avgRating, setAvgRating] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -19,13 +21,38 @@ const ServiceProviderProfile = () => {
         const data = await res.json();
         setProvider(data);
         setFormData(data);
+        fetchReviews(data.userId); // Fetch reviews for the provider
       } catch (err) {
         console.error("Failed to fetch provider profile:", err);
       }
     };
 
+    const fetchReviews = async (providerId: string) => {
+      try {
+        const res = await fetch(
+          `http://localhost:3001/review/provider/${providerId}`
+        );
+        if (!res.ok) throw new Error("Failed to fetch reviews");
+
+        const data = await res.json();
+
+        setReviews(data);
+
+        const avg =
+          data.length > 0
+            ? data.reduce((acc: number, r: any) => acc + r.rating, 0) /
+              data.length
+            : null;
+        setAvgRating(avg);
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      }
+    };
+
     fetchProfile();
   }, []);
+
+  // console.log("provider reviews: ", reviews);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -190,7 +217,49 @@ const ServiceProviderProfile = () => {
 
         {activeTab === "stats" && (
           <div className="bg-gray-800 p-6 rounded text-gray-400">
-            <p>Stats and reviews will appear here.</p>
+            <div>
+              <h2 className="text-xl font-bold text-orange-400 mb-4">
+                Reviews & Ratings
+              </h2>
+
+              {avgRating !== null && (
+                <div className="mb-4">
+                  <p className="text-lg text-white font-semibold">
+                    ⭐ Average Rating:{" "}
+                    <span className="text-yellow-400">
+                      {avgRating.toFixed(1)}
+                    </span>{" "}
+                    / 5
+                  </p>
+                </div>
+              )}
+
+              {reviews.length === 0 ? (
+                <p>No reviews yet.</p>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((review) => (
+                    <div
+                      key={review._id}
+                      className="bg-gray-700 rounded p-4 border border-gray-600"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-yellow-400 font-bold">
+                          ⭐ {review.rating}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="mt-2 text-white">{review.comment}</p>
+                        <span className="text-xs text-gray-400">
+                          ~ {review.customerId.firstName}{" "}
+                          {review.customerId.lastName}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

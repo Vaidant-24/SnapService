@@ -2,27 +2,19 @@
 
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { Service } from "../type/Service";
 
-interface AddServiceFormProps {
+type AddServiceFormProps = {
   onServiceAdded: (service: Service) => void;
   onCancel: () => void;
-}
+};
 
-interface ServiceFormData {
+type ServiceFormData = {
   name: string;
   description: string;
   price: string;
   category: string;
-}
-
-interface Service {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  providerId: string | { _id: string };
-}
+};
 
 const categories = [
   "Cleaning",
@@ -30,7 +22,6 @@ const categories = [
   "Electrical",
   "Carpentry",
   "Pest Control",
-  "Home Repair",
   "Painting",
   "Appliance Repair",
 ];

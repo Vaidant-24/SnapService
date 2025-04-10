@@ -11,6 +11,7 @@ import { Booking, BookingSchema } from './schemas/booking.schema';
 import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 import { User, UserSchema } from './schemas/user.schema';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { User, UserSchema } from './schemas/user.schema';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Service.name, schema: ServiceSchema }]),
     MongooseModule.forFeature([{ name: Booking.name, schema: BookingSchema }]),
+    ReviewModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {

@@ -2,15 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-type Service = {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  providerId: { firstName: string; lastName: string };
-};
+import { Service } from "../type/Service";
 
 export default function FeaturedServices() {
   const [services, setServices] = useState<Service[]>([]);
@@ -73,7 +65,7 @@ export default function FeaturedServices() {
       {/* Button to navigate to full Services Page */}
       <div className="mt-6 text-center">
         <Link href="/services">
-          <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md">
+          <button className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-4 py-2 rounded-md">
             View All Services
           </button>
         </Link>

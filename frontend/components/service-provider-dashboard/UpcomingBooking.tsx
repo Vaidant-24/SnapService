@@ -2,30 +2,15 @@
 import { useEffect, useState } from "react";
 import { CalendarDays, Clock, CreditCard } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Booking } from "../type/Booking";
 
-interface TopBookingsProps {
+interface UpcomingBookingsProps {
   providerId: string;
 }
 
-interface Booking {
-  _id: string;
-  customerId: string;
-  serviceId: string;
-  date: string;
-  time: string;
-  status: string;
-  isPaid: boolean;
-  providerDetails: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  customerName: string;
-  serviceName: string;
-}
-
-export default function ProviderTopBookings({ providerId }: TopBookingsProps) {
+export default function ProviderUpcomingBookings({
+  providerId,
+}: UpcomingBookingsProps) {
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
@@ -103,7 +88,7 @@ export default function ProviderTopBookings({ providerId }: TopBookingsProps) {
           {upcomingBookings.map((booking) => (
             <div
               key={booking._id}
-              className="bg-gray-800 rounded-md p-3 border border-gray-800 hover:border-orange-500 transition-all"
+              className="bg-gray-800 rounded-md p-3 border border-gray-800"
             >
               <div className="flex justify-between items-start">
                 <div>
@@ -116,6 +101,10 @@ export default function ProviderTopBookings({ providerId }: TopBookingsProps) {
                   className={`px-2 py-1 rounded text-xs ${
                     booking.status === "confirmed"
                       ? "bg-green-500 text-white"
+                      : booking.status === "cancelled"
+                      ? "bg-red-500 text-white"
+                      : booking.status === "completed"
+                      ? "bg-blue-500 text-white"
                       : "bg-yellow-500 text-white"
                   }`}
                 >

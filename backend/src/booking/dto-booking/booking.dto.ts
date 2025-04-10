@@ -9,6 +9,7 @@ export class CreateBookingDto {
   serviceId: string;
   date: Date;
   time: string;
+  paymentMethod: 'Online' | 'Cash';
   status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
 }
 

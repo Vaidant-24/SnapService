@@ -5,25 +5,10 @@ import { useAuth } from "@/context/AuthContext";
 import AuthGuard from "@/components/auth/AuthGuard";
 import AddServiceForm from "@/components/service-provider-dashboard/AddServiceForm";
 import ProviderServices from "@/components/service-provider-dashboard/ProviderServices";
-import ProviderTopBookings from "@/components/service-provider-dashboard/TopBookings";
+import { Service } from "@/components/type/Service";
+import ProviderUpcomingBookings from "@/components/service-provider-dashboard/UpcomingBooking";
 
 // Interface definitions
-interface UserData {
-  userId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-}
-
-interface Service {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  providerId: string | { _id: string };
-}
 
 export default function ServiceProviderDashboard() {
   const { user: userData } = useAuth();
@@ -43,10 +28,7 @@ export default function ServiceProviderDashboard() {
         const servicesData = await servicesRes.json();
 
         const myServicesData = servicesData.filter((service: Service) => {
-          const providerId =
-            typeof service.providerId === "object"
-              ? service.providerId._id
-              : service.providerId;
+          const providerId = service.providerId?._id;
           return providerId === userData.userId;
         });
 
@@ -101,7 +83,9 @@ export default function ServiceProviderDashboard() {
             {/* // Provider Services Component */}
             <ProviderServices services={myServices} />
             {/* // Provider Bookings Component */}
-            {userData && <ProviderTopBookings providerId={userData?.userId} />}
+            {userData && (
+              <ProviderUpcomingBookings providerId={userData?.userId} />
+            )}
           </>
         )}
       </div>

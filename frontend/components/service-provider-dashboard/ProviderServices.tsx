@@ -9,15 +9,7 @@ import {
   CircleHelp,
   LetterText,
 } from "lucide-react";
-
-interface Service {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  providerId: string | { _id: string };
-}
+import { Service } from "../type/Service";
 
 interface ProviderServicesProps {
   services: Service[];
@@ -36,7 +28,7 @@ export default function ProviderServices({ services }: ProviderServicesProps) {
             {services.map((service) => (
               <div
                 key={service._id}
-                className="bg-gray-800 rounded-xl p-10 border border-gray-800 hover:border-orange-500 transition-all duration-300 shadow-lg"
+                className="bg-gray-800 rounded-xl p-10 border border-gray-800  duration-300 shadow-lg"
               >
                 <div className="mb-4">
                   <h4 className="text-lg text-white font-semibold flex items-center gap-2">
