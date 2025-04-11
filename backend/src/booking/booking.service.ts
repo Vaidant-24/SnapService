@@ -15,15 +15,31 @@ export class BookingService {
       .populate('providerDetails', 'firstName lastName email phone');
   }
 
-  // async findAllByProvider(providerId: string): Promise<Booking[]> {
-  //   return this.bookingModel
-  //     .find({ providerId })
-  //     .populate('serviceId', 'name description price')
-  //     .populate('providerDetails', 'username email');
-  // }
+  async findAllByProvider(providerId: string): Promise<Booking[]> {
+    return this.bookingModel
+      .find({ providerId })
+      .populate('serviceId', 'name description price')
+      .populate('providerDetails', 'username email');
+  }
 
   async findAllBookings(): Promise<Booking[]> {
     return this.bookingModel.find();
+  }
+
+  async findBookingById(bookingId: string): Promise<Booking> {
+    const booking = await this.bookingModel.findOne({ _id: bookingId });
+    if (!booking) {
+      throw new NotFoundException(`Booking with ID ${bookingId} not found`);
+    }
+    return booking;
+  }
+
+  async findBookingByStatus(status: string): Promise<Booking[]> {
+    const booking = await this.bookingModel.find({ status: status });
+    if (!booking) {
+      throw new NotFoundException(`Booking with status ${status} not found`);
+    }
+    return booking;
   }
 
   async create(createBookingDto: CreateBookingDto): Promise<Booking> {

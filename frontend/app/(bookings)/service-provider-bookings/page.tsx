@@ -1,19 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import AuthGuard from "@/components/auth/AuthGuard";
 
 import ProviderBookings from "@/components/service-provider-dashboard/ProviderBookings";
 
 // Interface definitions
-interface UserData {
-  userId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-}
 
 export default function ServiceProviderBookings() {
   const [loading, setLoading] = useState<boolean>(false);

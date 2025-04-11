@@ -10,9 +10,9 @@ export class CreateBookingDto {
   date: Date;
   time: string;
   paymentMethod: 'Online' | 'Cash';
-  status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
+  status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'Awaiting Completion';
 }
 
 export class UpdateBookingDto {
-  status?: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
+  status?: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'Awaiting Completion';
 }

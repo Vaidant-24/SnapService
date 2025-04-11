@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Service } from "@/components/type/Service";
 import ServiceCard from "./ServiceCard";
@@ -20,6 +20,8 @@ export default function ServicesList() {
   const { user } = useAuth();
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+
   useEffect(() => {
     (async () => {
       try {
@@ -29,6 +31,13 @@ export default function ServicesList() {
         setServices(data);
         setFilteredServices(data);
         setCategories([...new Set(data.map((s) => s.category))]);
+        if (searchParams.get("category")) {
+          setSelectedCategory(searchParams.get("category") || "All");
+          setFilteredServices(
+            services.filter((s) => s.category === selectedCategory)
+          );
+          router.replace("/services");
+        }
       } catch (err) {
         setError("Unable to load services.");
       } finally {

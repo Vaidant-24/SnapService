@@ -19,7 +19,7 @@ type ServiceFormData = {
 const categories = [
   "Cleaning",
   "Plumbing",
-  "Electrical",
+  "Shifting",
   "Carpentry",
   "Pest Control",
   "Painting",

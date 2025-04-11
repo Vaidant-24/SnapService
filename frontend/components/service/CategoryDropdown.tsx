@@ -43,7 +43,10 @@ export default function CategoryDropdown({
           <ul className="py-1">
             <li key="all">
               <button
-                onClick={() => onSelect("All")}
+                onClick={() => {
+                  onSelect("All");
+                  toggleOpen();
+                }}
                 className={`block w-full text-left px-4 py-2 hover:bg-gray-700 ${
                   selected === "All"
                     ? "bg-gray-700 text-white"
@@ -56,7 +59,10 @@ export default function CategoryDropdown({
             {categories.map((category) => (
               <li key={category}>
                 <button
-                  onClick={() => onSelect(category)}
+                  onClick={() => {
+                    onSelect(category);
+                    toggleOpen();
+                  }}
                   className={`block w-full text-left px-4 py-2 hover:bg-gray-700 ${
                     selected === category
                       ? "bg-gray-700 text-white"

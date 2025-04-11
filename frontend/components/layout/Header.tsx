@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { FaBell } from "react-icons/fa";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -113,7 +114,17 @@ const Header = () => {
       </nav>
 
       {/* Desktop Right Side */}
-      <div className="hidden md:flex items-center gap-4 relative">
+      <div className="hidden md:flex items-center gap-8 relative">
+        {user && user.role === "customer" && (
+          <Link href="/customer-notifications">
+            <FaBell className="text-white text-2xl hover:text-orange-500 transition duration-300 cursor-pointer" />
+          </Link>
+        )}
+        {user && user.role === "service_provider" && (
+          <Link href="/service-provider-notifications">
+            <FaBell className="text-white text-2xl hover:text-orange-500 transition duration-300 cursor-pointer" />
+          </Link>
+        )}
         {user ? (
           <div ref={dropdownRef} className="relative">
             <button
@@ -176,6 +187,7 @@ const Header = () => {
       </div>
 
       {/* Mobile Menu Toggle */}
+
       <button
         className="md:hidden text-orange-500 hover:text-orange-600 transition duration-300"
         onClick={toggleMenu}

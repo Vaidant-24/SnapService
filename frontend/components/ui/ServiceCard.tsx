@@ -6,6 +6,7 @@ import {
   FaBoxOpen,
   FaFaucet,
   FaBolt,
+  FaToolbox,
 } from "react-icons/fa";
 
 interface ServiceCardProps {
@@ -28,13 +29,15 @@ const ServiceCard = ({ name, iconType }: ServiceCardProps) => {
         return <FaFaucet className="w-8 h-18 text-orange-500" />;
       case "electric":
         return <FaBolt className="w-8 h-18 text-orange-500" />;
+      case "carpentry":
+        return <FaToolbox className="w-8 h-18 text-orange-500" />;
       default:
         return <FaHome className="w-8 h-18 text-orange-500" />;
     }
   };
 
   return (
-    <Link href={`/services/${name.toLowerCase()}`}>
+    <Link href={`/services?category=${name}`}>
       <div className="bg-gray-50 rounded-lg shadow-sm p-8 flex flex-col items-center justify-center border border-gray-100 transition-all duration-300 hover:shadow-md hover:bg-white hover:scale-105 hover:border-orange-200">
         <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mb-4">
           {getIcon()}

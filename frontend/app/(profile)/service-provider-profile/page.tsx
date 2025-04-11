@@ -91,7 +91,7 @@ const ServiceProviderProfile = () => {
 
   return (
     <AuthGuard>
-      <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-900 text-white rounded-lg shadow-md">
+      <div className="max-w-4xl mx-auto mt-10 mb-12 p-6 bg-gray-900 text-white rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Service Provider Profile</h1>
           {!editMode ? (

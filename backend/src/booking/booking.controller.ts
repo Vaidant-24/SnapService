@@ -21,6 +21,16 @@ export class BookingController {
     return this.bookingService.findAllBookings();
   }
 
+  @Get(':status')
+  async getBookingsByStatus(@Param('status') status: string) {
+    return this.bookingService.findBookingByStatus(status);
+  }
+
+  @Get(':bookingId')
+  async getBookingById(@Param('bookingId') id: string) {
+    return this.bookingService.findBookingById(id);
+  }
+
   @Post()
   async createBooking(@Body() createBookingDto: CreateBookingDto) {
     return this.bookingService.create(createBookingDto);

@@ -7,8 +7,6 @@ import {
   Phone,
   MapPin,
   CreditCard,
-  CheckCircle,
-  XCircle,
 } from "lucide-react";
 import InfoItem from "./InfoItem";
 import { Booking } from "../type/Booking";
@@ -31,6 +29,7 @@ export default function BookingCard({
       });
 
       const updated = await res.json();
+      console.log("Updated booking:", updated.status);
 
       setBookings((prev) =>
         prev.map((b) =>
@@ -58,6 +57,8 @@ export default function BookingCard({
         return "bg-yellow-500";
       case "Cancelled":
         return "bg-red-500";
+      case "Awaiting Completion":
+        return "bg-orange-500";
       case "Completed":
         return "bg-blue-500";
       default:
@@ -77,7 +78,7 @@ export default function BookingCard({
         <div
           className={`${getStatusColor(
             booking.status
-          )} p-3 py-4 rounded-full text-xs text-white font-semibold flex items-center justify-center`}
+          )} px-2 py-2 rounded-full text-xs text-white font-semibold  flex items-center justify-center`}
         >
           {booking.status}
         </div>
@@ -106,24 +107,37 @@ export default function BookingCard({
         />
         <InfoItem
           icon={<CreditCard className="text-orange-500 h-5 w-5" />}
-          text={booking.isPaid ? "Paid" : "Payment Pending"}
+          text={booking.isPaid ? "Paid" : "Unpaid"}
         />
-      </div>
 
-      <div className="p-4 pt-2 bg-gray-950 flex justify-end">
-        <div ref={dropdownRef} className="space-x-2">
-          <button
-            onClick={() => handleStatusUpdate("Confirmed")}
-            className="px-4 py-2 bg-green-600 text-white rounded-md text-sm"
+        {/* Inline Actions */}
+        <div
+          ref={dropdownRef}
+          className="flex gap-3 items-center pt-2 flex-wrap"
+        >
+          <select
+            onChange={(e) => {
+              const selected = e.target.value;
+              if (selected !== "") handleStatusUpdate(selected);
+            }}
+            defaultValue=""
+            className="px-3 py-2 bg-gray-700 text-white rounded-md text-sm hover:bg-gray-700 transition-colors"
           >
-            Accept
-          </button>
-          <button
-            onClick={() => handleStatusUpdate("Cancelled")}
-            className="px-4 py-2 bg-red-600 text-white rounded-md text-sm"
-          >
-            Reject
-          </button>
+            <option value="" disabled>
+              Change Status
+            </option>
+            <option value="Confirmed">Accept</option>
+            <option value="Cancelled">Reject</option>
+          </select>
+
+          {booking.status === "Confirmed" && (
+            <button
+              onClick={() => handleStatusUpdate("Awaiting Completion")}
+              className="px-4 py-2 bg-orange-500 text-white rounded-md text-sm hover:bg-orange-600 transition-colors"
+            >
+              Request Completion
+            </button>
+          )}
         </div>
       </div>
     </div>
