@@ -1,4 +1,3 @@
-// components/services/ServicesList.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,19 +6,22 @@ import { useAuth } from "@/context/AuthContext";
 import { Service } from "@/components/type/Service";
 import ServiceCard from "./ServiceCard";
 import CategoryDropdown from "./CategoryDropdown";
+import SearchField from "./SearchField";
+import SortDropdown from "./SortDropDown";
 
 export default function ServicesList() {
   const [services, setServices] = useState<Service[]>([]);
   const [filteredServices, setFilteredServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [sortOption, setSortOption] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const { user } = useAuth();
   const router = useRouter();
-
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -31,12 +33,10 @@ export default function ServicesList() {
         setServices(data);
         setFilteredServices(data);
         setCategories([...new Set(data.map((s) => s.category))]);
-        if (searchParams.get("category")) {
-          setSelectedCategory(searchParams.get("category") || "All");
-          setFilteredServices(
-            services.filter((s) => s.category === selectedCategory)
-          );
-          router.replace("/services");
+
+        const initialCategory = searchParams.get("category");
+        if (initialCategory) {
+          setSelectedCategory(initialCategory);
         }
       } catch (err) {
         setError("Unable to load services.");
@@ -47,14 +47,29 @@ export default function ServicesList() {
   }, []);
 
   useEffect(() => {
-    if (selectedCategory === "All") {
-      setFilteredServices(services);
-    } else {
-      setFilteredServices(
-        services.filter((s) => s.category === selectedCategory)
+    let filtered = services;
+
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter((s) => s.category === selectedCategory);
+    }
+
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (s) =>
+          s.name.toLowerCase().includes(query) ||
+          s.description.toLowerCase().includes(query)
       );
     }
-  }, [selectedCategory, services]);
+
+    if (sortOption === "price-asc") {
+      filtered = [...filtered].sort((a, b) => a.price - b.price); // a-b asc
+    } else if (sortOption === "price-desc") {
+      filtered = [...filtered].sort((a, b) => b.price - a.price); // b-a desc
+    }
+
+    setFilteredServices(filtered);
+  }, [selectedCategory, searchQuery, services, sortOption]);
 
   const handleBookNow = (serviceId: string) => {
     if (user?.role !== "customer") {
@@ -69,20 +84,14 @@ export default function ServicesList() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-orange-500">
-            Available Services
+            Browse Services
           </h1>
-          {user && (
-            <button
-              onClick={() => router.push("/customer-dashboard")}
-              className="mt-4 sm:mt-0 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-md transition-all duration-300"
-            >
-              Back to Dashboard
-            </button>
-          )}
         </div>
 
-        {categories.length > 0 && (
-          <div className="mb-6 flex justify-end">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-12">
+          <SearchField value={searchQuery} onChange={setSearchQuery} />
+
+          {categories.length > 0 && (
             <CategoryDropdown
               selected={selectedCategory}
               categories={categories}
@@ -90,8 +99,10 @@ export default function ServicesList() {
               isOpen={isDropdownOpen}
               toggleOpen={() => setIsDropdownOpen(!isDropdownOpen)}
             />
-          </div>
-        )}
+          )}
+
+          <SortDropdown selected={sortOption} onChange={setSortOption} />
+        </div>
 
         {loading ? (
           <p className="text-center text-gray-400">Loading services...</p>
@@ -110,7 +121,7 @@ export default function ServicesList() {
         ) : (
           <p className="text-center text-gray-400">
             {services.length > 0
-              ? `No services available in the "${selectedCategory}" category.`
+              ? "No matching services found."
               : "No services available."}
           </p>
         )}

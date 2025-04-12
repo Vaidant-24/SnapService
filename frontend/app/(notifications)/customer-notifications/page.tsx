@@ -1,21 +1,21 @@
-// app/customer/notifications/page.tsx (if using App Router)
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { CalendarDays, Clock, MapPin } from "lucide-react";
 import { Booking } from "@/components/type/Booking";
 import InfoItem from "@/components/service-provider-dashboard/InfoItem";
-import Link from "next/link";
+import ReviewModal from "@/components/review/ReviewModal";
+import { useAuth } from "@/context/AuthContext";
 
 export default function NotificationsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const { user: customer } = useAuth();
 
   useEffect(() => {
     const fetchAwaiting = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3001/bookings/Awaiting Completion`
+          `http://localhost:3001/bookings/filterByStatus?status=Awaiting Completion&customerId=${customer?.userId}`
         );
         const data = await res.json();
         setBookings(data);
@@ -25,19 +25,16 @@ export default function NotificationsPage() {
     };
 
     fetchAwaiting();
-  }, []);
-
-  console.log("Bookings:", bookings);
+  }, [customer]);
 
   const handleStatusUpdate = async (bookingId: string, status: string) => {
     try {
-      const res = await fetch(`http://localhost:3001/bookings/${bookingId}`, {
+      await fetch(`http://localhost:3001/bookings/${bookingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
 
-      const updated = await res.json();
       setBookings((prev) => prev.filter((b) => b._id !== bookingId));
     } catch (err) {
       console.error("Status update failed:", err);
@@ -87,18 +84,21 @@ export default function NotificationsPage() {
                 />
               </div>
 
-              <div className="mt-4 flex gap-4">
-                <button
-                  onClick={() => handleStatusUpdate(booking._id, "Completed")}
-                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md text-sm font-semibold"
-                >
-                  Approve Completion
-                </button>
-                <Link href={`/customer-review/${booking._id}`}>
-                  <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-semibold">
-                    Rate Service
-                  </button>
-                </Link>
+              <div className="mt-4 flex gap-4 flex-wrap">
+                <ReviewModal
+                  bookingId={booking._id}
+                  providerId={booking.providerDetails._id}
+                  customerId={booking.customerId}
+                  serviceId={
+                    typeof booking.serviceId === "string"
+                      ? booking.serviceId
+                      : ""
+                  }
+                  serviceName={booking.serviceName}
+                  onSubmitted={() =>
+                    handleStatusUpdate(booking._id, "Completed")
+                  }
+                />
               </div>
             </div>
           ))}

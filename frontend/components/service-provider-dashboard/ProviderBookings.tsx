@@ -20,11 +20,11 @@ export default function ProviderBookings({
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const res = await fetch("http://localhost:3001/bookings");
-        const data = await res.json();
-        const filtered = data.filter(
-          (b: Booking) => b.providerDetails._id === providerId
+        const res = await fetch(
+          `http://localhost:3001/bookings/provider/${providerId}`
         );
+        const data = await res.json();
+        const filtered = data;
         setBookings(filtered);
         setFilteredBookings(filtered);
       } catch (err) {

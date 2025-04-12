@@ -12,6 +12,10 @@ export class CreateReviewDto {
 
   @IsString()
   @IsNotEmpty()
+  serviceId: string;
+
+  @IsString()
+  @IsNotEmpty()
   bookingId: string;
 
   @IsInt()

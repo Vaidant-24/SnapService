@@ -21,15 +21,15 @@ export default function ProviderUpcomingBookings({
     const fetchUpcomingBookings = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:3001/bookings");
+        const res = await fetch(
+          `http://localhost:3001/bookings/provider/${providerId}`
+        );
         if (!res.ok) throw new Error("Failed to fetch bookings");
 
         const data = await res.json();
 
         // Filter bookings by provider and only get confirmed/pending bookings
-        const providerBookings = data.filter(
-          (b: Booking) => b.providerDetails?._id === providerId
-        );
+        const providerBookings = data;
 
         // Get today's date (without time)
         const today = new Date();

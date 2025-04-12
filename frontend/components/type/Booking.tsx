@@ -1,6 +1,6 @@
 import { Service } from "./Service";
 
-export type Booking = {
+export interface Booking {
   _id: string;
   customerId: string;
   serviceId: Service;
@@ -22,4 +22,4 @@ export type Booking = {
     lastName: string;
     email: string;
   };
-};
+}

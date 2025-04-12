@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateBookingDto, UpdateBookingDto } from './dto-booking/booking.dto';
 import { Booking, BookingDocument } from 'src/schemas/booking.schema';
+import { QueryParams } from './booking.controller';
 
 @Injectable()
 export class BookingService {
@@ -17,7 +18,7 @@ export class BookingService {
 
   async findAllByProvider(providerId: string): Promise<Booking[]> {
     return this.bookingModel
-      .find({ providerId })
+      .find({ 'providerDetails._id': providerId })
       .populate('serviceId', 'name description price')
       .populate('providerDetails', 'username email');
   }
@@ -38,6 +39,14 @@ export class BookingService {
     const booking = await this.bookingModel.find({ status: status });
     if (!booking) {
       throw new NotFoundException(`Booking with status ${status} not found`);
+    }
+    return booking;
+  }
+
+  async findBookingByQuery(query: QueryParams): Promise<Booking[]> {
+    const booking = await this.bookingModel.find({ status: query.status, customerId: query.customerId });
+    if (!booking) {
+      throw new NotFoundException(`Booking with query ${query} not found`);
     }
     return booking;
   }

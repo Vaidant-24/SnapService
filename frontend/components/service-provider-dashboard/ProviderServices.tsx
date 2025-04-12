@@ -17,7 +17,7 @@ interface ProviderServicesProps {
 
 export default function ProviderServices({ services }: ProviderServicesProps) {
   return (
-    <section className="bg-gray-950 min-h-screen py-10">
+    <section className="bg-gray-950  py-4">
       <div className="container mx-auto px-4">
         <h3 className="text-2xl text-orange-500 font-semibold mb-6">
           Your Services

@@ -17,6 +17,14 @@ export class ReviewService {
     return created.save();
   }
 
+  async getAllReviews(): Promise<Review[]> {
+    return this.reviewModel
+      .find()
+      .populate('customerId', 'firstName lastName')
+      .populate('providerId', 'firstName lastName')
+      .exec();
+  }
+
   async getReviewsByProvider(providerId: string): Promise<Review[]> {
     return this.reviewModel.find({ providerId }).populate('customerId', 'firstName lastName ').exec();
   }

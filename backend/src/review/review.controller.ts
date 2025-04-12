@@ -12,6 +12,11 @@ export class ReviewController {
     return this.reviewsService.addReview(dto);
   }
 
+  @Get()
+  async getAll() {
+    return this.reviewsService.getAllReviews();
+  }
+
   @Get('/provider/:id')
   async getReviews(@Param('id') providerId: string) {
     return this.reviewsService.getReviewsByProvider(providerId);

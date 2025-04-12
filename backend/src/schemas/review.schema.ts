@@ -15,6 +15,9 @@ export class Review {
   @Prop({ required: true })
   bookingId: string;
 
+  @Prop({ required: true })
+  serviceId: string;
+
   @Prop({ required: true, min: 1, max: 5 })
   rating: number;
 
