@@ -14,9 +14,11 @@ import { Booking } from "../type/Booking";
 export default function BookingCard({
   booking,
   setBookings,
+  onViewDetails,
 }: {
   booking: Booking;
   setBookings: React.Dispatch<React.SetStateAction<Booking[]>>;
+  onViewDetails: (booking: Booking) => void;
 }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -29,7 +31,7 @@ export default function BookingCard({
       });
 
       const updated = await res.json();
-      console.log("Updated booking:", updated.status);
+      // console.log("Updated booking:", updated.status);
 
       setBookings((prev) =>
         prev.map((b) =>
@@ -105,40 +107,48 @@ export default function BookingCard({
           icon={<MapPin className="text-orange-500 h-5 w-5" />}
           text={booking.customerAddress}
         />
-        <InfoItem
-          icon={<CreditCard className="text-orange-500 h-5 w-5" />}
-          text={booking.isPaid ? "Paid" : "Unpaid"}
-        />
 
         {/* Inline Actions */}
-        <div
-          ref={dropdownRef}
-          className="flex gap-3 items-center pt-2 flex-wrap"
-        >
-          <select
-            onChange={(e) => {
-              const selected = e.target.value;
-              if (selected !== "") handleStatusUpdate(selected);
-            }}
-            defaultValue=""
-            className="px-3 py-2 bg-gray-700 text-white rounded-md text-sm hover:bg-gray-700 transition-colors"
+        {booking.status !== "Completed" && (
+          <div
+            ref={dropdownRef}
+            className="flex gap-3 items-center pt-2 flex-wrap"
           >
-            <option value="" disabled>
-              Change Status
-            </option>
-            <option value="Confirmed">Accept</option>
-            <option value="Cancelled">Reject</option>
-          </select>
-
-          {booking.status === "Confirmed" && (
-            <button
-              onClick={() => handleStatusUpdate("Awaiting Completion")}
-              className="px-4 py-2 bg-orange-500 text-white rounded-md text-sm hover:bg-orange-600 transition-colors"
+            <select
+              onChange={(e) => {
+                const selected = e.target.value;
+                if (selected !== "") handleStatusUpdate(selected);
+              }}
+              defaultValue=""
+              className="px-3 py-2 bg-gray-700 text-white rounded-md text-sm hover:bg-gray-700 transition-colors"
             >
-              Request Completion
+              <option value="" disabled>
+                Change Status
+              </option>
+              <option value="Confirmed">Accept</option>
+              <option value="Cancelled">Reject</option>
+            </select>
+
+            {booking.status === "Confirmed" && (
+              <button
+                onClick={() => handleStatusUpdate("Awaiting Completion")}
+                className="px-4 py-2 bg-orange-500 text-white rounded-md text-sm hover:bg-orange-600 transition-colors"
+              >
+                Request Completion
+              </button>
+            )}
+          </div>
+        )}
+        {booking.status === "Completed" && (
+          <div className="flex gap-3 items-center pt-2 flex-wrap">
+            <button
+              onClick={() => onViewDetails(booking)}
+              className="px-4 py-2 bg-gray-700 text-white rounded-md text-sm hover:bg-gray-600 transition-colors"
+            >
+              View Details
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -17,7 +17,6 @@ interface ReviewModalProps {
   customerId: string;
   serviceId: string;
   serviceName: string;
-  onSubmitted: () => void;
 }
 
 export default function ReviewModal({
@@ -26,7 +25,6 @@ export default function ReviewModal({
   customerId,
   serviceId,
   serviceName,
-  onSubmitted,
 }: ReviewModalProps) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
@@ -47,11 +45,28 @@ export default function ReviewModal({
         }),
       });
 
+      const bookingRes = await fetch(
+        `http://localhost:3001/bookings/${bookingId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: "Completed",
+            isRated: true,
+            rating: rating,
+            comment: feedback,
+          }),
+        }
+      );
+
+      if (!bookingRes.ok) {
+        throw new Error("Failed to update booking status");
+      }
+
       if (!res.ok) {
         throw new Error("Failed to submit review");
       } else {
         alert("Thank you for your feedback!");
-        onSubmitted();
         setOpen(false);
         setRating(0);
         setFeedback("");
@@ -64,7 +79,9 @@ export default function ReviewModal({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary">Rate Service</Button>
+        <Button className="4px 2py bg-blue-600 hover:bg-blue-700">
+          Rate Service
+        </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-md bg-zinc-900 text-white">

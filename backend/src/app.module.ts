@@ -12,6 +12,7 @@ import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 import { User, UserSchema } from './schemas/user.schema';
 import { ReviewModule } from './review/review.module';
+import { NotificationsGateway } from './socketIO/notifications.gateway';
 
 @Module({
   imports: [
@@ -32,7 +33,7 @@ import { ReviewModule } from './review/review.module';
       inject: [ConfigService],
     }),
   ],
-  providers: [ServiceService, BookingService, UserService],
+  providers: [ServiceService, BookingService, UserService, NotificationsGateway],
   controllers: [ServiceController, BookingController, UserController],
 })
 export class AppModule {}

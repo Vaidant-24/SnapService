@@ -6,17 +6,39 @@ import { useState, useRef, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { FaBell } from "react-icons/fa";
+import { io, Socket } from "socket.io-client";
+import { toast } from "sonner";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [notificationsCount, setNotificationsCount] = useState(0);
   const { user, logout } = useAuth();
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
   // Close dropdown when clicking outside
+
+  useEffect(() => {
+    const notificationsCount = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3001/bookings/filterByStatus?status=Awaiting Completion&customerId=${user?.userId}`
+        );
+        const data = await res.json();
+        console.log("Notifications data:", data);
+
+        console.log("Notifications count:", data?.length);
+        setNotificationsCount(data?.length || 0);
+      } catch (err) {
+        console.error("Error fetching notifications count:", err);
+      }
+    };
+    notificationsCount();
+  }, [user]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -29,6 +51,40 @@ const Header = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Socket connection
+  useEffect(() => {
+    if (!user) return;
+
+    // Establish socket connection
+    const socket: Socket = io("http://localhost:3001", {
+      transports: ["websocket"],
+    }); // backend URL
+
+    // Listen to the dynamic booking update event
+    const eventKey = `booking-update-${user?.userId}`;
+    socket.on(eventKey, (data) => {
+      console.log("Received booking update:", data);
+
+      toast.success("Booking status updated!", {
+        description: "Your booking is now awaiting your approval.",
+        duration: 4000,
+        action: {
+          label: "View",
+          onClick: () => {
+            window.location.href = "/customer-notifications"; // or any route you prefer
+          },
+        },
+      });
+      setNotificationsCount((prev) => prev + 1);
+    });
+
+    // Cleanup when component unmounts or user changes
+    return () => {
+      socket.off(eventKey);
+      socket.disconnect();
+    };
+  }, [user]);
 
   const dashboardPath =
     user?.role === "customer"
@@ -115,16 +171,24 @@ const Header = () => {
 
       {/* Desktop Right Side */}
       <div className="hidden md:flex items-center gap-8 relative">
-        {user && user.role === "customer" && (
-          <Link href="/customer-notifications">
+        {user && (
+          <Link
+            href={
+              user.role === "customer"
+                ? "/customer-notifications"
+                : "/service-provider-notifications"
+            }
+            className="relative"
+          >
             <FaBell className="text-white text-2xl hover:text-orange-500 transition duration-300 cursor-pointer" />
+            {notificationsCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {notificationsCount > 9 ? "9+" : notificationsCount}
+              </span>
+            )}
           </Link>
         )}
-        {user && user.role === "service_provider" && (
-          <Link href="/service-provider-notifications">
-            <FaBell className="text-white text-2xl hover:text-orange-500 transition duration-300 cursor-pointer" />
-          </Link>
-        )}
+
         {user ? (
           <div ref={dropdownRef} className="relative">
             <button
@@ -197,7 +261,7 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="absolute top-16 left-0 w-full bg-black text-white flex flex-col gap-4 p-6 md:hidden z-50">
+        <div className="absolute top-16 right-6 bg-gray-800 border border-gray-700 text-white flex flex-col gap-4 p-6 md:hidden z-50">
           <Link
             href="/"
             onClick={toggleMenu}
@@ -241,6 +305,26 @@ const Header = () => {
               className="hover:text-orange-500 transition duration-300"
             >
               Bookings
+            </Link>
+          )}
+
+          {user?.role === "service_provider" && (
+            <Link
+              href="/service-provider-notifications"
+              onClick={toggleMenu}
+              className="hover:text-orange-500 transition duration-300"
+            >
+              Notifications
+            </Link>
+          )}
+
+          {user?.role === "customer" && (
+            <Link
+              href="/customer-notifications"
+              onClick={toggleMenu}
+              className="hover:text-orange-500 transition duration-300"
+            >
+              Notifications
             </Link>
           )}
 

@@ -5,6 +5,8 @@ import BookingCard from "./BookingCard";
 import BookingsFilter from "./BookingsFilter";
 import { Booking } from "../type/Booking";
 
+import BookingDetailModal from "./BookingDetailModal";
+
 interface ProviderBookingsProps {
   providerId: string;
 }
@@ -16,6 +18,13 @@ export default function ProviderBookings({
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("All");
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleViewDetails = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setDialogOpen(true);
+  };
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -77,6 +86,7 @@ export default function ProviderBookings({
                 key={booking._id}
                 booking={booking}
                 setBookings={setBookings}
+                onViewDetails={handleViewDetails}
               />
             ))}
           </div>
@@ -99,6 +109,12 @@ export default function ProviderBookings({
           </div>
         )}
       </div>
+
+      <BookingDetailModal
+        dialogOpen={dialogOpen}
+        selectedBooking={selectedBooking}
+        setDialogOpen={setDialogOpen}
+      />
     </section>
   );
 }

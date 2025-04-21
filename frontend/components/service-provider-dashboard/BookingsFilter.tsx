@@ -13,11 +13,13 @@ export default function BookingsFilter({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const filterOptions = [
     "All",
+    "Completed",
     "Confirmed",
     "Pending",
     "Cancelled",
     "Paid",
     "UnPaid",
+    "Awaiting Completion",
   ];
 
   useEffect(() => {

@@ -59,6 +59,9 @@ export class Booking {
   @Prop({ default: 0 })
   rating?: number; // Rating given by customer
 
+  @Prop({ default: '' })
+  comment?: string;
+
   @Prop()
   review?: string; // Optional review by customer
 }

@@ -22,4 +22,6 @@ export interface Booking {
     lastName: string;
     email: string;
   };
+  rating: number;
+  comment: string;
 }

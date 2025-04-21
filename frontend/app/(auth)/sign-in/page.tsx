@@ -47,7 +47,8 @@ export default function Login() {
           router.push("/service-provider-dashboard");
           break;
         default:
-          router.push("/dashboard");
+          router.push("/unAuthorized");
+          break;
       }
     } catch (err) {
       if (err instanceof Error) {

@@ -15,4 +15,7 @@ export class CreateBookingDto {
 
 export class UpdateBookingDto {
   status?: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'Awaiting Completion';
+  isRated?: boolean;
+  rating?: number;
+  comment?: string;
 }

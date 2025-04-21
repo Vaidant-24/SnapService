@@ -18,6 +18,7 @@ export default function NotificationsPage() {
           `http://localhost:3001/bookings/filterByStatus?status=Awaiting Completion&customerId=${customer?.userId}`
         );
         const data = await res.json();
+
         setBookings(data);
       } catch (err) {
         console.error("Error fetching notifications:", err);
@@ -26,20 +27,6 @@ export default function NotificationsPage() {
 
     fetchAwaiting();
   }, [customer]);
-
-  const handleStatusUpdate = async (bookingId: string, status: string) => {
-    try {
-      await fetch(`http://localhost:3001/bookings/${bookingId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-
-      setBookings((prev) => prev.filter((b) => b._id !== bookingId));
-    } catch (err) {
-      console.error("Status update failed:", err);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-black px-6 py-10 text-white">
@@ -95,9 +82,6 @@ export default function NotificationsPage() {
                       : ""
                   }
                   serviceName={booking.serviceName}
-                  onSubmitted={() =>
-                    handleStatusUpdate(booking._id, "Completed")
-                  }
                 />
               </div>
             </div>

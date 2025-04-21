@@ -4,10 +4,14 @@ import { Model } from 'mongoose';
 import { CreateBookingDto, UpdateBookingDto } from './dto-booking/booking.dto';
 import { Booking, BookingDocument } from 'src/schemas/booking.schema';
 import { QueryParams } from './booking.controller';
+import { NotificationsGateway } from 'src/socketIO/notifications.gateway';
 
 @Injectable()
 export class BookingService {
-  constructor(@InjectModel(Booking.name) private bookingModel: Model<BookingDocument>) {}
+  constructor(
+    @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
+    private readonly notificationsGateway: NotificationsGateway,
+  ) {}
 
   async findAllByCustomer(customerId: string): Promise<Booking[]> {
     return this.bookingModel
@@ -58,9 +62,15 @@ export class BookingService {
 
   async update(bookingId: string, updateBookingDto: UpdateBookingDto): Promise<Booking> {
     const updatedBooking = await this.bookingModel.findByIdAndUpdate(bookingId, updateBookingDto, { new: true });
+
     if (!updatedBooking) {
       throw new NotFoundException(`Booking with ID ${bookingId} not found`);
     }
+
+    if (updateBookingDto.status === 'Awaiting Completion') {
+      this.notificationsGateway.notifyCustomer(updatedBooking.customerId.toString());
+    }
+
     return updatedBooking;
   }
 }
