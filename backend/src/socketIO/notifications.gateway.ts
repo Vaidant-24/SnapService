@@ -31,4 +31,12 @@ export class NotificationsGateway implements OnGatewayInit, OnGatewayConnection,
   notifyCustomer(customerId: string) {
     this.server.emit(`booking-update-${customerId}`, { message: 'new-pending-completion' });
   }
+
+  customerBookingCancelled(customerId: string) {
+    this.server.emit(`booking-cancelled-${customerId}`, { message: 'booking-cancelled' });
+  }
+
+  sendNotificationToProvider(providerId: string) {
+    this.server.emit(`review-${providerId}`, { message: 'new-review-added' });
+  }
 }

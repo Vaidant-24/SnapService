@@ -4,16 +4,20 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Review, ReviewDocument } from 'src/schemas/review.schema';
 import { CreateReviewDto } from './dto-review/create-review.dto';
+import { NotificationsGateway } from 'src/socketIO/notifications.gateway';
+import { log } from 'console';
 
 @Injectable()
 export class ReviewService {
   constructor(
     @InjectModel(Review.name)
     private reviewModel: Model<ReviewDocument>,
+    private readonly notificationsGateway: NotificationsGateway,
   ) {}
 
   async addReview(dto: CreateReviewDto): Promise<Review> {
     const created = new this.reviewModel(dto);
+    this.notificationsGateway.sendNotificationToProvider(dto.providerId.toString());
     return created.save();
   }
 
@@ -26,6 +30,16 @@ export class ReviewService {
   }
 
   async getReviewsByProvider(providerId: string): Promise<Review[]> {
-    return this.reviewModel.find({ providerId }).populate('customerId', 'firstName lastName ').exec();
+    return await this.reviewModel
+      .find({ providerId, isRead: false })
+      .populate('customerId', 'firstName lastName ')
+      .exec();
+  }
+
+  async markAllReviewsAsRead(providerId: string): Promise<{ modifiedCount: number }> {
+    const result = await this.reviewModel.updateMany({ providerId, isRead: false }, { $set: { isRead: true } });
+    console.log('Updated reviews:', result);
+
+    return { modifiedCount: result.modifiedCount };
   }
 }

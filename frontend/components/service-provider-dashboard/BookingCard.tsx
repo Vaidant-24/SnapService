@@ -125,8 +125,18 @@ export default function BookingCard({
               <option value="" disabled>
                 Change Status
               </option>
-              <option value="Confirmed">Accept</option>
-              <option value="Cancelled">Reject</option>
+              <option
+                value="Confirmed"
+                onClick={() => handleStatusUpdate("Confirmed")}
+              >
+                Accept
+              </option>
+              <option
+                value="Cancelled"
+                onClick={() => handleStatusUpdate("Cancelled")}
+              >
+                Reject
+              </option>
             </select>
 
             {booking.status === "Confirmed" && (

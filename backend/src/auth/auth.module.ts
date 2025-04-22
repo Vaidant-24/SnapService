@@ -18,7 +18,7 @@ import { Booking, BookingSchema } from '../schemas/booking.schema';
     ]),
     PassportModule,
     JwtModule.register({
-      secret: 'your_jwt_secret_key', // Use environment variables in production
+      secret: 'your_jwt_secret_key',
       signOptions: { expiresIn: '1h' },
     }),
   ],

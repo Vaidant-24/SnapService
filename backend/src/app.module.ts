@@ -13,6 +13,7 @@ import { UserController } from './user/user.controller';
 import { User, UserSchema } from './schemas/user.schema';
 import { ReviewModule } from './review/review.module';
 import { NotificationsGateway } from './socketIO/notifications.gateway';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { NotificationsGateway } from './socketIO/notifications.gateway';
     MongooseModule.forFeature([{ name: Service.name, schema: ServiceSchema }]),
     MongooseModule.forFeature([{ name: Booking.name, schema: BookingSchema }]),
     ReviewModule,
+    NotificationModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
@@ -30,6 +32,7 @@ import { NotificationsGateway } from './socketIO/notifications.gateway';
           uri: mongoDbUri,
         };
       },
+
       inject: [ConfigService],
     }),
   ],

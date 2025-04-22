@@ -1,5 +1,12 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 
 type User = {
@@ -13,8 +20,10 @@ type User = {
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  setUser: (user: User | null) => void;
+  setUser: Dispatch<SetStateAction<User | null>>;
   logout: () => void;
+  notificationsCount: number;
+  setNotificationsCount: Dispatch<SetStateAction<number>>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [notificationsCount, setNotificationsCount] = useState<number>(0);
 
   useEffect(() => {
     const verifyUser = async () => {
@@ -52,8 +62,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     router.push("/sign-in");
   };
 
+  useEffect(() => {
+    const CountNotifications = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3001/bookings/filterByStatus?status=Awaiting Completion&customerId=${user?.userId}`
+        );
+        const data = await res.json();
+
+        setNotificationsCount(data?.length || 0);
+      } catch (err) {
+        console.error("Error fetching notifications count:", err);
+      }
+    };
+    CountNotifications();
+  }, [setNotificationsCount, user]);
+
   return (
-    <AuthContext.Provider value={{ user, setUser, logout, loading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        logout,
+        loading,
+        notificationsCount,
+        setNotificationsCount,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

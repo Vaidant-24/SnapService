@@ -71,6 +71,10 @@ export class BookingService {
       this.notificationsGateway.notifyCustomer(updatedBooking.customerId.toString());
     }
 
+    if (updateBookingDto.status === 'Cancelled') {
+      this.notificationsGateway.customerBookingCancelled(updatedBooking.customerId.toString());
+    }
+
     return updatedBooking;
   }
 }

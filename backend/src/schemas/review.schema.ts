@@ -23,6 +23,9 @@ export class Review {
 
   @Prop()
   comment: string;
+
+  @Prop({ default: false })
+  isRead: boolean;
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);

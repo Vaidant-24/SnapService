@@ -26,7 +26,7 @@ export default function NotificationsPage() {
     };
 
     fetchAwaiting();
-  }, [customer]);
+  }, [customer, bookings]);
 
   return (
     <div className="min-h-screen bg-black px-6 py-10 text-white">
