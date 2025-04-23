@@ -1,13 +1,6 @@
 "use client";
 import { useRef } from "react";
-import {
-  CalendarDays,
-  Clock,
-  Mail,
-  Phone,
-  MapPin,
-  CreditCard,
-} from "lucide-react";
+import { CalendarDays, Clock, Mail, Phone, MapPin } from "lucide-react";
 import InfoItem from "./InfoItem";
 import { Booking } from "../type/Booking";
 

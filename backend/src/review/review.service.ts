@@ -5,7 +5,6 @@ import { Model } from 'mongoose';
 import { Review, ReviewDocument } from 'src/schemas/review.schema';
 import { CreateReviewDto } from './dto-review/create-review.dto';
 import { NotificationsGateway } from 'src/socketIO/notifications.gateway';
-import { log } from 'console';
 
 @Injectable()
 export class ReviewService {
@@ -17,7 +16,7 @@ export class ReviewService {
 
   async addReview(dto: CreateReviewDto): Promise<Review> {
     const created = new this.reviewModel(dto);
-    this.notificationsGateway.sendNotificationToProvider(dto.providerId.toString());
+    this.notificationsGateway.customerReviewAdded(dto.providerId.toString());
     return created.save();
   }
 

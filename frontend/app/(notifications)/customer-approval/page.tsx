@@ -15,7 +15,7 @@ export default function NotificationsPage() {
     const fetchAwaiting = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3001/notifications/filterByStatus?status=Awaiting Completion&customerId=${customer?.userId}`
+          `http://localhost:3001/bookings/filterByStatus?status=Awaiting Completion&customerId=${customer?.userId}`
         );
         const data = await res.json();
 

@@ -24,6 +24,8 @@ type AuthContextType = {
   logout: () => void;
   notificationsCount: number;
   setNotificationsCount: Dispatch<SetStateAction<number>>;
+  unreadNotifications: any[];
+  setUnreadNotifications: Dispatch<SetStateAction<any[]>>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,6 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [notificationsCount, setNotificationsCount] = useState<number>(0);
+  const [unreadNotifications, setUnreadNotifications] = useState<any[]>([]);
 
   useEffect(() => {
     const verifyUser = async () => {
@@ -66,7 +69,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const CountNotifications = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3001/bookings/filterByStatus?status=Awaiting Completion&customerId=${user?.userId}`
+          `http://localhost:3001/notifications/user/${user?.userId}/unread/count`
         );
         const data = await res.json();
 
@@ -75,8 +78,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("Error fetching notifications count:", err);
       }
     };
+
+    const fetchUnreadNotifications = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3001/notifications/user/${user?.userId}/unread`
+        );
+        const data = await res.json();
+
+        setUnreadNotifications(data);
+      } catch (err) {
+        console.error("Error fetching unread notifications:", err);
+      }
+    };
     CountNotifications();
-  }, [setNotificationsCount, user]);
+    fetchUnreadNotifications();
+  }, [setNotificationsCount, setUnreadNotifications, user]);
 
   return (
     <AuthContext.Provider
@@ -87,6 +104,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         loading,
         notificationsCount,
         setNotificationsCount,
+        unreadNotifications,
+        setUnreadNotifications,
       }}
     >
       {children}

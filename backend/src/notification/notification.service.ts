@@ -20,6 +20,15 @@ export class NotificationService {
     return await this.notificationModel.find({ recipientId: userId }).sort({ createdAt: -1 });
   }
 
+  async findUnreadNotificationsByUser(userId: string): Promise<Notification[]> {
+    return await this.notificationModel
+      .find({ recipientId: userId, isRead: false })
+      .populate('senderId', 'firstName lastName')
+      .populate('serviceId', 'name')
+      .populate('bookingId', 'status ')
+      .sort({ createdAt: -1 });
+  }
+
   async countUnread(userId: string): Promise<number> {
     return await this.notificationModel.countDocuments({
       recipientId: userId,
@@ -35,5 +44,9 @@ export class NotificationService {
       throw new Error('Notification not found');
     }
     return updatedNotification;
+  }
+
+  async markAllAsRead(userId: string): Promise<void> {
+    await this.notificationModel.updateMany({ recipientId: userId, isRead: false }, { $set: { isRead: true } });
   }
 }

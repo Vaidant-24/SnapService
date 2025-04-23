@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(notifications)/customer-notifications", "app/(notifications)/service-provider-notifications"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(notifications)/customer-approval", "app/(notifications)/service-provider-notifications"],
   "exclude": ["node_modules"]
 }

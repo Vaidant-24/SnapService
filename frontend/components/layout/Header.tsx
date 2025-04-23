@@ -5,18 +5,14 @@ import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { FaBell } from "react-icons/fa";
-import { io, Socket } from "socket.io-client";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import socket from "@/lib/socket";
+import { useNotificationSocket } from "@/hooks/useNotificationSocket";
+import { NotificationPopover } from "../notification/NotificationPopOver";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { user, logout, notificationsCount, setNotificationsCount } = useAuth();
-  const router = useRouter();
+  const { user, logout } = useAuth();
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
@@ -35,53 +31,7 @@ const Header = () => {
   }, []);
 
   // Socket connection
-  useEffect(() => {
-    if (!user) return;
-
-    // Listen to the dynamic booking update event
-    const eventKey = `booking-update-${user?.userId}`;
-    socket.on(eventKey, (data) => {
-      console.log("Received booking update:", data);
-
-      toast.success("Booking status updated!", {
-        description: "Your booking is now awaiting your approval.",
-        duration: 4000,
-        action: {
-          label: "View",
-          onClick: () => {
-            router.push("/customer-notifications");
-          },
-        },
-      });
-      setNotificationsCount((prev: number) => prev + 1);
-    });
-
-    socket.on(`review-${user?.userId}`, (data) => {
-      console.log("Received review update:", data);
-
-      toast.success("New review received!", {
-        description: "You have a new review.",
-        duration: 4000,
-        action: {
-          label: "View",
-          onClick: () => {
-            router.push("/service-provider-notifications"); // or any route you prefer
-          },
-        },
-      });
-    });
-
-    socket.on(`booking-cancelled-${user?.userId}`, (data) => {
-      console.log("Received booking cancellation:", data);
-      setNotificationsCount((prev: number) => prev - 1);
-    });
-
-    // Cleanup when component unmounts or user changes
-    return () => {
-      socket.off(eventKey);
-      socket.disconnect();
-    };
-  }, [user]);
+  useNotificationSocket();
 
   const dashboardPath =
     user?.role === "customer"
@@ -168,23 +118,7 @@ const Header = () => {
 
       {/* Desktop Right Side */}
       <div className="hidden md:flex items-center gap-8 relative">
-        {user && (
-          <Link
-            href={
-              user.role === "customer"
-                ? "/customer-notifications"
-                : "/service-provider-notifications"
-            }
-            className="relative"
-          >
-            <FaBell className="text-white text-2xl hover:text-orange-500 transition duration-300 cursor-pointer" />
-            {notificationsCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                {notificationsCount > 9 ? "9+" : notificationsCount}
-              </span>
-            )}
-          </Link>
-        )}
+        {user && <NotificationPopover />}
 
         {user ? (
           <div ref={dropdownRef} className="relative">
@@ -210,6 +144,15 @@ const Header = () => {
                 >
                   Dashboard
                 </Link>
+                {user?.role === "customer" && (
+                  <Link
+                    href="/customer-approval"
+                    className="block px-4 py-2 text-sm text-white hover:bg-gray-800"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    Your Approval
+                  </Link>
+                )}
                 <Link
                   href={profilePath}
                   className="block px-4 py-2 text-sm text-white hover:bg-gray-800"

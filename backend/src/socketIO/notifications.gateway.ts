@@ -1,4 +1,3 @@
-// notifications.gateway.ts
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -7,6 +6,14 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+
+export enum NotificationEvent {
+  BookingCompletionApproval = 'booking-completion-approval',
+  BookingCancelled = 'booking-cancelled',
+  BookingConfirmed = 'booking-confirmed',
+  CustomerReviewAdded = 'customer-review-added',
+  BookingCompleted = 'booking-completed',
+}
 
 @WebSocketGateway({
   cors: {
@@ -21,22 +28,44 @@ export class NotificationsGateway implements OnGatewayInit, OnGatewayConnection,
   }
 
   handleConnection(client: Socket) {
-    console.log(`Client connected: ${client.id}`);
+    const userId = client.handshake.query.userId as string;
+    if (userId) {
+      client.join(userId);
+      console.log(`Client ${client.id} joined room ${userId}`);
+    } else {
+      console.warn(`Client ${client.id} did not provide userId in query`);
+    }
   }
 
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
   }
 
-  notifyCustomer(customerId: string) {
-    this.server.emit(`booking-update-${customerId}`, { message: 'new-pending-completion' });
+  emitToUser(userId: string, event: NotificationEvent, message: string) {
+    this.server.to(userId).emit(event, {
+      message,
+      timestamp: new Date(),
+    });
+    console.log(`Emitted event ${event} to user ${userId}`);
+  }
+
+  customerBookingCompletionApproval(customerId: string) {
+    this.emitToUser(customerId, NotificationEvent.BookingCompletionApproval, 'new-pending-completion');
   }
 
   customerBookingCancelled(customerId: string) {
-    this.server.emit(`booking-cancelled-${customerId}`, { message: 'booking-cancelled' });
+    this.emitToUser(customerId, NotificationEvent.BookingCancelled, 'booking-cancelled');
   }
 
-  sendNotificationToProvider(providerId: string) {
-    this.server.emit(`review-${providerId}`, { message: 'new-review-added' });
+  customerBookingConfirmed(customerId: string) {
+    this.emitToUser(customerId, NotificationEvent.BookingConfirmed, 'booking-confirmed');
+  }
+
+  customerReviewAdded(providerId: string) {
+    this.emitToUser(providerId, NotificationEvent.CustomerReviewAdded, 'new-review-added');
+  }
+
+  customerBookingCompleted(providerId: string) {
+    this.emitToUser(providerId, NotificationEvent.BookingCompleted, 'booking-completed');
   }
 }

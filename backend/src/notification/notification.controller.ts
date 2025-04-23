@@ -25,9 +25,19 @@ export class NotificationController {
     return this.notificationService.countUnread(userId);
   }
 
-  // ✅ Mark a specific notification as read
+  // 📬 Get unread notifications for a user
+  @Get('user/:userId/unread')
+  async getUnreadNotifications(@Param('userId') userId: string) {
+    return this.notificationService.findUnreadNotificationsByUser(userId);
+  }
+
   @Patch(':id/read')
   async markNotificationRead(@Param('id') notificationId: string, @Body() updateDto: UpdateNotificationDto) {
     return this.notificationService.updateNotification(notificationId, updateDto);
+  }
+
+  @Patch('user/:userId/mark-all-read')
+  async markAllAsRead(@Param('userId') userId: string) {
+    return this.notificationService.markAllAsRead(userId);
   }
 }
