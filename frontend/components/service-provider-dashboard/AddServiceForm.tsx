@@ -65,6 +65,7 @@ export default function AddServiceForm({
           ...newService,
           price: Number(price),
           providerId: userData?.userId,
+          location: userData?.location,
         }),
       });
 
@@ -79,6 +80,8 @@ export default function AddServiceForm({
       console.error(err);
       setSubmitMessage("❌ Error adding service.");
     } finally {
+      console.log(userData);
+
       setSubmitting(false);
     }
   };

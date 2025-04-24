@@ -16,7 +16,6 @@ export class ReviewService {
 
   async addReview(dto: CreateReviewDto): Promise<Review> {
     const created = new this.reviewModel(dto);
-    this.notificationsGateway.customerReviewAdded(dto.providerId.toString());
     return created.save();
   }
 

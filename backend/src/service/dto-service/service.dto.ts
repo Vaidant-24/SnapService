@@ -1,4 +1,6 @@
-import { IsNotEmpty, IsString, IsNumber, IsMongoId, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsString, IsNumber, IsMongoId, IsOptional, ValidateNested } from 'class-validator';
+import { GeoLocationDto } from 'src/user/dto-user/service-provider-dto';
 
 export class CreateServiceDto {
   @IsNotEmpty()
@@ -20,6 +22,11 @@ export class CreateServiceDto {
   @IsNotEmpty()
   @IsMongoId()
   providerId: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => GeoLocationDto)
+  location?: GeoLocationDto;
 }
 
 export class UpdateServiceDto {
@@ -38,4 +45,9 @@ export class UpdateServiceDto {
   @IsOptional()
   @IsString()
   category?: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => GeoLocationDto)
+  location?: GeoLocationDto;
 }

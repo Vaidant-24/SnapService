@@ -36,4 +36,15 @@ export class ServiceService {
     if (!deletedService) throw new NotFoundException('Service not found');
     return deletedService;
   }
+
+  async findNearbyServices(lng: number, lat: number, radius: number) {
+    return this.serviceModel.find({
+      location: {
+        $near: {
+          $geometry: { type: 'Point', coordinates: [lng, lat] },
+          $maxDistance: radius,
+        },
+      },
+    });
+  }
 }

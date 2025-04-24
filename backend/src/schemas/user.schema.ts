@@ -30,6 +30,22 @@ export class User {
   @Prop({ required: true })
   address: string;
 
+  @Prop({
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      required: true,
+    },
+  })
+  location: {
+    type: 'Point';
+    coordinates: [number, number];
+  };
+
   // Service Provider Specific Fields
 
   @Prop()
@@ -58,6 +74,8 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index({ location: '2dsphere' });
 
 // Password Hashing Pre-save Hook
 UserSchema.pre('save', async function (next) {

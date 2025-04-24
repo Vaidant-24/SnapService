@@ -8,6 +8,8 @@ import {
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
+import { Notification } from "@/components/type/Notification";
+import { Geolocation } from "@/components/type/User";
 
 type User = {
   userId: string;
@@ -15,6 +17,7 @@ type User = {
   lastName: string;
   email: string;
   role: "customer" | "service_provider";
+  location: Geolocation;
 };
 
 type AuthContextType = {
@@ -26,6 +29,8 @@ type AuthContextType = {
   setNotificationsCount: Dispatch<SetStateAction<number>>;
   unreadNotifications: any[];
   setUnreadNotifications: Dispatch<SetStateAction<any[]>>;
+  fetchNotifications: () => Promise<void>;
+  markAllAsRead: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,7 +40,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [notificationsCount, setNotificationsCount] = useState<number>(0);
-  const [unreadNotifications, setUnreadNotifications] = useState<any[]>([]);
+  const [unreadNotifications, setUnreadNotifications] = useState<
+    Notification[]
+  >([]);
 
   useEffect(() => {
     const verifyUser = async () => {
@@ -63,6 +70,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
     setUser(null);
     router.push("/sign-in");
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const res1 = await fetch(
+        `http://localhost:3001/notifications/user/${user?.userId}/unread`
+      );
+      const unread = await res1.json();
+      setUnreadNotifications(unread);
+
+      const res2 = await fetch(
+        `http://localhost:3001/notifications/user/${user?.userId}/unread/count`
+      );
+      const count = await res2.json();
+      setNotificationsCount(count || 0);
+    } catch (err) {
+      console.error("Failed to fetch notifications", err);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:3001/notifications/user/${user?.userId}/mark-all-read`,
+        {
+          method: "PATCH",
+        }
+      );
+      if (!res.ok) throw new Error("Failed to mark notifications as read");
+      setUnreadNotifications([]);
+      setNotificationsCount(0);
+    } catch (err) {
+      console.error("Failed to mark notifications as read", err);
+    }
   };
 
   useEffect(() => {
@@ -106,6 +147,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setNotificationsCount,
         unreadNotifications,
         setUnreadNotifications,
+        fetchNotifications,
+        markAllAsRead,
       }}
     >
       {children}

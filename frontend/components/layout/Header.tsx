@@ -12,7 +12,16 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { user, logout } = useAuth();
+  const {
+    user,
+    logout,
+    setNotificationsCount,
+    setUnreadNotifications,
+    notificationsCount,
+    unreadNotifications,
+    markAllAsRead,
+    fetchNotifications,
+  } = useAuth();
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
@@ -32,6 +41,10 @@ const Header = () => {
 
   // Socket connection
   useNotificationSocket();
+
+  useEffect(() => {
+    if (user) fetchNotifications();
+  }, [user, notificationsCount]);
 
   const dashboardPath =
     user?.role === "customer"
@@ -118,7 +131,13 @@ const Header = () => {
 
       {/* Desktop Right Side */}
       <div className="hidden md:flex items-center gap-8 relative">
-        {user && <NotificationPopover />}
+        {user && (
+          <NotificationPopover
+            notifications={unreadNotifications}
+            count={notificationsCount}
+            onMarkAllAsRead={markAllAsRead}
+          />
+        )}
 
         {user ? (
           <div ref={dropdownRef} className="relative">
@@ -250,21 +269,21 @@ const Header = () => {
 
           {user?.role === "service_provider" && (
             <Link
-              href="/service-provider-notifications"
+              href="/service-provider-reviews"
               onClick={toggleMenu}
               className="hover:text-orange-500 transition duration-300"
             >
-              Notifications
+              Reviews
             </Link>
           )}
 
           {user?.role === "customer" && (
             <Link
-              href="/customer-notifications"
+              href="/customer-approval"
               onClick={toggleMenu}
               className="hover:text-orange-500 transition duration-300"
             >
-              Notifications
+              Approvals
             </Link>
           )}
 

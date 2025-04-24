@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
+import { GeoLocationDto } from 'src/user/dto-user/service-provider-dto';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,7 +19,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: string; firstName: string; lastName: string; email: string; role: string }) {
+  async validate(payload: {
+    sub: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: string;
+    location: GeoLocationDto;
+  }) {
     const isValid = await this.authService.verifyToken(payload.sub);
 
     if (!isValid) {
@@ -31,6 +39,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       lastName: payload.lastName,
       email: payload.email,
       role: payload.role,
+      location: payload.location,
     };
   }
 }

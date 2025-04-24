@@ -89,6 +89,33 @@ const ServiceProviderProfile = () => {
     setMessage(null);
   };
 
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        setFormData((prev: any) => ({
+          ...prev,
+          location: {
+            type: "Point",
+            coordinates: [longitude, latitude], // GeoJSON format: [lng, lat]
+          },
+        }));
+
+        alert("Location detected successfully!");
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        alert("Failed to detect location.");
+      }
+    );
+  };
+
   return (
     <AuthGuard>
       <div className="max-w-4xl mx-auto mt-10 mb-12 p-6 bg-gray-900 text-white rounded-lg shadow-md">
@@ -211,6 +238,23 @@ const ServiceProviderProfile = () => {
                   disabled={!editMode}
                 />
               </div>
+
+              {editMode && (
+                <div className="mt-4">
+                  <button
+                    onClick={handleDetectLocation}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                  >
+                    📍 Detect My Location
+                  </button>
+                  {formData.location && (
+                    <p className="mt-2 text-sm text-green-400">
+                      Location set to: [Lng: {formData.location.coordinates[0]},
+                      Lat: {formData.location.coordinates[1]}]
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}

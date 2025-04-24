@@ -28,7 +28,7 @@ export const useNotificationSocket = () => {
     socket.on("booking-completion-approval", (payload) => {
       toast.success("Booking status updated!", {
         description: "Your booking is now awaiting your approval.",
-        duration: 4000,
+        duration: 3000,
         action: {
           label: "View",
           onClick: () => router.push("/customer-approval"),
@@ -41,7 +41,7 @@ export const useNotificationSocket = () => {
     socket.on("booking-cancelled", () => {
       toast.error("Booking was cancelled by the provider", {
         description: "You may try booking another provider.",
-        duration: 4000,
+        duration: 3000,
       });
       setNotificationsCount((prev) => prev + 1);
     });
@@ -52,7 +52,7 @@ export const useNotificationSocket = () => {
 
       toast.success("Booking confirmed!", {
         description: "Your booking request has been accepted.",
-        duration: 4000,
+        duration: 3000,
       });
       setNotificationsCount((prev) => prev + 1);
     });
@@ -61,7 +61,7 @@ export const useNotificationSocket = () => {
     socket.on("customer-review-added", () => {
       toast.success("New review received!", {
         description: "You have a new review from a customer.",
-        duration: 4000,
+        duration: 3000,
         action: {
           label: "View",
           onClick: () => router.push("/service-provider-notifications"),
@@ -70,11 +70,20 @@ export const useNotificationSocket = () => {
       setNotificationsCount((prev) => prev + 1);
     });
 
-    // PROVIDER: Booking completed (review submitted by customer)
+    // PROVIDER: Booking completed (booking marked as completed by customer)
     socket.on("booking-completed", () => {
       toast.success("Booking marked as completed!", {
         description: "The customer has completed the review.",
-        duration: 4000,
+        duration: 3000,
+      });
+      setNotificationsCount((prev) => prev + 1);
+    });
+
+    // PROVIDER: Provider Booked (by customer)
+    socket.on("provider-booked", () => {
+      toast.success("Your service is booked!", {
+        description: "The customer has booked your service.",
+        duration: 3000,
       });
       setNotificationsCount((prev) => prev + 1);
     });
@@ -85,6 +94,7 @@ export const useNotificationSocket = () => {
       socket.off("booking-confirmed");
       socket.off("customer-review-added");
       socket.off("booking-completed");
+      socket.off("provider-booked");
       socket.disconnect();
     };
   }, [user]);

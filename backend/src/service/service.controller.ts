@@ -1,10 +1,19 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Query } from '@nestjs/common';
 import { ServiceService } from './service.service';
 import { CreateServiceDto, UpdateServiceDto } from './dto-service/service.dto';
 
 @Controller('services')
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
+
+  @Get('nearby')
+  async getNearbyServices(
+    @Query('lng') lng: number,
+    @Query('lat') lat: number,
+    @Query('radius') radius: number = 5000, // default to 5 km
+  ) {
+    return this.serviceService.findNearbyServices(lng, lat, radius);
+  }
 
   @Get()
   async getAllServices() {

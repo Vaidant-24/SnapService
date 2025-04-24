@@ -61,6 +61,19 @@ export class BookingService {
 
   async create(createBookingDto: CreateBookingDto): Promise<Booking> {
     const newBooking = new this.bookingModel(createBookingDto);
+    const providerId = createBookingDto.providerDetails._id;
+    if (providerId) {
+      await this.notificationService.createNotification({
+        type: 'BookingUpdate',
+        message: `A customer booked your service - ${newBooking.serviceName}`,
+        senderId: createBookingDto.customerId,
+        serviceId: createBookingDto.serviceId,
+        recipientId: providerId,
+        bookingId: (newBooking._id as string).toString(),
+        isRead: false,
+      });
+      await this.notificationsGateway.ProviderBookedByCustomer(providerId);
+    }
     return newBooking.save();
   }
 
@@ -123,10 +136,10 @@ export class BookingService {
         if (providerId) {
           await this.notificationService.createNotification({
             type: 'BookingUpdate',
-            message: 'Your booking has been completed',
-            senderId: providerId,
+            message: 'A customer marked booking as Completed',
+            senderId: customerId,
             serviceId: updatedBooking.serviceId.toString(),
-            recipientId: customerId,
+            recipientId: providerId,
             bookingId: bookingId,
             isRead: false,
           });
@@ -139,7 +152,7 @@ export class BookingService {
       await this.notificationService.createNotification({
         type: 'ReviewSubmitted',
         message: 'A customer has submitted a review',
-        senderId: providerId,
+        senderId: customerId,
         serviceId: updatedBooking.serviceId.toString(),
         recipientId: providerId,
         bookingId: bookingId,

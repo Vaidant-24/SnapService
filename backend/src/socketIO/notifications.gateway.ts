@@ -13,6 +13,7 @@ export enum NotificationEvent {
   BookingConfirmed = 'booking-confirmed',
   CustomerReviewAdded = 'customer-review-added',
   BookingCompleted = 'booking-completed',
+  ProviderBooked = 'provider-booked',
 }
 
 @WebSocketGateway({
@@ -67,5 +68,9 @@ export class NotificationsGateway implements OnGatewayInit, OnGatewayConnection,
 
   customerBookingCompleted(providerId: string) {
     this.emitToUser(providerId, NotificationEvent.BookingCompleted, 'booking-completed');
+  }
+
+  ProviderBookedByCustomer(providerId: string) {
+    this.emitToUser(providerId, NotificationEvent.ProviderBooked, 'provider-booked');
   }
 }

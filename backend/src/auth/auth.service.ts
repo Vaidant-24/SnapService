@@ -55,6 +55,7 @@ export class AuthService {
       lastName: user.lastName,
       email: user.email,
       role: user.role,
+      location: user.location,
     };
 
     return {
@@ -65,6 +66,7 @@ export class AuthService {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        location: user.location,
       },
     };
   }
@@ -84,6 +86,7 @@ export class AuthService {
       email: user.email,
       phone: user.phone,
       address: user.address,
+      location: user.location,
       experience: user.experience,
       description: user.description,
       createdAt: user.createdAt,
