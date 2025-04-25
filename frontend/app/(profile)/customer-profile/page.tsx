@@ -91,13 +91,15 @@ const CustomerProfile = () => {
 
   return (
     <AuthGuard>
-      <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-900 text-white rounded-lg shadow-md">
+      <div className="max-w-4xl mx-auto my-28 mb-18 p-6 bg-gray-900 text-white rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Customer Profile</h1>
+          <h1 className="text-2xl font-bold text-orange-500">
+            Customer Profile
+          </h1>
           {!editMode ? (
             <button
               onClick={() => setEditMode(true)}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-semibold"
+              className="bg-orange-500 hover:bg-orange-600 text-white text-center px-2 py-2 rounded "
             >
               Edit Profile
             </button>
@@ -154,7 +156,6 @@ const CustomerProfile = () => {
               <h2 className="text-xl font-semibold">
                 {customer.firstName + " " + customer.lastName}
               </h2>
-              <p className="text-orange-400">Valued Customer</p>
               <p className="text-sm text-gray-400 mt-2">
                 Member since {new Date(customer.createdAt).toLocaleDateString()}
               </p>

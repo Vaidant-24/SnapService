@@ -15,8 +15,6 @@ const Header = () => {
   const {
     user,
     logout,
-    setNotificationsCount,
-    setUnreadNotifications,
     notificationsCount,
     unreadNotifications,
     markAllAsRead,
@@ -57,7 +55,7 @@ const Header = () => {
       : "/service-provider-profile";
 
   return (
-    <header className="flex items-center justify-between py-4 px-6 md:px-12 bg-transparent relative z-50">
+    <header className="flex items-center  justify-between  py-4 px-6 md:px-12 bg-gray-950 w-full fixed z-50">
       {/* Logo and Brand Name */}
       <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
         <Image
@@ -155,7 +153,14 @@ const Header = () => {
               <ChevronDown size={18} />
             </button>
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 rounded-md bg-gray-900 shadow-lg border border-gray-700">
+              <div className="absolute right-0 mt-2 w-48 rounded-md bg-gray-950 shadow-lg border border-gray-700">
+                <Link
+                  href={profilePath}
+                  className="block px-4 py-2 text-sm text-white hover:bg-gray-800"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Profile: {user.firstName}
+                </Link>
                 <Link
                   href={dashboardPath}
                   className="block px-4 py-2 text-sm text-white hover:bg-gray-800"
@@ -172,13 +177,7 @@ const Header = () => {
                     Your Approval
                   </Link>
                 )}
-                <Link
-                  href={profilePath}
-                  className="block px-4 py-2 text-sm text-white hover:bg-gray-800"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  Profile
-                </Link>
+
                 <button
                   onClick={() => {
                     logout();
@@ -220,7 +219,7 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="absolute top-16 right-6 bg-gray-800 border border-gray-700 text-white flex flex-col gap-4 p-6 md:hidden z-50">
+        <div className="absolute top-14 right-2 bg-gray-800 border border-gray-700 text-white flex flex-col gap-4 p-6 md:hidden z-50">
           <Link
             href="/"
             onClick={toggleMenu}

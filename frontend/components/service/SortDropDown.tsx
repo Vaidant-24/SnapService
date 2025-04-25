@@ -13,7 +13,7 @@ export default function SortDropdown({
     <select
       value={selected}
       onChange={(e) => onChange(e.target.value)}
-      className="px-2 py-2 bg-gray-800 text-white border border-gray-600 rounded-md"
+      className="px-2 py-1 bg-gray-800 text-white border flex items-center border-gray-600 rounded-md"
     >
       <option value="">Sort by</option>
       <option value="price-asc">Price: Low to High</option>

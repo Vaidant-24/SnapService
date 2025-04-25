@@ -8,11 +8,7 @@ export default function CustomerAllBookings() {
 
   return (
     <AuthGuard>
-      <div className="container mx-8 px-8 py-16 bg-black text-white min-h-screen">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl text-orange-500 font-bold">Bookings</h1>
-        </div>
-
+      <div className="container mx-8 mt-4 px-8 py-16  text-white min-h-screen">
         {!userData ? (
           <p>Unable to load user data.</p>
         ) : (

@@ -17,9 +17,9 @@ interface ProviderServicesProps {
 
 export default function ProviderServices({ services }: ProviderServicesProps) {
   return (
-    <section className="bg-gray-950  py-4">
+    <section className=" py-4">
       <div className="container mx-auto px-4">
-        <h3 className="text-2xl text-orange-500 font-semibold mb-6">
+        <h3 className="text-3xl text-orange-500 font-semibold mb-6">
           Your Services
         </h3>
 
@@ -47,7 +47,7 @@ export default function ProviderServices({ services }: ProviderServicesProps) {
 
                   <div className="flex items-center gap-2">
                     <IndianRupee className="text-orange-500 w-5 h-5" />
-                    <span className="text-orange-400 font-medium text-sm">
+                    <span className="text-gray-400 text-sm">
                       Price: {service.price}
                     </span>
                   </div>

@@ -85,7 +85,7 @@ export default function ProviderReviews() {
   const unreadReviews = reviews.filter((r) => !r.isRead);
 
   return (
-    <div className="w-full max-w-2xl my-12 mx-auto bg-gray-900">
+    <div className="w-full max-w-2xl my-24 mx-auto bg-gray-900">
       <Card className="w-full">
         <CardHeader className="flex flex-row justify-between items-center">
           <CardTitle className="text-xl font-semibold">

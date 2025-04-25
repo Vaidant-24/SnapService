@@ -67,9 +67,11 @@ export default function CustomerBookings({ userId }: CustomerBookingsProps) {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="mt-10">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Your Bookings</h2>
+    <div className="mt-6 mr-4">
+      <div className="flex justify-between items-center mb-4 px-4">
+        <h2 className="text-3xl text-orange-500 font-semibold">
+          Your Bookings
+        </h2>
 
         <DropDown
           setIsDropdownOpen={setIsDropdownOpen}

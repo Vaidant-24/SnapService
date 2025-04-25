@@ -16,6 +16,13 @@ export class BookingService {
     private readonly notificationService: NotificationService,
   ) {}
 
+  async findAllByCustomerAndStatus(customerId: string): Promise<Booking[]> {
+    return this.bookingModel
+      .find({ customerId, status: 'Confirmed' })
+      .populate('serviceId', 'name description price')
+      .populate('providerDetails', 'firstName lastName email phone');
+  }
+
   async findAllByCustomer(customerId: string): Promise<Booking[]> {
     return this.bookingModel
       .find({ customerId })
@@ -26,6 +33,14 @@ export class BookingService {
   async findAllByProvider(providerId: string): Promise<Booking[]> {
     return this.bookingModel
       .find({ 'providerDetails._id': providerId })
+      .populate('serviceId', 'name description price')
+      .populate('providerDetails', 'username email')
+      .sort({ createAt: -1 });
+  }
+
+  async findAllByProviderAndStatus(providerId: string): Promise<Booking[]> {
+    return this.bookingModel
+      .find({ 'providerDetails._id': providerId, status: 'Confirmed' })
       .populate('serviceId', 'name description price')
       .populate('providerDetails', 'username email')
       .sort({ createAt: -1 });

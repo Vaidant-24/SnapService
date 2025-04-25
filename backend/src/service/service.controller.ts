@@ -10,7 +10,7 @@ export class ServiceController {
   async getNearbyServices(
     @Query('lng') lng: number,
     @Query('lat') lat: number,
-    @Query('radius') radius: number = 5000, // default to 5 km
+    @Query('radius') radius: number, // default to 5 km
   ) {
     return this.serviceService.findNearbyServices(lng, lat, radius);
   }

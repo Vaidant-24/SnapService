@@ -64,7 +64,7 @@ export const useNotificationSocket = () => {
         duration: 3000,
         action: {
           label: "View",
-          onClick: () => router.push("/service-provider-notifications"),
+          onClick: () => router.push("/service-provider-reviews"),
         },
       });
       setNotificationsCount((prev) => prev + 1);

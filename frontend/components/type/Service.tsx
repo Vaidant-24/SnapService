@@ -1,3 +1,5 @@
+import { Geolocation } from "./User";
+
 export type Service = {
   _id: string;
   name: string;
@@ -13,4 +15,5 @@ export type Service = {
     address: string;
     experience?: string;
   };
+  location: Geolocation;
 };

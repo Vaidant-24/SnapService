@@ -8,6 +8,8 @@ import ServiceCard from "./ServiceCard";
 import CategoryDropdown from "./CategoryDropdown";
 import SearchField from "./SearchField";
 import SortDropdown from "./SortDropDown";
+import { getDistanceFromLatLonInKm } from "@/utility/calculateDistance";
+import { Button } from "../ui/button";
 
 export default function ServicesList() {
   const [services, setServices] = useState<Service[]>([]);
@@ -23,6 +25,37 @@ export default function ServicesList() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const handleNearbyServices = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        const nearby = filteredServices.filter((service) => {
+          if (!service.location) return false;
+
+          const distance = getDistanceFromLatLonInKm(
+            latitude,
+            longitude,
+            service.location?.coordinates[1],
+            service.location?.coordinates[0]
+          );
+          return distance <= 10; // filter within 10 km radius
+        });
+
+        setFilteredServices(nearby);
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        alert("Unable to retrieve your location");
+      }
+    );
+  };
 
   useEffect(() => {
     (async () => {
@@ -80,7 +113,7 @@ export default function ServicesList() {
   };
 
   return (
-    <div className="min-h-screen mx-8 bg-black text-white px-8 py-16">
+    <div className="min-h-screen mx-8 my-12  text-white px-8 py-16">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-orange-500">
@@ -102,6 +135,13 @@ export default function ServicesList() {
           )}
 
           <SortDropdown selected={sortOption} onChange={setSortOption} />
+
+          <Button
+            onClick={handleNearbyServices}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+          >
+            Nearby Services
+          </Button>
         </div>
 
         {loading ? (

@@ -1,7 +1,14 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Booking } from "../type/Booking";
+import Link from "next/link";
+import {
+  CalendarDays,
+  CircleCheckBig,
+  Wallet,
+  IndianRupee,
+  PackageSearch,
+} from "lucide-react";
 
 interface UpcomingBookingsProps {
   userId: string;
@@ -15,7 +22,6 @@ export default function CustomerUpcomingBooking({
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const router = useRouter();
 
   useEffect(() => {
     if (!userId) return;
@@ -23,12 +29,11 @@ export default function CustomerUpcomingBooking({
     const fetchBookings = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3001/bookings/customer/${userId}`
+          `http://localhost:3001/bookings/customer/status/${userId}`
         );
         if (!response.ok) throw new Error("Failed to fetch bookings");
         const data = await response.json();
 
-        // Filter only future bookings and sort by date
         const upcoming = data
           .filter((b: Booking) => new Date(b.date) >= new Date())
           .sort(
@@ -49,78 +54,96 @@ export default function CustomerUpcomingBooking({
     fetchBookings();
   }, [userId, limit]);
 
-  if (loading) return <p>Loading upcoming bookings...</p>;
+  if (loading)
+    return <p className="text-gray-300">Loading upcoming bookings...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="mt-6">
-      <h2 className="text-xl font-semibold mb-3">Upcoming Bookings</h2>
+    <section className=" py-4">
+      <div className="container mx-auto px-4">
+        <h3 className="text-2xl text-orange-500 font-semibold mb-6">
+          Upcoming Bookings
+        </h3>
 
-      {bookings.length > 0 ? (
-        <div className="space-y-6">
-          {bookings.map((booking) => (
-            <div
-              key={booking._id}
-              className="bg-gray-800 p-6 rounded-lg shadow flex justify-between items-center"
-            >
-              <div>
-                <h3 className="text-lg ">
-                  Service:{" "}
-                  <span className="text-xl">{booking.serviceId.name}</span>
-                </h3>
-                <p className="text-lg">
-                  Date: {new Date(booking.date).toLocaleDateString()}
-                </p>
-                <p className="text-lg">
-                  Price:{" "}
-                  <span className="text-orange-500 ">
-                    ₹{booking.serviceId.price}
-                  </span>
-                </p>
+        {bookings.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {bookings.map((booking) => (
+              <div
+                key={booking._id}
+                className="bg-gray-800 rounded-xl p-10 border border-gray-800 shadow-lg"
+              >
+                <h4 className="text-lg text-white font-semibold flex items-center gap-2 mb-4">
+                  {booking.serviceId.name}
+                </h4>
+
+                <div className="space-y-3 text-gray-300 text-sm">
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="text-orange-500 w-5 h-5" />
+                    <span>
+                      Date: {new Date(booking.date).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <IndianRupee className="text-orange-500 w-5 h-5" />
+                    <span>Price: ₹{booking.serviceId.price}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <CircleCheckBig className="text-orange-500 w-5 h-5" />
+                    <span>
+                      Status:{" "}
+                      <span
+                        className={`${
+                          booking.status === "Pending"
+                            ? "text-yellow-500"
+                            : booking.status === "Confirmed"
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {booking.status}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Wallet className="text-orange-500 w-5 h-5" />
+                    <span>
+                      Payment:{" "}
+                      <span
+                        className={`${
+                          booking.isPaid ? "text-green-500" : "text-yellow-500"
+                        }`}
+                      >
+                        {booking.isPaid ? "Paid" : "Not Paid"}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Wallet className="text-orange-500 w-5 h-5" />
+                    <span>Method: {booking.paymentMethod}</span>
+                  </div>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-lg">
-                  Status:{" "}
-                  <span
-                    className={`${
-                      booking.status === "Pending"
-                        ? "text-yellow-500"
-                        : booking.status === "Confirmed"
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {booking.status}
-                  </span>
-                </p>
-                <p className="text-lg">
-                  Payment:{" "}
-                  <span
-                    className={`${
-                      booking.isPaid ? "text-green-500" : "text-yellow-500"
-                    }`}
-                  >
-                    {booking.isPaid ? "Paid" : "Not Paid"}
-                  </span>
-                </p>
-                <p className="text-lg">
-                  Payment Method: {booking.paymentMethod}
-                </p>
-              </div>
+            ))}
+
+            <div className="col-span-full mt-6 text-center">
+              <Link href="/customer-bookings">
+                <button className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-4 py-2 rounded-md">
+                  View All
+                </button>
+              </Link>
             </div>
-          ))}
-          <div className="text-center mt-6">
-            <button
-              onClick={() => router.push("/customer-bookings")}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md"
-            >
-              View All Bookings
-            </button>
           </div>
-        </div>
-      ) : (
-        <p className="text-gray-400">No upcoming bookings found.</p>
-      )}
-    </div>
+        ) : (
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center shadow-md">
+            <PackageSearch className="mx-auto h-12 w-12 text-gray-600 mb-3" />
+            <p className="text-gray-400 text-lg">No upcoming bookings found.</p>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

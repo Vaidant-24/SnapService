@@ -118,7 +118,7 @@ const ServiceProviderProfile = () => {
 
   return (
     <AuthGuard>
-      <div className="max-w-4xl mx-auto mt-10 mb-12 p-6 bg-gray-900 text-white rounded-lg shadow-md">
+      <div className="max-w-4xl mx-auto my-12  p-6 bg-gray-900 text-white rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Service Provider Profile</h1>
           {!editMode ? (
@@ -247,10 +247,10 @@ const ServiceProviderProfile = () => {
                   >
                     📍 Detect My Location
                   </button>
-                  {formData.location && (
+                  {formData.location.coordinates && (
                     <p className="mt-2 text-sm text-green-400">
-                      Location set to: [Lng: {formData.location.coordinates[0]},
-                      Lat: {formData.location.coordinates[1]}]
+                      Location set to: [Lng: {formData.location?.coordinates[0]}
+                      , Lat: {formData.location?.coordinates[1]}]
                     </p>
                   )}
                 </div>

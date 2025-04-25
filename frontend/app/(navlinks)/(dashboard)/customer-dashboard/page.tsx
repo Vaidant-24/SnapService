@@ -9,18 +9,12 @@ export default function CustomerDashboard() {
 
   return (
     <AuthGuard>
-      <div className="container mx-8 px-8 py-16 bg-black text-white min-h-screen">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl text-orange-500 font-medium">
-            Customer Dashboard
-          </h1>
-        </div>
-
+      <div className="container mx-8 my-12 px-8 py-16 text-white min-h-screen">
         {!userData ? (
           <p>Unable to load user data.</p>
         ) : (
           <>
-            <h2 className="text-xl  mb-4">
+            <h2 className="text-xl  mb-4 ml-4">
               Welcome,{" "}
               <span className="text-2xl text-green-400 font-semibold">
                 {userData.firstName + " " + userData.lastName}

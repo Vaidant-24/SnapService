@@ -29,8 +29,8 @@ export default function NotificationsPage() {
   }, [customer, bookings]);
 
   return (
-    <div className="min-h-screen bg-black px-6 py-10 text-white">
-      <h2 className="text-2xl font-bold mb-6">Notifications</h2>
+    <div className="min-h-screen my-12 bg-black px-6 py-10 text-white">
+      <h2 className="text-2xl font-bold mb-6">Your Approvals</h2>
 
       {bookings.length === 0 ? (
         <p className="text-gray-400">No pending completion requests.</p>

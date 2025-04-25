@@ -10,9 +10,19 @@ export interface QueryParams {
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
+  @Get('customer/status/:customerId')
+  async getUpcomingBookingsByCustomer(@Param('customerId') customerId: string) {
+    return this.bookingService.findAllByCustomerAndStatus(customerId);
+  }
+
   @Get('customer/:customerId')
   async getBookingsByCustomer(@Param('customerId') customerId: string) {
     return this.bookingService.findAllByCustomer(customerId);
+  }
+
+  @Get('provider/status/:providerId')
+  async getUpcomingBookingsByProvider(@Param('providerId') providerId: string) {
+    return this.bookingService.findAllByProviderAndStatus(providerId);
   }
 
   @Get('provider/:providerId')

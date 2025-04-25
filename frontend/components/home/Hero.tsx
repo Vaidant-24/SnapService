@@ -2,7 +2,7 @@ import SearchBar from "../ui/SearchBar";
 
 const Hero = () => {
   return (
-    <section className="py-16 px-6 md:py-24 flex flex-col items-center text-center">
+    <section className="py-16 px-6 md:py-24 flex flex-col items-center text-center mt-12 mb-6">
       <h1 className="text-4xl md:text-6xl font-bold mb-4 max-w-4xl">
         <span className="text-orange-500">SnapService</span>
       </h1>

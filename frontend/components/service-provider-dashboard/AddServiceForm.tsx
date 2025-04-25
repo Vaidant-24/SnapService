@@ -21,7 +21,6 @@ const categories = [
   "Plumbing",
   "Shifting",
   "Carpentry",
-  "Pest Control",
   "Painting",
   "Appliance Repair",
 ];
@@ -87,8 +86,7 @@ export default function AddServiceForm({
   };
 
   return (
-    <section className="bg-gray-800 p-6 rounded-lg mb-6">
-      <h3 className="text-lg font-bold mb-4">Add New Service</h3>
+    <section className=" p-6 rounded-lg mb-6">
       <form onSubmit={handleFormSubmit} className="space-y-4">
         <input
           type="text"

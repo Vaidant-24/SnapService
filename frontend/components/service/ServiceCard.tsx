@@ -10,6 +10,13 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {
+  BriefcaseBusiness,
+  IndianRupee,
+  CircleHelp,
+  LetterText,
+  User2Icon,
+} from "lucide-react";
 
 interface ServiceCardProps {
   service: Service;
@@ -23,16 +30,38 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
       : "N/A";
 
   return (
-    <div className="bg-gray-800 p-6 rounded-xl shadow hover:shadow-orange-500/20 transition-all duration-300">
-      <h2 className="text-xl font-semibold text-white mb-4">{service.name}</h2>
-      <p className="text-gray-400 mb-3">Description: {service.description}</p>
-      <p className="text-gray-400  mb-3">Category: {service.category}</p>
-      <p className=" text-gray-400 mb-3">
-        Price: <span className="text-orange-400 mb-3">₹{service.price}</span>
-      </p>
-      <p className=" text-gray-400 mb-3">Provider: {providerName}</p>
+    <div className="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-800 transition-all duration-300 ">
+      <div className="mb-6">
+        <h4 className="text-lg text-white font-semibold flex items-center gap-2">
+          {service.name}
+        </h4>
+      </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="space-y-3 text-gray-300">
+        <div className="flex items-start gap-2">
+          <LetterText className="text-orange-500 w-5 h-5 mt-1" />
+          <p className="text-sm">Description: {service.description}</p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <IndianRupee className="text-orange-500 w-5 h-5" />
+          <span className="text-gray-400 text-sm">Price: ₹{service.price}</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <CircleHelp className="text-orange-500 w-5 h-5" />
+          <span className="text-gray-400 text-sm">
+            Category: {service.category}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <User2Icon className="text-orange-500 w-5 h-5" />
+          <p className="text-gray-400 text-sm">Provider: {providerName}</p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-2">
         <Button
           className="bg-orange-500 hover:bg-orange-600 text-white"
           onClick={() => onBook(service._id)}
@@ -43,7 +72,7 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
         <Dialog>
           <DialogTrigger asChild>
             <Button className="bg-gray-700 hover:bg-gray-600 text-white">
-              View
+              View Details
             </Button>
           </DialogTrigger>
           <DialogContent className="bg-gray-800 border border-gray-700 text-white">
@@ -56,25 +85,33 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
               </DialogDescription>
             </DialogHeader>
             <div className="mt-4 space-y-5">
-              <p className="text-gray-400 mb-3">
-                <span className="text-gray-400 mb-3">Description:</span>{" "}
-                {service.description}
-              </p>
-              <p className="text-gray-400 mb-3">
-                Price:{" "}
-                <span className="text-orange-500 mb-3">₹{service.price}</span>
-              </p>
-              <p className="text-gray-400 mb-3">
-                Category:{" "}
-                <span className="text-gray-400 mb-3">{service.category}</span>
-              </p>
-              <p className="text-gray-400 mb-4">
-                Provider: <span>{providerName}</span>
-              </p>
-              <p className="text-gray-400 mb-4">
-                Rating: 4.5/5
-                <span className="text-orange-500 mb-3 sm">⭐</span>
-              </p>
+              <div className="flex items-start gap-2">
+                <LetterText className="text-orange-500 w-5 h-5 mt-1" />
+                <p className="text-sm">Description: {service.description}</p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <IndianRupee className="text-orange-500 w-5 h-5" />
+                <span className="text-gray-400 text-sm">
+                  Price: ₹{service.price}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <CircleHelp className="text-orange-500 w-5 h-5" />
+                <span className="text-gray-400 text-sm">
+                  Category: {service.category}
+                </span>
+              </div>
+
+              <div className="text-gray-400 mb-4">
+                <span>Provider: {providerName}</span>
+              </div>
+
+              <div className="text-gray-400 mb-4">
+                Rating: 4.5/5 <span className="text-orange-500">⭐</span>
+              </div>
+
               <Button
                 className="bg-orange-500 hover:bg-orange-600 text-white"
                 onClick={() => onBook(service._id)}

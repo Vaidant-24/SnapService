@@ -63,19 +63,21 @@ export default function BookingCard({
 
   return (
     <div className="bg-gray-800 rounded-lg border border-gray-800 shadow-lg">
-      <div className="p-4 border-b border-gray-800 flex justify-between">
+      <div className="p-4 border-b border-gray-800 flex justify-between items-start">
         <div>
           <h4 className="text-white font-semibold text-lg truncate">
             {booking.customerName}
           </h4>
           <p className="text-gray-400 text-sm">{booking.serviceName}</p>
         </div>
-        <div
-          className={`${getStatusColor(
-            booking.status
-          )} px-2 py-2 rounded-full text-xs text-white font-semibold  flex items-center justify-center`}
-        >
-          {booking.status}
+        <div className="shrink-0">
+          <span
+            className={`${getStatusColor(
+              booking.status
+            )} px-3 py-1 rounded  text-xs text-white font-medium inline-block`}
+          >
+            {booking.status}
+          </span>
         </div>
       </div>
 

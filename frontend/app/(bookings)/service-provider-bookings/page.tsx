@@ -13,7 +13,7 @@ export default function ServiceProviderBookings() {
   const { user: userData } = useAuth();
   return (
     <AuthGuard>
-      <div className="container mx-auto px-6 py-12 bg-black text-white min-h-screen">
+      <div className="container mx-auto my-12 px-6 py-12 text-white min-h-screen">
         <header className="flex justify-between items-center mb-6">
           <h1 className="text-2xl text-orange-500 font-bold">
             Service Provider Bookings

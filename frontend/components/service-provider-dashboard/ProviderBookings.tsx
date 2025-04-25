@@ -67,7 +67,7 @@ export default function ProviderBookings({
   }
 
   return (
-    <section className="bg-gray-950 min-h-screen">
+    <section className=" min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl text-orange-500 font-semibold">
