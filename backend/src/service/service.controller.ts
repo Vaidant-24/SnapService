@@ -15,6 +15,14 @@ export class ServiceController {
     return this.serviceService.findNearbyServices(lng, lat, radius);
   }
 
+  @Get('provider/:providerId')
+  async getAllServicesByProvider(
+    @Param('providerId') providerId: string,
+    @Query('limit') limit?: string, // optional query param
+  ) {
+    return this.serviceService.findAllServicesByProvider(providerId, limit);
+  }
+
   @Get()
   async getAllServices() {
     return this.serviceService.findAll();
@@ -28,6 +36,11 @@ export class ServiceController {
   @Post()
   async createService(@Body() createServiceDto: CreateServiceDto) {
     return this.serviceService.create(createServiceDto);
+  }
+
+  @Put('update-all-rating')
+  async updateServiceRatings() {
+    return this.serviceService.updateAllServicesRatings();
   }
 
   @Put(':id')

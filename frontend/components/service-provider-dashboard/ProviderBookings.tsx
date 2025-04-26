@@ -6,6 +6,7 @@ import BookingsFilter from "./BookingsFilter";
 import { Booking } from "../type/Booking";
 
 import BookingDetailModal from "./BookingDetailModal";
+import { MdOutlineSync } from "react-icons/md";
 
 interface ProviderBookingsProps {
   providerId: string;
@@ -26,22 +27,22 @@ export default function ProviderBookings({
     setDialogOpen(true);
   };
 
+  const fetchBookings = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:3001/bookings/provider/${providerId}`
+      );
+      const data = await res.json();
+      setBookings(data);
+      setFilteredBookings(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const res = await fetch(
-          `http://localhost:3001/bookings/provider/${providerId}`
-        );
-        const data = await res.json();
-        const filtered = data;
-        setBookings(filtered);
-        setFilteredBookings(filtered);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     if (providerId) fetchBookings();
   }, [providerId]);
 
@@ -73,10 +74,18 @@ export default function ProviderBookings({
           <h3 className="text-2xl text-orange-500 font-semibold">
             Bookings Dashboard
           </h3>
-          <BookingsFilter
-            activeFilter={activeFilter}
-            setActiveFilter={setActiveFilter}
-          />
+          <div className="flex items-center gap-6 mb-6">
+            <button
+              onClick={fetchBookings}
+              className="flex items-center gap-2 text-green-500 hover:text-green-600"
+            >
+              <MdOutlineSync className="w-9 h-9" />
+            </button>
+            <BookingsFilter
+              activeFilter={activeFilter}
+              setActiveFilter={setActiveFilter}
+            />
+          </div>
         </div>
 
         {filteredBookings.length > 0 ? (

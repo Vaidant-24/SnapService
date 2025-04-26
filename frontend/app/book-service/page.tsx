@@ -124,7 +124,7 @@ export default function BookService() {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-black text-white px-4 py-10">
+      <div className="min-h-screen bg-black text-white px-4 py-24">
         <div className="max-w-3xl mx-auto bg-gray-900 rounded-xl shadow-lg p-6">
           <h1 className="text-3xl font-bold text-orange-500 mb-6 text-center">
             Book a Service

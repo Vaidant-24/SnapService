@@ -16,6 +16,8 @@ import {
   CircleHelp,
   LetterText,
   User2Icon,
+  Star,
+  SquarePen,
 } from "lucide-react";
 
 interface ServiceCardProps {
@@ -104,12 +106,25 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
                 </span>
               </div>
 
-              <div className="text-gray-400 mb-4">
-                <span>Provider: {providerName}</span>
+              <div className="flex items-center gap-2">
+                <User2Icon className="text-orange-500 w-5 h-5" />
+                <span className="text-gray-400 text-sm">
+                  Provider: {providerName}
+                </span>
               </div>
 
-              <div className="text-gray-400 mb-4">
-                Rating: 4.5/5 <span className="text-orange-500">⭐</span>
+              <div className="flex items-center gap-2">
+                <Star className="text-orange-500 w-5 h-5" />
+                <span className="text-gray-400 text-sm">
+                  Rating: {service.averageRating}/5
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <SquarePen className="text-orange-500 w-5 h-5" />
+                <span className="text-gray-400 text-sm">
+                  Total Ratings: {service.reviewCount}
+                </span>
               </div>
 
               <Button

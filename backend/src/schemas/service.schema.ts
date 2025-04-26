@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document, Types } from 'mongoose';
-import { User } from './user.schema';
 
 export type ServiceDocument = Service & Document;
 
 @Schema({ timestamps: true })
 export class Service {
+  _id: mongoose.Schema.Types.ObjectId;
   @Prop({ required: true, unique: false })
   name: string;
 
@@ -36,6 +36,13 @@ export class Service {
     type: 'Point';
     coordinates: [number, number];
   };
+
+  // Rating summary fields
+  @Prop({ default: 0 })
+  averageRating: number;
+
+  @Prop({ default: 0 })
+  reviewCount: number;
 
   @Prop({ default: true })
   isActive: boolean;

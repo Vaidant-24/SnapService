@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsString, IsNumber, IsMongoId, IsOptional, ValidateNested } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsMongoId, IsOptional, ValidateNested, Min, Max } from 'class-validator';
 import { GeoLocationDto } from 'src/user/dto-user/service-provider-dto';
 
 export class CreateServiceDto {
@@ -27,6 +27,17 @@ export class CreateServiceDto {
   @ValidateNested()
   @Type(() => GeoLocationDto)
   location?: GeoLocationDto;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(5)
+  averageRating?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  reviewCount?: number;
 }
 
 export class UpdateServiceDto {
@@ -50,4 +61,15 @@ export class UpdateServiceDto {
   @ValidateNested()
   @Type(() => GeoLocationDto)
   location?: GeoLocationDto;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(5)
+  averageRating?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  reviewCount?: number;
 }

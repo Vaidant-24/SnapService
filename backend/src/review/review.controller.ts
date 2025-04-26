@@ -22,6 +22,11 @@ export class ReviewController {
     return this.reviewsService.getReviewsByProvider(providerId);
   }
 
+  @Get('/service/:id')
+  async getReviewsByService(@Param('id') serviceId: string) {
+    return this.reviewsService.getReviewsByService(serviceId);
+  }
+
   @Patch('/mark-read/:providerId')
   async markAllReviewsAsRead(@Param('providerId') providerId: string) {
     return this.reviewsService.markAllReviewsAsRead(providerId);

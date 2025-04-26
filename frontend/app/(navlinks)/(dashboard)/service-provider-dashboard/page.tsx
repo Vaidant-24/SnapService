@@ -21,27 +21,25 @@ export default function ServiceProviderDashboard() {
   const [myServices, setMyServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const fetchServices = async () => {
+    try {
+      const servicesRes = await fetch(
+        `http://localhost:3001/services/provider/${userData?.userId}?limit=6`
+      );
+      if (!servicesRes.ok) throw new Error("Failed to fetch services");
+
+      const servicesData = await servicesRes.json();
+
+      setMyServices(servicesData);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!userData) return;
-
-    const fetchServices = async () => {
-      try {
-        const servicesRes = await fetch("http://localhost:3001/services");
-        if (!servicesRes.ok) throw new Error("Failed to fetch services");
-
-        const servicesData = await servicesRes.json();
-        const myServicesData = servicesData.filter((service: Service) => {
-          const providerId = service.providerId?._id;
-          return providerId === userData.userId;
-        });
-
-        setMyServices(myServicesData);
-      } catch (error) {
-        console.error("Fetch error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchServices();
   }, [userData]);
@@ -91,7 +89,11 @@ export default function ServiceProviderDashboard() {
             </section>
 
             {/* Provider Services Component */}
-            <ProviderServices services={myServices} />
+            <ProviderServices
+              services={myServices}
+              handleFetchService={() => fetchServices()}
+              loading={loading}
+            />
 
             {/* Provider Bookings Component */}
             {userData && (

@@ -17,17 +17,39 @@ export class BookingService {
   ) {}
 
   async findAllByCustomerAndStatus(customerId: string): Promise<Booking[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     return this.bookingModel
-      .find({ customerId, status: 'Confirmed' })
+      .find({ customerId, status: 'Confirmed', date: { $gte: today } })
       .populate('serviceId', 'name description price')
-      .populate('providerDetails', 'firstName lastName email phone');
+      .populate('providerDetails', 'firstName lastName email phone')
+
+      .sort({ date: 1 })
+      .limit(5);
+  }
+
+  async findAllByProviderAndStatus(providerId: string): Promise<Booking[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return this.bookingModel
+      .find({
+        'providerDetails._id': providerId,
+        status: 'Confirmed',
+        date: { $gte: today }, // Only bookings for today or later
+      })
+      .populate('serviceId', 'name description price')
+      .populate('providerDetails', 'username email')
+      .sort({ date: 1 }) // Sort by booking date (earliest first)
+      .limit(5); // Limit to top 5
   }
 
   async findAllByCustomer(customerId: string): Promise<Booking[]> {
     return this.bookingModel
       .find({ customerId })
       .populate('serviceId', 'name description price')
-      .populate('providerDetails', 'firstName lastName email phone');
+      .populate('providerDetails', 'firstName lastName email phone')
+      .sort({ createdAt: -1 });
   }
 
   async findAllByProvider(providerId: string): Promise<Booking[]> {
@@ -35,19 +57,11 @@ export class BookingService {
       .find({ 'providerDetails._id': providerId })
       .populate('serviceId', 'name description price')
       .populate('providerDetails', 'username email')
-      .sort({ createAt: -1 });
-  }
-
-  async findAllByProviderAndStatus(providerId: string): Promise<Booking[]> {
-    return this.bookingModel
-      .find({ 'providerDetails._id': providerId, status: 'Confirmed' })
-      .populate('serviceId', 'name description price')
-      .populate('providerDetails', 'username email')
-      .sort({ createAt: -1 });
+      .sort({ createdAt: -1 });
   }
 
   async findAllBookings(): Promise<Booking[]> {
-    return this.bookingModel.find().sort({ createAt: -1 });
+    return this.bookingModel.find().sort({ createdAt: -1 });
   }
 
   async findBookingById(bookingId: string): Promise<Booking> {

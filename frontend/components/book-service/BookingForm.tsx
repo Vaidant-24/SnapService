@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 export type PaymentMethod = "Cash" | "Online";
 
 interface BookingFormProps {
@@ -27,6 +29,24 @@ export default function BookingForm({
   setPaymentMethod,
   onSubmit,
 }: BookingFormProps) {
+  const [minDate, setMinDate] = useState("");
+  const [minTime, setMinTime] = useState("");
+
+  useEffect(() => {
+    const now = new Date();
+    const todayStr = now.toISOString().split("T")[0]; // Format: yyyy-mm-dd
+    const currentTimeStr = now.toTimeString().slice(0, 5); // Format: HH:MM
+
+    setMinDate(todayStr);
+
+    // Only restrict time if selected date is today
+    if (date === todayStr) {
+      setMinTime(currentTimeStr);
+    } else {
+      setMinTime(""); // no restriction
+    }
+  }, [date]);
+
   return (
     <div>
       <h2 className="text-xl font-semibold text-orange-400 mb-2 border-b border-gray-700 pb-1">
@@ -43,6 +63,7 @@ export default function BookingForm({
             type="date"
             className="w-full bg-gray-800 p-2 rounded-md text-white focus:ring-2 focus:ring-orange-500"
             value={date}
+            min={minDate}
             onChange={(e) => setDate(e.target.value)}
           />
         </div>
@@ -54,6 +75,7 @@ export default function BookingForm({
             type="time"
             className="w-full bg-gray-800 p-2 rounded-md text-white focus:ring-2 focus:ring-orange-500"
             value={time}
+            min={minTime}
             onChange={(e) => setTime(e.target.value)}
           />
         </div>

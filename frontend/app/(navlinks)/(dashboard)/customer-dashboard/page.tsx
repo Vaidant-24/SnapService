@@ -25,7 +25,7 @@ export default function CustomerDashboard() {
             <FeaturedServices />
 
             {/* Customer's Bookings Component */}
-            <CustomerUpcomingBooking userId={userData.userId} limit={3} />
+            <CustomerUpcomingBooking userId={userData.userId} />
           </>
         )}
       </div>

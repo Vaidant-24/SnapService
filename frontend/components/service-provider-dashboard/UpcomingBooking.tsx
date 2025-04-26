@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { CalendarDays, Clock, CreditCard } from "lucide-react";
+import { CalendarDays, Clock, CreditCard, PackageSearch } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Booking } from "../type/Booking";
+import { MdOutlineSync } from "react-icons/md";
 
 interface UpcomingBookingsProps {
   providerId: string;
@@ -15,45 +16,25 @@ export default function ProviderUpcomingBookings({
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 
+  const fetchUpcomingBookings = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(
+        `http://localhost:3001/bookings/provider/status/${providerId}`
+      );
+      if (!res.ok) throw new Error("Failed to fetch bookings");
+
+      const data = await res.json();
+      setUpcomingBookings(data); // Already filtered & sorted from backend
+    } catch (err) {
+      console.error("Error fetching upcoming bookings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!providerId) return;
-
-    const fetchUpcomingBookings = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(
-          `http://localhost:3001/bookings/provider/status/${providerId}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch bookings");
-
-        const data = await res.json();
-
-        // Filter bookings by provider and only get confirmed/pending bookings
-        const providerBookings = data;
-
-        // Get today's date (without time)
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        // Filter upcoming bookings (today or later)
-        const upcoming = providerBookings.filter((b: Booking) => {
-          const bookingDate = new Date(b.date);
-          return bookingDate >= today;
-        });
-
-        // Sort by nearest date
-        const sorted = upcoming.sort((a: Booking, b: Booking) => {
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        });
-
-        // Take top 5
-        setUpcomingBookings(sorted.slice(0, 5));
-      } catch (err) {
-        console.error("Error fetching upcoming bookings:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchUpcomingBookings();
   }, [providerId]);
@@ -81,6 +62,12 @@ export default function ProviderUpcomingBookings({
         <h3 className="text-3xl text-orange-500 font-semibold">
           Upcoming Bookings
         </h3>
+        <button
+          onClick={fetchUpcomingBookings}
+          className="flex items-center gap-2 text-green-500 hover:text-green-700"
+        >
+          <MdOutlineSync className="w-9 h-9" />
+        </button>
       </div>
 
       {upcomingBookings.length > 0 ? (
@@ -138,8 +125,9 @@ export default function ProviderUpcomingBookings({
           </div>
         </div>
       ) : (
-        <div className="text-center py-8">
-          <p className="text-gray-400">No upcoming bookings found.</p>
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center shadow-md">
+          <PackageSearch className="mx-auto h-12 w-12 text-gray-600 mb-3" />
+          <p className="text-gray-400 text-lg">No upcoming bookings found.</p>
         </div>
       )}
     </div>

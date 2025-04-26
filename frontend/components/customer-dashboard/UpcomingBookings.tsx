@@ -9,61 +9,65 @@ import {
   IndianRupee,
   PackageSearch,
 } from "lucide-react";
+import { MdOutlineSync } from "react-icons/md";
 
 interface UpcomingBookingsProps {
   userId: string;
-  limit?: number;
 }
 
 export default function CustomerUpcomingBooking({
   userId,
-  limit = 5,
 }: UpcomingBookingsProps) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const fetchBookings = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/bookings/customer/status/${userId}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch bookings");
+      const data = await response.json();
+
+      setBookings(data);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      setError("Failed to load upcoming bookings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!userId) return;
 
-    const fetchBookings = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:3001/bookings/customer/status/${userId}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch bookings");
-        const data = await response.json();
-
-        const upcoming = data
-          .filter((b: Booking) => new Date(b.date) >= new Date())
-          .sort(
-            (a: Booking, b: Booking) =>
-              new Date(a.date).getTime() - new Date(b.date).getTime()
-          )
-          .slice(0, limit);
-
-        setBookings(upcoming);
-      } catch (error) {
-        console.error("Error fetching bookings:", error);
-        setError("Failed to load upcoming bookings");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBookings();
-  }, [userId, limit]);
+  }, [userId]);
 
-  if (loading)
-    return <p className="text-gray-300">Loading upcoming bookings...</p>;
+  if (loading) {
+    return (
+      <div className="rounded-lg shadow-lg p-4 h-64 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500" />
+      </div>
+    );
+  }
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <section className=" py-4">
       <div className="container mx-auto px-4">
-        <h3 className="text-2xl text-orange-500 font-semibold mb-6">
-          Upcoming Bookings
-        </h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-2xl text-orange-500 font-semibold mb-6">
+            Upcoming Bookings
+          </h3>
+          <button
+            onClick={fetchBookings}
+            className="flex items-center gap-2 text-green-500 hover:text-green-700"
+          >
+            <MdOutlineSync className="w-9 h-9" />
+          </button>
+        </div>
 
         {bookings.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

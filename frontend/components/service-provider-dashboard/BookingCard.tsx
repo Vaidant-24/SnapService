@@ -1,4 +1,5 @@
 "use client";
+
 import { useRef } from "react";
 import { CalendarDays, Clock, Mail, Phone, MapPin } from "lucide-react";
 import InfoItem from "./InfoItem";
@@ -15,16 +16,35 @@ export default function BookingCard({
 }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleStatusUpdate = async (status: string) => {
+  // Define valid status transitions
+  const validTransitions: { [key: string]: string[] } = {
+    Pending: ["Confirmed", "Cancelled"],
+    Confirmed: ["Awaiting Completion"],
+    AwaitingCompletion: [],
+    Completed: [],
+    Cancelled: [],
+  };
+
+  // Handle status update with validation
+  const handleStatusUpdate = async (newStatus: string) => {
+    const currentStatusKey = booking.status.replace(/\s/g, ""); // remove spaces for matching
+    const allowedNextStatuses = validTransitions[currentStatusKey];
+
+    if (!allowedNextStatuses.includes(newStatus)) {
+      console.error(
+        `Invalid status transition from ${booking.status} to ${newStatus}`
+      );
+      return;
+    }
+
     try {
       const res = await fetch(`http://localhost:3001/bookings/${booking._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status: newStatus }),
       });
 
       const updated = await res.json();
-      // console.log("Updated booking:", updated.status);
 
       setBookings((prev) =>
         prev.map((b) =>
@@ -74,7 +94,7 @@ export default function BookingCard({
           <span
             className={`${getStatusColor(
               booking.status
-            )} px-3 py-1 rounded  text-xs text-white font-medium inline-block`}
+            )} px-3 py-1 rounded text-xs text-white font-medium inline-block`}
           >
             {booking.status}
           </span>
@@ -104,36 +124,36 @@ export default function BookingCard({
         />
 
         {/* Inline Actions */}
-        {booking.status !== "Completed" && (
+        {booking.status !== "Completed" && booking.status !== "Cancelled" && (
           <div
             ref={dropdownRef}
             className="flex gap-3 items-center pt-2 flex-wrap"
           >
-            <select
-              onChange={(e) => {
-                const selected = e.target.value;
-                if (selected !== "") handleStatusUpdate(selected);
-              }}
-              defaultValue=""
-              className="px-3 py-2 bg-gray-700 text-white rounded-md text-sm hover:bg-gray-700 transition-colors"
-            >
-              <option value="" disabled>
-                Change Status
-              </option>
-              <option
-                value="Confirmed"
-                onClick={() => handleStatusUpdate("Confirmed")}
+            {/* Dropdown showing only valid next statuses */}
+            {validTransitions[booking.status.replace(/\s/g, "")]?.length >
+              0 && (
+              <select
+                onChange={(e) => {
+                  const selected = e.target.value;
+                  if (selected !== "") handleStatusUpdate(selected);
+                }}
+                defaultValue=""
+                className="px-3 py-2 bg-gray-700 text-white rounded-md text-sm hover:bg-gray-700 transition-colors"
               >
-                Accept
-              </option>
-              <option
-                value="Cancelled"
-                onClick={() => handleStatusUpdate("Cancelled")}
-              >
-                Reject
-              </option>
-            </select>
+                <option value="" disabled>
+                  Change Status
+                </option>
+                {validTransitions[booking.status.replace(/\s/g, "")]?.map(
+                  (nextStatus) => (
+                    <option key={nextStatus} value={nextStatus}>
+                      {nextStatus === "Confirmed" ? "Accept" : nextStatus}
+                    </option>
+                  )
+                )}
+              </select>
+            )}
 
+            {/* Special button for "Request Completion" */}
             {booking.status === "Confirmed" && (
               <button
                 onClick={() => handleStatusUpdate("Awaiting Completion")}
@@ -144,6 +164,8 @@ export default function BookingCard({
             )}
           </div>
         )}
+
+        {/* Completed booking: only View Details */}
         {booking.status === "Completed" && (
           <div className="flex gap-3 items-center pt-2 flex-wrap">
             <button

@@ -14,6 +14,7 @@ import { User, UserSchema } from './schemas/user.schema';
 import { ReviewModule } from './review/review.module';
 import { NotificationsGateway } from './socketIO/notifications.gateway';
 import { NotificationModule } from './notification/notification.module';
+import { Review, ReviewSchema } from './schemas/review.schema';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { NotificationModule } from './notification/notification.module';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Service.name, schema: ServiceSchema }]),
     MongooseModule.forFeature([{ name: Booking.name, schema: BookingSchema }]),
+    MongooseModule.forFeature([{ name: Review.name, schema: ReviewSchema }]),
     ReviewModule,
     NotificationModule,
     MongooseModule.forRootAsync({

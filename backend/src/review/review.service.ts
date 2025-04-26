@@ -1,10 +1,10 @@
-// review.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Review, ReviewDocument } from 'src/schemas/review.schema';
 import { CreateReviewDto } from './dto-review/create-review.dto';
 import { NotificationsGateway } from 'src/socketIO/notifications.gateway';
+import { ServiceService } from '../service/service.service';
 
 @Injectable()
 export class ReviewService {
@@ -12,11 +12,17 @@ export class ReviewService {
     @InjectModel(Review.name)
     private reviewModel: Model<ReviewDocument>,
     private readonly notificationsGateway: NotificationsGateway,
+    private readonly serviceService: ServiceService,
   ) {}
 
   async addReview(dto: CreateReviewDto): Promise<Review> {
     const created = new this.reviewModel(dto);
-    return created.save();
+    const savedReview = await created.save();
+
+    // Update service ratings
+    await this.serviceService.updateServiceRatings(dto.serviceId);
+
+    return savedReview;
   }
 
   async getAllReviews(): Promise<Review[]> {
@@ -39,5 +45,14 @@ export class ReviewService {
     console.log('Updated reviews:', result);
 
     return { modifiedCount: result.modifiedCount };
+  }
+
+  // Add a method to get reviews by serviceId
+  async getReviewsByService(serviceId: string): Promise<Review[]> {
+    return this.reviewModel
+      .find({ serviceId })
+      .populate('customerId', 'firstName lastName')
+      .sort({ createdAt: -1 })
+      .exec();
   }
 }

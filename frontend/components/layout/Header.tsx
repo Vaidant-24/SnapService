@@ -55,21 +55,21 @@ const Header = () => {
       : "/service-provider-profile";
 
   return (
-    <header className="flex items-center  justify-between  py-4 px-6 md:px-12 bg-gray-950 w-full fixed z-50">
+    <header className="flex items-center justify-between py-4 px-4 sm:px-6 md:px-12 bg-gray-950 w-full fixed z-50">
       {/* Logo and Brand Name */}
       <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
         <Image
           src="/zap.svg"
           alt="SnapService Logo"
-          width={40}
-          height={40}
+          width={36}
+          height={36}
           className="object-contain"
         />
-        <span>SnapService</span>
+        <span className="hidden sm:inline">SnapService</span>
       </Link>
 
       {/* Desktop Navigation */}
-      <nav className="hidden md:flex gap-6">
+      <nav className="hidden md:flex gap-4 lg:gap-6">
         <Link
           href="/"
           className="text-white hover:text-orange-500 transition duration-300"
@@ -88,7 +88,6 @@ const Header = () => {
         {user?.role === "customer" && (
           <Link
             href="/customer-bookings"
-            onClick={toggleMenu}
             className="hover:text-orange-500 transition duration-300"
           >
             Bookings
@@ -98,7 +97,6 @@ const Header = () => {
         {user?.role === "service_provider" && (
           <Link
             href="/service-provider-bookings"
-            onClick={toggleMenu}
             className="hover:text-orange-500 transition duration-300"
           >
             Bookings
@@ -112,23 +110,10 @@ const Header = () => {
             Services
           </Link>
         )}
-
-        <Link
-          href="/about"
-          className="text-white hover:text-orange-500 transition duration-300"
-        >
-          About Us
-        </Link>
-        <Link
-          href="/contact"
-          className="text-white hover:text-orange-500 transition duration-300"
-        >
-          Contact
-        </Link>
       </nav>
 
       {/* Desktop Right Side */}
-      <div className="hidden md:flex items-center gap-8 relative">
+      <div className="hidden md:flex items-center gap-3 lg:gap-4">
         {user && (
           <NotificationPopover
             notifications={unreadNotifications}
@@ -141,7 +126,7 @@ const Header = () => {
           <div ref={dropdownRef} className="relative">
             <button
               onClick={toggleDropdown}
-              className="flex items-center gap-2 text-white hover:text-orange-500 transition"
+              className="flex items-center gap-1 lg:gap-2 text-white hover:text-orange-500 transition"
             >
               <Image
                 src="avatar.svg"
@@ -150,7 +135,7 @@ const Header = () => {
                 height={32}
                 className="rounded-full object-cover"
               />
-              <ChevronDown size={18} />
+              <ChevronDown size={16} />
             </button>
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 rounded-md bg-gray-950 shadow-lg border border-gray-700">
@@ -174,7 +159,7 @@ const Header = () => {
                     className="block px-4 py-2 text-sm text-white hover:bg-gray-800"
                     onClick={() => setDropdownOpen(false)}
                   >
-                    Your Approval
+                    Approvals
                   </Link>
                 )}
 
@@ -194,13 +179,13 @@ const Header = () => {
           <>
             <Link
               href="/sign-in"
-              className="px-4 py-2 border border-orange-500 text-orange-500 rounded-md hover:bg-orange-50 hover:text-orange-600 transition duration-300"
+              className="px-3 py-1.5 border border-orange-500 text-orange-500 rounded-md hover:bg-orange-50 hover:text-orange-600 transition duration-300 text-sm lg:px-4 lg:py-2 lg:text-base"
             >
               Login
             </Link>
             <Link
               href="/sign-up"
-              className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition duration-300"
+              className="px-3 py-1.5 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition duration-300 text-sm lg:px-4 lg:py-2 lg:text-base"
             >
               Register
             </Link>
@@ -208,22 +193,30 @@ const Header = () => {
         )}
       </div>
 
-      {/* Mobile Menu Toggle */}
-
-      <button
-        className="md:hidden text-orange-500 hover:text-orange-600 transition duration-300"
-        onClick={toggleMenu}
-      >
-        {menuOpen ? <X size={28} /> : <Menu size={28} />}
-      </button>
+      {/* Mobile Menu Toggle and Notification */}
+      <div className="md:hidden flex items-center gap-2">
+        {user && (
+          <NotificationPopover
+            notifications={unreadNotifications}
+            count={notificationsCount}
+            onMarkAllAsRead={markAllAsRead}
+          />
+        )}
+        <button
+          className="text-orange-500 hover:text-orange-600 transition duration-300"
+          onClick={toggleMenu}
+        >
+          {menuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="absolute top-14 right-2 bg-gray-800 border border-gray-700 text-white flex flex-col gap-4 p-6 md:hidden z-50">
+        <div className="absolute top-16 right-2 bg-gray-800 border border-gray-700 text-white flex flex-col gap-3 p-4 sm:p-6 md:hidden z-50 rounded-md w-56">
           <Link
             href="/"
             onClick={toggleMenu}
-            className="hover:text-orange-500 transition duration-300"
+            className="hover:text-orange-500 transition duration-300 py-1.5"
           >
             Home
           </Link>
@@ -231,7 +224,7 @@ const Header = () => {
             <Link
               href={dashboardPath}
               onClick={toggleMenu}
-              className="hover:text-orange-500 transition duration-300"
+              className="hover:text-orange-500 transition duration-300 py-1.5"
             >
               Dashboard
             </Link>
@@ -240,7 +233,7 @@ const Header = () => {
             <Link
               href="/services"
               onClick={toggleMenu}
-              className="hover:text-orange-500 transition duration-300"
+              className="hover:text-orange-500 transition duration-300 py-1.5"
             >
               Services
             </Link>
@@ -250,7 +243,7 @@ const Header = () => {
             <Link
               href="/customer-bookings"
               onClick={toggleMenu}
-              className="hover:text-orange-500 transition duration-300"
+              className="hover:text-orange-500 transition duration-300 py-1.5"
             >
               Bookings
             </Link>
@@ -260,7 +253,7 @@ const Header = () => {
             <Link
               href="/service-provider-bookings"
               onClick={toggleMenu}
-              className="hover:text-orange-500 transition duration-300"
+              className="hover:text-orange-500 transition duration-300 py-1.5"
             >
               Bookings
             </Link>
@@ -270,7 +263,7 @@ const Header = () => {
             <Link
               href="/service-provider-reviews"
               onClick={toggleMenu}
-              className="hover:text-orange-500 transition duration-300"
+              className="hover:text-orange-500 transition duration-300 py-1.5"
             >
               Reviews
             </Link>
@@ -280,53 +273,39 @@ const Header = () => {
             <Link
               href="/customer-approval"
               onClick={toggleMenu}
-              className="hover:text-orange-500 transition duration-300"
+              className="hover:text-orange-500 transition duration-300 py-1.5"
             >
               Approvals
             </Link>
           )}
 
-          <Link
-            href="/about"
-            onClick={toggleMenu}
-            className="hover:text-orange-500 transition duration-300"
-          >
-            About Us
-          </Link>
-          <Link
-            href="/contact"
-            onClick={toggleMenu}
-            className="hover:text-orange-500 transition duration-300"
-          >
-            Contact
-          </Link>
           {user ? (
             <button
               onClick={() => {
                 logout();
                 toggleMenu();
               }}
-              className="text-left hover:text-orange-500 transition duration-300"
+              className="text-left hover:text-orange-500 transition duration-300 py-1.5 text-red-400"
             >
               Logout
             </button>
           ) : (
-            <>
+            <div className="flex flex-col gap-2 mt-2">
               <Link
                 href="/sign-in"
                 onClick={toggleMenu}
-                className="hover:text-orange-500 transition duration-300"
+                className="px-3 py-1.5 border border-orange-500 text-orange-500 rounded-md hover:bg-orange-600 hover:text-white transition duration-300 text-center"
               >
                 Login
               </Link>
               <Link
                 href="/sign-up"
                 onClick={toggleMenu}
-                className="hover:text-orange-500 transition duration-300"
+                className="px-3 py-1.5 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition duration-300 text-center"
               >
                 Register
               </Link>
-            </>
+            </div>
           )}
         </div>
       )}

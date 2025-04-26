@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import {
   CalendarDays,
   IndianRupee,
@@ -16,15 +16,38 @@ export type FilteredBookingsProps = {
   filteredBookings: Booking[];
   bookings: Booking[];
   filterStatus: string;
+  setBookings: Dispatch<SetStateAction<Booking[]>>;
 };
 
 const FilteredBookings = ({
   filteredBookings,
   bookings,
   filterStatus,
+  setBookings,
 }: FilteredBookingsProps) => {
+  const handleCancel = async (bookingId: string) => {
+    try {
+      const res = await fetch(`http://localhost:3001/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "Cancelled" }),
+      });
+      if (!res.ok) {
+        throw new Error("Error while updating booking status!");
+      }
+      const updated = await res.json();
+
+      setBookings((prev) =>
+        prev.map((b) =>
+          b._id === bookingId ? { ...b, status: updated.status } : b
+        )
+      );
+    } catch (error) {
+      console.log("Error while updating booking status: ", error);
+    }
+  };
   return (
-    <section className=" py-4">
+    <section className="py-4">
       <div className="container mx-auto px-4 my-4">
         {filteredBookings.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -100,6 +123,17 @@ const FilteredBookings = ({
                     </span>
                   </div>
                 </div>
+                {/* {(booking.status === "Confirmed" ||
+                  booking.status === "Pending") && (
+                  <div className="mt-4 pt-2 border-t border-gray-700">
+                    <button
+                      onClick={() => handleCancel(booking._id)}
+                      className="w-full py-2 bg-amber-500 hover:bg-amber-600 rounded-md text-white text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )} */}
               </div>
             ))}
           </div>

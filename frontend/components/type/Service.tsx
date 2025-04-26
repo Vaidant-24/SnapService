@@ -15,5 +15,7 @@ export type Service = {
     address: string;
     experience?: string;
   };
+  averageRating: number;
+  reviewCount: number;
   location: Geolocation;
 };
