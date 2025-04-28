@@ -3,6 +3,13 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Service } from "../type/Service";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"; // Make sure shadcn <Select> is properly imported
 
 type AddServiceFormProps = {
   onServiceAdded: (service: Service) => void;
@@ -40,10 +47,14 @@ export default function AddServiceForm({
   });
 
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setNewService((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setNewService((prev) => ({ ...prev, category: value }));
   };
 
   const handleFormSubmit = async (e: FormEvent) => {
@@ -79,29 +90,27 @@ export default function AddServiceForm({
       console.error(err);
       setSubmitMessage("❌ Error adding service.");
     } finally {
-      console.log(userData);
-
       setSubmitting(false);
     }
   };
 
   return (
-    <section className=" p-6 rounded-lg mb-6">
-      <form onSubmit={handleFormSubmit} className="space-y-4">
+    <section className="p-4 sm:p-6 rounded-lg mb-6 bg-gray-900">
+      <form onSubmit={handleFormSubmit} className="space-y-4 flex flex-col">
         <input
           type="text"
           name="name"
           placeholder="Service Title"
           value={newService.name}
           onChange={handleInputChange}
-          className="w-full p-2 bg-gray-800 border border-gray-700 rounded"
+          className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-sm"
         />
         <textarea
           name="description"
           placeholder="Description"
           value={newService.description}
           onChange={handleInputChange}
-          className="w-full p-2 bg-gray-800 border border-gray-700 rounded"
+          className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-sm"
           rows={3}
         />
         <input
@@ -110,41 +119,51 @@ export default function AddServiceForm({
           placeholder="Price"
           value={newService.price}
           onChange={handleInputChange}
-          className="w-full p-2 bg-gray-800 border border-gray-700 rounded"
+          className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-sm"
         />
-        <select
-          name="category"
-          value={newService.category}
-          onChange={handleInputChange}
-          className="w-full p-2 bg-gray-800 border border-gray-700 rounded"
-        >
-          <option value="" disabled>
-            Select Category
-          </option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-        <div className="flex space-x-4">
+
+        {/* Using shadcn/ui Select */}
+        <div>
+          <Select
+            value={newService.category}
+            onValueChange={handleCategoryChange}
+          >
+            <SelectTrigger className="w-full bg-gray-800 border border-gray-700 text-sm">
+              <SelectValue placeholder="Select Category" />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-800 text-white">
+              {categories.map((cat) => (
+                <SelectItem
+                  key={cat}
+                  value={cat}
+                  className="hover:bg-gray-700 focus:bg-gray-700 text-sm"
+                >
+                  {cat}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
           <button
             type="submit"
             disabled={submitting}
             className={`${
               submitting ? "bg-green-800" : "bg-green-600 hover:bg-green-700"
-            } px-4 py-2 rounded`}
+            } w-full sm:w-auto px-4 py-2 rounded text-sm`}
           >
             {submitting ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded"
+            className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded text-sm"
           >
             Cancel
           </button>
         </div>
+
         {submitMessage && (
           <p className="mt-4 text-sm text-green-400">{submitMessage}</p>
         )}

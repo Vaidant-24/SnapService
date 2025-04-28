@@ -74,7 +74,7 @@ export default function ProviderBookings({
           <h3 className="text-2xl text-orange-500 font-semibold">
             Bookings Dashboard
           </h3>
-          <div className="flex items-center gap-6 mb-6">
+          <div className="flex items-center gap-6 ">
             <button
               onClick={fetchBookings}
               className="flex items-center gap-2 text-green-500 hover:text-green-600"

@@ -19,6 +19,8 @@ const ServiceProviderProfile = () => {
           credentials: "include",
         });
         const data = await res.json();
+        console.log("profile data: ", data);
+
         setProvider(data);
         setFormData(data);
         fetchReviews(data.userId); // Fetch reviews for the provider
@@ -35,6 +37,7 @@ const ServiceProviderProfile = () => {
         if (!res.ok) throw new Error("Failed to fetch reviews");
 
         const data = await res.json();
+        console.log("review data: ", data);
 
         setReviews(data);
 
@@ -118,7 +121,7 @@ const ServiceProviderProfile = () => {
 
   return (
     <AuthGuard>
-      <div className="max-w-4xl mx-auto my-12  p-6 bg-gray-900 text-white rounded-lg shadow-md">
+      <div className="max-w-4xl mx-auto mt-28 mb-20  p-6 bg-gray-900 text-white rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Service Provider Profile</h1>
           {!editMode ? (
@@ -282,25 +285,40 @@ const ServiceProviderProfile = () => {
                 <p>No reviews yet.</p>
               ) : (
                 <div className="space-y-4">
-                  {reviews.map((review) => (
-                    <div
-                      key={review._id}
-                      className="bg-gray-700 rounded p-4 border border-gray-600"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-yellow-400 font-bold">
-                          ⭐ {review.rating}
-                        </span>
+                  {reviews.map(
+                    ({ _id, rating, createdAt, comment, customerId }) => (
+                      <div
+                        key={_id}
+                        className="bg-gray-700 rounded-xl p-5 border border-gray-600 shadow-md"
+                      >
+                        {/* Top Row: Rating and Date */}
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-200 ">
+                            Rating: {rating}/5
+                          </span>
+                          <span className="text-gray-400 text-sm">
+                            {new Date(createdAt).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
+                          </span>
+                        </div>
+
+                        {/* Comment */}
+                        <p className="text-white text-base leading-relaxed mb-3">
+                          {comment}
+                        </p>
+
+                        {/* Customer Name */}
+                        <div className="text-right">
+                          <span className="text-sm text-gray-400 italic">
+                            ~ {customerId.firstName} {customerId.lastName}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <p className="mt-2 text-white">{review.comment}</p>
-                        <span className="text-xs text-gray-400">
-                          ~ {review.customerId.firstName}{" "}
-                          {review.customerId.lastName}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               )}
             </div>

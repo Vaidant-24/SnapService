@@ -71,13 +71,13 @@ export default function ServiceProviderDashboard() {
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                   <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-semibold">
-                    Add New Service
+                    Add Service
                   </button>
                 </DialogTrigger>
                 <DialogContent className="bg-gray-900 border-gray-700 text-white sm:max-w-lg">
                   <DialogHeader>
                     <DialogTitle className="text-lg font-semibold text-white">
-                      Add New Service
+                      Add Service
                     </DialogTitle>
                   </DialogHeader>
                   <AddServiceForm

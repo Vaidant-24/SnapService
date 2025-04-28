@@ -9,7 +9,7 @@ export default function CustomerDashboard() {
 
   return (
     <AuthGuard>
-      <div className="container mx-8 my-12 px-8 py-16 text-white min-h-screen">
+      <div className="container mx-auto my-12 px-8 py-16 text-white min-h-screen">
         {!userData ? (
           <p>Unable to load user data.</p>
         ) : (

@@ -60,7 +60,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black">
+    <div className="flex min-h-screen items-center justify-center mt-4 p-4 sm:p-8">
       <div className="w-full max-w-md rounded-lg bg-gray-900 p-8 shadow-md">
         <h1 className="mb-3 text-center text-2xl font-bold text-white">
           Login to Your Account

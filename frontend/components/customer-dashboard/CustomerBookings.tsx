@@ -73,12 +73,12 @@ export default function CustomerBookings({ userId }: CustomerBookingsProps) {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="mt-6 mr-4">
+    <div className="mt-6 mr-4 ">
       <div className="flex justify-between  mb-4 px-4">
-        <h2 className="text-3xl text-orange-500 font-semibold">
+        <h2 className="text-2xl text-orange-500 font-semibold">
           Your Bookings
         </h2>
-        <div className="flex justify-between items-center mb-4 gap-12">
+        <div className="flex justify-between items-center mb-4 gap-6">
           <button
             onClick={fetchBookings}
             className="flex items-center gap-2 text-green-500 hover:text-green-700"

@@ -17,6 +17,11 @@ export class ReviewController {
     return this.reviewsService.getAllReviews();
   }
 
+  @Get('/provider-unread/:id')
+  async getUnreadReviews(@Param('id') providerId: string) {
+    return this.reviewsService.getunreadReviewsByProvider(providerId);
+  }
+
   @Get('/provider/:id')
   async getReviews(@Param('id') providerId: string) {
     return this.reviewsService.getReviewsByProvider(providerId);

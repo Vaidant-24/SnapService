@@ -19,7 +19,7 @@ const DropDown = ({
     <div className="relative">
       <button
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md font-medium"
+        className="flex items-center gap-1 bg-orange-500 hover:bg-orange-600 text-white px-1 py-1 rounded-md font-medium"
       >
         <Filter className="h-4 w-4" />
         {filterStatus}

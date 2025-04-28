@@ -1,6 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 
 export default function Register() {
   const [error, setError] = useState("");
@@ -60,11 +66,10 @@ export default function Register() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black p-4 sm:p-8">
+    <div className="flex min-h-screen items-center justify-center  mt-20 p-4 sm:p-8">
       <div className="w-full max-w-lg rounded-lg bg-gray-900 p-6 sm:p-10 shadow-md">
-        {" "}
         {/* Responsive Form */}
-        <h1 className="mb-6 text-center text-2xl sm:text-3xl font-bold text-white">
+        <h1 className="mb-6 text-center text-2xl sm:text-3xl font-bold text-orange-500">
           Create an Account
         </h1>
         {error && (
@@ -143,14 +148,19 @@ export default function Register() {
             <label className="block text-sm font-medium text-gray-400">
               Role
             </label>
-            <select
-              name="role"
-              onChange={(e) => setRole(e.target.value)}
-              className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"
-            >
-              <option value="customer">Customer</option>
-              <option value="service_provider">Service Provider</option>
-            </select>
+            <Select value={role} onValueChange={setRole}>
+              <SelectTrigger className="mt-1  w-full rounded-md bg-gray-800 p-3 text-white">
+                <span>
+                  {role === "customer" ? "Customer" : "Service Provider"}
+                </span>
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 text-white border border-gray-600 rounded-md mt-1">
+                <SelectItem value="customer">Customer</SelectItem>
+                <SelectItem value="service_provider">
+                  Service Provider
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           {role === "service_provider" && (
             <>

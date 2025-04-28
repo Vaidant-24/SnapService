@@ -42,6 +42,10 @@ export const useNotificationSocket = () => {
       toast.error("Booking was cancelled by the provider", {
         description: "You may try booking another provider.",
         duration: 3000,
+        action: {
+          label: "View",
+          onClick: () => router.push("/customer-bookings"),
+        },
       });
       setNotificationsCount((prev) => prev + 1);
     });
@@ -53,6 +57,10 @@ export const useNotificationSocket = () => {
       toast.success("Booking confirmed!", {
         description: "Your booking request has been accepted.",
         duration: 3000,
+        action: {
+          label: "View",
+          onClick: () => router.push("/customer-bookings"),
+        },
       });
       setNotificationsCount((prev) => prev + 1);
     });
@@ -64,7 +72,7 @@ export const useNotificationSocket = () => {
         duration: 3000,
         action: {
           label: "View",
-          onClick: () => router.push("/service-provider-reviews"),
+          onClick: () => router.push("/service-provider-Unread-reviews"),
         },
       });
       setNotificationsCount((prev) => prev + 1);
@@ -73,8 +81,12 @@ export const useNotificationSocket = () => {
     // PROVIDER: Booking completed (booking marked as completed by customer)
     socket.on("booking-completed", () => {
       toast.success("Booking marked as completed!", {
-        description: "The customer has completed the review.",
+        description: "The customer has marked booking as Completed.",
         duration: 3000,
+        action: {
+          label: "View",
+          onClick: () => router.push("/service-provider-bookings"),
+        },
       });
       setNotificationsCount((prev) => prev + 1);
     });
@@ -84,6 +96,10 @@ export const useNotificationSocket = () => {
       toast.success("Your service is booked!", {
         description: "The customer has booked your service.",
         duration: 3000,
+        action: {
+          label: "View",
+          onClick: () => router.push("/service-provider-bookings"),
+        },
       });
       setNotificationsCount((prev) => prev + 1);
     });

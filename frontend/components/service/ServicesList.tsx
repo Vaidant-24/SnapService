@@ -10,8 +10,14 @@ import SearchField from "./SearchField";
 import SortDropdown from "./SortDropDown";
 import { getDistanceFromLatLonInKm } from "@/utility/calculateDistance";
 import { Button } from "../ui/button";
+import { PackageSearch } from "lucide-react";
 
 export default function ServicesList() {
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
+
   const [services, setServices] = useState<Service[]>([]);
   const [filteredServices, setFilteredServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -27,34 +33,28 @@ export default function ServicesList() {
   const searchParams = useSearchParams();
 
   const handleNearbyServices = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
+    if (userLocation) {
+      setUserLocation(null);
       return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-
-        const nearby = filteredServices.filter((service) => {
-          if (!service.location) return false;
-
-          const distance = getDistanceFromLatLonInKm(
-            latitude,
-            longitude,
-            service.location?.coordinates[1],
-            service.location?.coordinates[0]
-          );
-          return distance <= 10; // filter within 10 km radius
-        });
-
-        setFilteredServices(nearby);
-      },
-      (error) => {
-        console.error("Geolocation error:", error);
-        alert("Unable to retrieve your location");
+    } else {
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser");
+        return;
       }
-    );
+
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) => {
+          setUserLocation({
+            lat: coords.latitude,
+            lon: coords.longitude,
+          });
+        },
+        (err) => {
+          console.error("Geolocation error:", err);
+          alert("Unable to retrieve your location");
+        }
+      );
+    }
   };
 
   useEffect(() => {
@@ -82,27 +82,45 @@ export default function ServicesList() {
   useEffect(() => {
     let filtered = services;
 
+    // 1. Category
     if (selectedCategory !== "All") {
       filtered = filtered.filter((s) => s.category === selectedCategory);
     }
 
+    // 2. Search text
     if (searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase();
+      const q = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (s) =>
-          s.name.toLowerCase().includes(query) ||
-          s.description.toLowerCase().includes(query)
+          s.name.toLowerCase().includes(q) ||
+          s.description.toLowerCase().includes(q)
       );
     }
 
+    // 3. Sort by price
     if (sortOption === "price-asc") {
-      filtered = [...filtered].sort((a, b) => a.price - b.price); // a-b asc
+      filtered = filtered.slice().sort((a, b) => a.price - b.price);
     } else if (sortOption === "price-desc") {
-      filtered = [...filtered].sort((a, b) => b.price - a.price); // b-a desc
+      filtered = filtered.slice().sort((a, b) => b.price - a.price);
+    }
+
+    // 4. Proximity (if userLocation is set)
+    if (userLocation) {
+      filtered = filtered.filter((service) => {
+        if (!service.location) return false;
+        const { coordinates } = service.location;
+        const distanceKm = getDistanceFromLatLonInKm(
+          userLocation.lat,
+          userLocation.lon,
+          coordinates[1],
+          coordinates[0]
+        );
+        return distanceKm <= 10;
+      });
     }
 
     setFilteredServices(filtered);
-  }, [selectedCategory, searchQuery, services, sortOption]);
+  }, [services, selectedCategory, searchQuery, sortOption, userLocation]);
 
   const handleBookNow = (serviceId: string) => {
     if (user?.role !== "customer") {
@@ -140,7 +158,7 @@ export default function ServicesList() {
             onClick={handleNearbyServices}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
           >
-            Nearby Services
+            {userLocation ? "Clear Nearby" : "Nearby Services"}
           </Button>
         </div>
 
@@ -159,11 +177,16 @@ export default function ServicesList() {
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-400">
-            {services.length > 0
-              ? "No matching services found."
-              : "No services available."}
-          </p>
+          <>
+            <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center shadow-md">
+              <PackageSearch className="mx-auto h-12 w-12 text-gray-600 mb-3" />
+              <p className="text-gray-400 text-lg">
+                {services.length > 0
+                  ? "No matching services found."
+                  : "No services available."}
+              </p>
+            </div>
+          </>
         )}
       </div>
     </div>

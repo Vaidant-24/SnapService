@@ -163,6 +163,16 @@ const Header = () => {
                   </Link>
                 )}
 
+                {user?.role === "service_provider" && (
+                  <Link
+                    href="/service-provider-Unread-reviews"
+                    className="block px-4 py-2 text-sm text-white hover:bg-gray-800"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    Unread Reviews
+                  </Link>
+                )}
+
                 <button
                   onClick={() => {
                     logout();
@@ -220,6 +230,27 @@ const Header = () => {
           >
             Home
           </Link>
+
+          {user?.role === "customer" && (
+            <Link
+              href={profilePath}
+              className="hover:text-orange-500 transition duration-300 py-1.5"
+              onClick={() => setDropdownOpen(false)}
+            >
+              Profile: {user.firstName}
+            </Link>
+          )}
+
+          {user?.role === "service_provider" && (
+            <Link
+              href={profilePath}
+              className="hover:text-orange-500 transition duration-300 py-1.5"
+              onClick={() => setDropdownOpen(false)}
+            >
+              Profile: {user.firstName}
+            </Link>
+          )}
+
           {user && (
             <Link
               href={dashboardPath}
@@ -261,11 +292,11 @@ const Header = () => {
 
           {user?.role === "service_provider" && (
             <Link
-              href="/service-provider-reviews"
+              href="/service-provider-Unread-reviews"
               onClick={toggleMenu}
               className="hover:text-orange-500 transition duration-300 py-1.5"
             >
-              Reviews
+              Unread Reviews
             </Link>
           )}
 
@@ -294,14 +325,14 @@ const Header = () => {
               <Link
                 href="/sign-in"
                 onClick={toggleMenu}
-                className="px-3 py-1.5 border border-orange-500 text-orange-500 rounded-md hover:bg-orange-600 hover:text-white transition duration-300 text-center"
+                className="text-left hover:text-orange-500 transition duration-300 py-1.5 text-blue-400"
               >
                 Login
               </Link>
               <Link
                 href="/sign-up"
                 onClick={toggleMenu}
-                className="px-3 py-1.5 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition duration-300 text-center"
+                className="text-left hover:text-orange-500 transition duration-300 py-1.5 text-orange-500"
               >
                 Register
               </Link>

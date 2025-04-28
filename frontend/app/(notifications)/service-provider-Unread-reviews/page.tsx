@@ -34,7 +34,7 @@ export default function ProviderReviews() {
 
       try {
         const res = await fetch(
-          `http://localhost:3001/review/provider/${user.userId}`
+          `http://localhost:3001/review/provider-unread/${user.userId}`
         );
         const data: Review[] = await res.json();
 

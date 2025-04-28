@@ -33,11 +33,16 @@ export class ReviewService {
       .exec();
   }
 
-  async getReviewsByProvider(providerId: string): Promise<Review[]> {
+  async getunreadReviewsByProvider(providerId: string): Promise<Review[]> {
     return await this.reviewModel
       .find({ providerId, isRead: false })
       .populate('customerId', 'firstName lastName ')
+      .limit(6)
       .exec();
+  }
+
+  async getReviewsByProvider(providerId: string): Promise<Review[]> {
+    return await this.reviewModel.find({ providerId }).populate('customerId', 'firstName lastName ').limit(6).exec();
   }
 
   async markAllReviewsAsRead(providerId: string): Promise<{ modifiedCount: number }> {

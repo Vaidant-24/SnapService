@@ -17,10 +17,10 @@ export default function CategoryDropdown({
   toggleOpen,
 }: CategoryDropdownProps) {
   return (
-    <div className="relative">
+    <div className="relative w-full sm:w-64">
       <button
         onClick={toggleOpen}
-        className="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md flex items-center border border-orange-500"
+        className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-2 py-2 rounded-md flex items-center border border-orange-500"
       >
         Category: {selected}
         <svg

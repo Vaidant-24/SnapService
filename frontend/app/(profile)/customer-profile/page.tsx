@@ -166,6 +166,7 @@ const CustomerProfile = () => {
               <h3 className="text-lg font-semibold mb-2">
                 Personal Information
               </h3>
+
               {[
                 { label: "First Name", name: "firstName", type: "firstName" },
                 { label: "Last Name", name: "lastName", type: "lastName" },

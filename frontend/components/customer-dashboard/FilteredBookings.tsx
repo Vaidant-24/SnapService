@@ -9,6 +9,7 @@ import {
   XCircle,
   AlertCircle,
   CreditCard,
+  Contact2Icon,
 } from "lucide-react";
 import { Booking } from "../type/Booking";
 
@@ -74,6 +75,13 @@ const FilteredBookings = ({
                     <IndianRupee className="text-orange-500 w-5 h-5" />
                     <span className="text-gray-400 text-sm">
                       Price: ₹{booking.serviceId.price}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Contact2Icon className="text-orange-500 w-5 h-5" />
+                    <span className="text-gray-400 text-sm">
+                      Contact: {booking.providerDetails.phone}
                     </span>
                   </div>
 

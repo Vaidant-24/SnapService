@@ -4,6 +4,13 @@ import { useRef } from "react";
 import { CalendarDays, Clock, Mail, Phone, MapPin } from "lucide-react";
 import InfoItem from "./InfoItem";
 import { Booking } from "../type/Booking";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"; // Import Select components from shadcn
 
 export default function BookingCard({
   booking,
@@ -16,7 +23,6 @@ export default function BookingCard({
 }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Define valid status transitions
   const validTransitions: { [key: string]: string[] } = {
     Pending: ["Confirmed", "Cancelled"],
     Confirmed: ["Awaiting Completion"],
@@ -25,9 +31,8 @@ export default function BookingCard({
     Cancelled: [],
   };
 
-  // Handle status update with validation
   const handleStatusUpdate = async (newStatus: string) => {
-    const currentStatusKey = booking.status.replace(/\s/g, ""); // remove spaces for matching
+    const currentStatusKey = booking.status.replace(/\s/g, "");
     const allowedNextStatuses = validTransitions[currentStatusKey];
 
     if (!allowedNextStatuses.includes(newStatus)) {
@@ -90,14 +95,16 @@ export default function BookingCard({
           </h4>
           <p className="text-gray-400 text-sm">{booking.serviceName}</p>
         </div>
-        <div className="shrink-0">
-          <span
+        <div>
+          <div
             className={`${getStatusColor(
               booking.status
-            )} px-3 py-1 rounded text-xs text-white font-medium inline-block`}
+            )} px-1 py-1 rounded text-xs text-white font-medium`}
           >
-            {booking.status}
-          </span>
+            {booking.status === "Awaiting Completion"
+              ? "Awaiting"
+              : booking.status}
+          </div>
         </div>
       </div>
 
@@ -129,28 +136,31 @@ export default function BookingCard({
             ref={dropdownRef}
             className="flex gap-3 items-center pt-2 flex-wrap"
           >
-            {/* Dropdown showing only valid next statuses */}
+            {/* Use shadcn Select */}
             {validTransitions[booking.status.replace(/\s/g, "")]?.length >
               0 && (
-              <select
-                onChange={(e) => {
-                  const selected = e.target.value;
+              <Select
+                onValueChange={(selected) => {
                   if (selected !== "") handleStatusUpdate(selected);
                 }}
-                defaultValue=""
-                className="px-3 py-2 bg-gray-700 text-white rounded-md text-sm hover:bg-gray-700 transition-colors"
               >
-                <option value="" disabled>
-                  Change Status
-                </option>
-                {validTransitions[booking.status.replace(/\s/g, "")]?.map(
-                  (nextStatus) => (
-                    <option key={nextStatus} value={nextStatus}>
-                      {nextStatus === "Confirmed" ? "Accept" : nextStatus}
-                    </option>
-                  )
-                )}
-              </select>
+                <SelectTrigger className="w-[180px] bg-gray-700 text-white hover:bg-gray-600 transition-colors">
+                  <SelectValue placeholder="Change Status" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-700 text-white">
+                  {validTransitions[booking.status.replace(/\s/g, "")]?.map(
+                    (nextStatus) => (
+                      <SelectItem
+                        key={nextStatus}
+                        value={nextStatus}
+                        className="hover:bg-gray-600"
+                      >
+                        {nextStatus === "Confirmed" ? "Accept" : nextStatus}
+                      </SelectItem>
+                    )
+                  )}
+                </SelectContent>
+              </Select>
             )}
 
             {/* Special button for "Request Completion" */}

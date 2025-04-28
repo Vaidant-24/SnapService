@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CalendarDays, Clock, MapPin } from "lucide-react";
+import { CalendarDays, Clock, MapPin, PackageSearch } from "lucide-react";
 import { Booking } from "@/components/type/Booking";
 import InfoItem from "@/components/service-provider-dashboard/InfoItem";
 import ReviewModal from "@/components/review/ReviewModal";
@@ -26,14 +26,17 @@ export default function NotificationsPage() {
     };
 
     fetchAwaiting();
-  }, [customer, bookings]);
+  }, [customer]);
 
   return (
     <div className="min-h-screen my-12 bg-black px-6 py-10 text-white">
       <h2 className="text-2xl font-bold mb-6">Your Approvals</h2>
 
       {bookings.length === 0 ? (
-        <p className="text-gray-400">No pending completion requests.</p>
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center shadow-md">
+          <PackageSearch className="mx-auto h-12 w-12 text-gray-600 mb-3" />
+          <p className="text-gray-400">No pending completion requests.</p>
+        </div>
       ) : (
         <div className="space-y-6">
           {bookings.map((booking) => (
