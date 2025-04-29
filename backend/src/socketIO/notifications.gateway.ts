@@ -14,6 +14,7 @@ export enum NotificationEvent {
   CustomerReviewAdded = 'customer-review-added',
   BookingCompleted = 'booking-completed',
   ProviderBooked = 'provider-booked',
+  BookingCancelledByCustomer = 'customer-cancelled-booking',
 }
 
 @WebSocketGateway({
@@ -56,6 +57,10 @@ export class NotificationsGateway implements OnGatewayInit, OnGatewayConnection,
 
   customerBookingCancelled(customerId: string) {
     this.emitToUser(customerId, NotificationEvent.BookingCancelled, 'booking-cancelled');
+  }
+
+  BookingCancelledByCustomer(providerId: string) {
+    this.emitToUser(providerId, NotificationEvent.BookingCancelledByCustomer, 'customer-cancelled-booking');
   }
 
   customerBookingConfirmed(customerId: string) {

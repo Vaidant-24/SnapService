@@ -1,4 +1,3 @@
-// booking.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -23,7 +22,6 @@ export class BookingService {
       .find({ customerId, status: 'Confirmed', date: { $gte: today } })
       .populate('serviceId', 'name description price')
       .populate('providerDetails', 'firstName lastName email phone')
-
       .sort({ date: 1 })
       .limit(5);
   }
@@ -106,7 +104,11 @@ export class BookingService {
     return newBooking.save();
   }
 
-  async update(bookingId: string, updateBookingDto: UpdateBookingDto): Promise<Booking> {
+  async update(
+    bookingId: string,
+    updateBookingDto: UpdateBookingDto,
+    userRole: string = 'service_provider', // Default to customer if not provided
+  ): Promise<Booking> {
     const updatedBooking = await this.bookingModel.findByIdAndUpdate(bookingId, updateBookingDto, { new: true });
 
     if (!updatedBooking) {
@@ -116,67 +118,88 @@ export class BookingService {
     const customerId = updatedBooking.customerId?.toString();
     const providerId = updatedBooking.providerDetails?._id?.toString();
 
-    switch (updateBookingDto.status) {
-      case 'Awaiting Completion':
-        if (customerId) {
-          await this.notificationService.createNotification({
-            type: 'BookingUpdate',
-            message: 'Your booking is Awaiting Completion',
-            senderId: providerId,
-            serviceId: updatedBooking.serviceId.toString(),
-            recipientId: customerId,
-            bookingId: bookingId,
-            isRead: false,
-          });
+    if (userRole === 'service_provider') {
+      switch (updateBookingDto.status) {
+        case 'Awaiting Completion':
+          if (customerId) {
+            await this.notificationService.createNotification({
+              type: 'BookingUpdate',
+              message: 'Your booking is Awaiting Completion',
+              senderId: providerId,
+              serviceId: updatedBooking.serviceId.toString(),
+              recipientId: customerId,
+              bookingId: bookingId,
+              isRead: false,
+            });
 
-          await this.notificationsGateway.customerBookingCompletionApproval(customerId);
-        }
-        break;
-      case 'Cancelled':
-        if (customerId) {
-          await this.notificationService.createNotification({
-            type: 'BookingUpdate',
-            message: 'Your booking has been cancelled',
-            senderId: providerId,
-            serviceId: updatedBooking.serviceId.toString(),
-            recipientId: customerId,
-            bookingId: bookingId,
-            isRead: false,
-          });
-          await this.notificationsGateway.customerBookingCancelled(customerId);
-        }
-        break;
-      case 'Confirmed':
-        if (customerId) {
-          await this.notificationService.createNotification({
-            type: 'BookingUpdate',
-            message: 'Your booking has been confirmed',
-            senderId: providerId,
-            serviceId: updatedBooking.serviceId.toString(),
-            recipientId: customerId,
-            bookingId: bookingId,
-            isRead: false,
-          });
-          await this.notificationsGateway.customerBookingConfirmed(customerId);
-        }
-
-        break;
-      case 'Completed':
-        if (providerId) {
-          await this.notificationService.createNotification({
-            type: 'BookingUpdate',
-            message: 'A customer marked booking as Completed',
-            senderId: customerId,
-            serviceId: updatedBooking.serviceId.toString(),
-            recipientId: providerId,
-            bookingId: bookingId,
-            isRead: false,
-          });
-          await this.notificationsGateway.customerBookingCompleted(providerId);
-        }
-        break;
+            await this.notificationsGateway.customerBookingCompletionApproval(customerId);
+          }
+          break;
+        case 'Cancelled':
+          if (customerId) {
+            await this.notificationService.createNotification({
+              type: 'BookingUpdate',
+              message: 'Your booking has been cancelled by the service provider',
+              senderId: providerId,
+              serviceId: updatedBooking.serviceId.toString(),
+              recipientId: customerId,
+              bookingId: bookingId,
+              isRead: false,
+            });
+            await this.notificationsGateway.customerBookingCancelled(customerId);
+          }
+          break;
+        case 'Confirmed':
+          if (customerId) {
+            await this.notificationService.createNotification({
+              type: 'BookingUpdate',
+              message: 'Your booking has been confirmed',
+              senderId: providerId,
+              serviceId: updatedBooking.serviceId.toString(),
+              recipientId: customerId,
+              bookingId: bookingId,
+              isRead: false,
+            });
+            await this.notificationsGateway.customerBookingConfirmed(customerId);
+          }
+          break;
+      }
+    } else if (userRole === 'customer') {
+      // Customer-specific notifications to service provider
+      switch (updateBookingDto.status) {
+        case 'Cancelled':
+          if (providerId) {
+            await this.notificationService.createNotification({
+              type: 'BookingUpdate',
+              message: 'A customer has cancelled their booking',
+              senderId: customerId,
+              serviceId: updatedBooking.serviceId.toString(),
+              recipientId: providerId,
+              bookingId: bookingId,
+              isRead: false,
+            });
+            // You could create a new socket event for this if needed
+            await this.notificationsGateway.BookingCancelledByCustomer(providerId);
+          }
+          break;
+        case 'Completed':
+          if (providerId) {
+            await this.notificationService.createNotification({
+              type: 'BookingUpdate',
+              message: 'A customer marked booking as Completed',
+              senderId: customerId,
+              serviceId: updatedBooking.serviceId.toString(),
+              recipientId: providerId,
+              bookingId: bookingId,
+              isRead: false,
+            });
+            await this.notificationsGateway.customerBookingCompleted(providerId);
+          }
+          break;
+      }
     }
 
+    // Regardless of user role, handle rating notifications
     if (updateBookingDto.isRated && providerId) {
       await this.notificationService.createNotification({
         type: 'ReviewSubmitted',

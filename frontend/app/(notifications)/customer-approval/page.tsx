@@ -1,39 +1,75 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CalendarDays, Clock, MapPin, PackageSearch } from "lucide-react";
+import {
+  CalendarDays,
+  Clock,
+  Loader,
+  MapPin,
+  PackageSearch,
+} from "lucide-react";
 import { Booking } from "@/components/type/Booking";
 import InfoItem from "@/components/service-provider-dashboard/InfoItem";
 import ReviewModal from "@/components/review/ReviewModal";
 import { useAuth } from "@/context/AuthContext";
+import { MdOutlineSync } from "react-icons/md";
 
 export default function NotificationsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const { user: customer } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
+  const fetchAwaiting = async () => {
+    try {
+      setRefreshing(true);
+      const res = await fetch(
+        `http://localhost:3001/bookings/filterByStatus?status=Awaiting Completion&customerId=${customer?.userId}`
+      );
+      const data = await res.json();
+
+      setBookings(data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
   useEffect(() => {
-    const fetchAwaiting = async () => {
-      try {
-        const res = await fetch(
-          `http://localhost:3001/bookings/filterByStatus?status=Awaiting Completion&customerId=${customer?.userId}`
-        );
-        const data = await res.json();
-
-        setBookings(data);
-      } catch (err) {
-        console.error("Error fetching notifications:", err);
-      }
-    };
-
     fetchAwaiting();
   }, [customer]);
 
+  if (loading) {
+    return (
+      <div className="rounded-lg shadow-lg my-12  h-64 flex flex-col items-center justify-center">
+        <Loader className="h-10 w-10 text-orange-500 animate-spin mb-4" />
+        <p className="text-gray-300">Loading Approvals...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen my-12 bg-black px-6 py-10 text-white">
-      <h2 className="text-2xl font-bold mb-6">Your Approvals</h2>
+    <div className="min-h-screen container mx-auto mt-24 px-4">
+      <div className="flex justify-between mx-8 px-4 items-center mb-4 ">
+        <h3 className="text-2xl text-orange-500 font-semibold ">
+          Your Approvals
+        </h3>
+        <button
+          onClick={fetchAwaiting}
+          className="flex items-center gap-2 text-green-500 hover:text-green-700"
+          disabled={refreshing}
+        >
+          {refreshing ? (
+            <Loader className="w-9 h-9 animate-spin" />
+          ) : (
+            <MdOutlineSync className="w-9 h-9" />
+          )}
+        </button>
+      </div>
 
       {bookings.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center shadow-md">
+        <div className="bg-gray-900 border border-gray-800 rounded-lg mx-12 p-8 text-center shadow-md">
           <PackageSearch className="mx-auto h-12 w-12 text-gray-600 mb-3" />
           <p className="text-gray-400">No pending completion requests.</p>
         </div>

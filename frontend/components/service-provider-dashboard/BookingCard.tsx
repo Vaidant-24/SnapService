@@ -25,7 +25,7 @@ export default function BookingCard({
 
   const validTransitions: { [key: string]: string[] } = {
     Pending: ["Confirmed", "Cancelled"],
-    Confirmed: ["Awaiting Completion"],
+    Confirmed: ["Awaiting Completion", "Cancelled"],
     AwaitingCompletion: [],
     Completed: [],
     Cancelled: [],
@@ -88,7 +88,7 @@ export default function BookingCard({
 
   return (
     <div className="bg-gray-800 rounded-lg border border-gray-800 shadow-lg">
-      <div className="p-4 border-b border-gray-800 flex justify-between items-start">
+      <div className="p-6 border-b border-gray-800 flex justify-between items-start">
         <div>
           <h4 className="text-white font-semibold text-lg truncate">
             {booking.customerName}
@@ -108,7 +108,7 @@ export default function BookingCard({
         </div>
       </div>
 
-      <div className="p-4 space-y-3">
+      <div className="p-8 space-y-2">
         <InfoItem
           icon={<CalendarDays className="text-orange-500 h-5 w-5" />}
           text={formatDate(booking.date)}
@@ -161,16 +161,6 @@ export default function BookingCard({
                   )}
                 </SelectContent>
               </Select>
-            )}
-
-            {/* Special button for "Request Completion" */}
-            {booking.status === "Confirmed" && (
-              <button
-                onClick={() => handleStatusUpdate("Awaiting Completion")}
-                className="px-4 py-2 bg-orange-500 text-white rounded-md text-sm hover:bg-orange-600 transition-colors"
-              >
-                Request Completion
-              </button>
             )}
           </div>
         )}

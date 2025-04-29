@@ -11,6 +11,7 @@ import {
   CircleHelp,
   User,
   User2Icon,
+  Loader,
 } from "lucide-react";
 
 export default function FeaturedServices() {
@@ -22,7 +23,9 @@ export default function FeaturedServices() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch("http://localhost:3001/services");
+        const response = await fetch(
+          "http://localhost:3001/services/featured-services"
+        );
         if (!response.ok) throw new Error("Failed to fetch services");
         const data = await response.json();
         setServices(data);
@@ -40,11 +43,19 @@ export default function FeaturedServices() {
     router.push(`/book-service?serviceId=${serviceId}`);
   };
 
-  if (loading) return <p>Loading services...</p>;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 py-12">
+        <Loader className="h-10 w-10 text-orange-500 animate-spin mb-4" />
+        <p className="text-gray-300">Loading services...</p>
+      </div>
+    );
+  }
+
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <section className=" py-4">
+    <section className="py-4">
       <div className="container mx-auto px-4">
         <h3 className="text-2xl text-orange-500 font-semibold mb-6">
           Featured Services
@@ -91,6 +102,21 @@ export default function FeaturedServices() {
                       service.providerId.lastName || "N/A"}
                   </p>
                 </div>
+
+                <div className="flex items-center gap-2">
+                  <User2Icon className="text-orange-500 w-5 h-5" />
+                  <p className="text-gray-400 text-sm">
+                    Rating: {service.averageRating || "N/A"}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <User2Icon className="text-orange-500 w-5 h-5" />
+                  <p className="text-gray-400 text-sm">
+                    Rating Count: {service.reviewCount || "N/A"}
+                  </p>
+                </div>
+
                 <button
                   onClick={() => handleBookNow(service._id)}
                   className="mt-4 bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md w-full"

@@ -39,7 +39,7 @@ export const useNotificationSocket = () => {
 
     // CUSTOMER: Booking cancelled by provider
     socket.on("booking-cancelled", () => {
-      toast.error("Booking was cancelled by the provider", {
+      toast.info("Booking was cancelled by the provider", {
         description: "You may try booking another provider.",
         duration: 3000,
         action: {
@@ -72,7 +72,7 @@ export const useNotificationSocket = () => {
         duration: 3000,
         action: {
           label: "View",
-          onClick: () => router.push("/service-provider-Unread-reviews"),
+          onClick: () => router.push("/service-provider-unread-reviews"),
         },
       });
       setNotificationsCount((prev) => prev + 1);
@@ -104,6 +104,19 @@ export const useNotificationSocket = () => {
       setNotificationsCount((prev) => prev + 1);
     });
 
+    // PROVIDER: Customer Cancelled Booking
+    socket.on("customer-cancelled-booking", () => {
+      toast.info("Customer Cancelled", {
+        description: "The customer has cancelled your service.",
+        duration: 3000,
+        action: {
+          label: "View",
+          onClick: () => router.push("/service-provider-bookings"),
+        },
+      });
+      setNotificationsCount((prev) => prev + 1);
+    });
+
     return () => {
       socket.off("booking-completion-approval");
       socket.off("booking-cancelled");
@@ -111,6 +124,7 @@ export const useNotificationSocket = () => {
       socket.off("customer-review-added");
       socket.off("booking-completed");
       socket.off("provider-booked");
+      socket.off("customer-cancelled-booking");
       socket.disconnect();
     };
   }, [user]);

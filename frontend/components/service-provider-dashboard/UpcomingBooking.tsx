@@ -1,9 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
-import { CalendarDays, Clock, CreditCard, PackageSearch } from "lucide-react";
+import {
+  CalendarDays,
+  Clock,
+  CreditCard,
+  Loader,
+  PackageSearch,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Booking } from "../type/Booking";
-import { MdOutlineSync } from "react-icons/md";
+import { MdOutlineSync, MdPayment } from "react-icons/md";
 
 interface UpcomingBookingsProps {
   providerId: string;
@@ -14,11 +20,15 @@ export default function ProviderUpcomingBookings({
 }: UpcomingBookingsProps) {
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState(false);
+
   const router = useRouter();
 
   const fetchUpcomingBookings = async () => {
     try {
+      setRefreshing(true);
       setLoading(true);
+
       const res = await fetch(
         `http://localhost:3001/bookings/provider/status/${providerId}`
       );
@@ -30,6 +40,7 @@ export default function ProviderUpcomingBookings({
       console.error("Error fetching upcoming bookings:", err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -48,13 +59,13 @@ export default function ProviderUpcomingBookings({
     return new Date(dateStr).toLocaleDateString("en-US", options);
   };
 
-  if (loading) {
-    return (
-      <div className="rounded-lg shadow-lg p-4 h-64 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500" />
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="rounded-lg shadow-lg p-4 h-64 flex items-center justify-center">
+  //       <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="rounded-lg shadow-lg py-4 my-8">
@@ -66,7 +77,11 @@ export default function ProviderUpcomingBookings({
           onClick={fetchUpcomingBookings}
           className="flex items-center gap-2 text-green-500 hover:text-green-700"
         >
-          <MdOutlineSync className="w-9 h-9" />
+          {refreshing ? (
+            <Loader className="w-9 h-9 animate-spin" />
+          ) : (
+            <MdOutlineSync className="w-9 h-9" />
+          )}
         </button>
       </div>
 
@@ -109,8 +124,12 @@ export default function ProviderUpcomingBookings({
                   <span>{booking.time}</span>
                 </div>
                 <div className="flex items-center gap-1 text-gray-300">
-                  <CreditCard className="h-4 w-4 text-orange-500" />
-                  <span>{booking.isPaid ? "Paid" : "Unpaid"}</span>
+                  <MdPayment className="h-4 w-4 text-orange-500" />
+                  <span className="text-sm">
+                    {booking.paymentMethod === "Cash"
+                      ? "Payment: Cash"
+                      : "Payment: Online"}
+                  </span>
                 </div>
               </div>
             </div>

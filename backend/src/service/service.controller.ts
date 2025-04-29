@@ -23,6 +23,11 @@ export class ServiceController {
     return this.serviceService.findAllServicesByProvider(providerId, limit);
   }
 
+  @Get('featured-services')
+  async getFeaturedServices() {
+    return this.serviceService.findFeaturedService();
+  }
+
   @Get()
   async getAllServices() {
     return this.serviceService.findAll();

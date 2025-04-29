@@ -10,6 +10,7 @@ import ProviderInfo from "@/components/book-service/ProviderInfo";
 import BookingForm, {
   PaymentMethod,
 } from "@/components/book-service/BookingForm";
+import { Loader } from "lucide-react";
 
 export default function BookService() {
   const [service, setService] = useState<Service | null>(null);
@@ -116,8 +117,9 @@ export default function BookService() {
   // Combined loading check
   if (loadingUser || loadingService) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        <p className="text-gray-400">Loading details...</p>
+      <div className="rounded-lg shadow-lg my-12  h-64 flex flex-col items-center justify-center">
+        <Loader className="h-10 w-10 text-orange-500 animate-spin mb-4" />
+        <p className="text-gray-300">Loading details...</p>
       </div>
     );
   }

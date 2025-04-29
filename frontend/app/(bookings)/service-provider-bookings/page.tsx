@@ -14,12 +14,6 @@ export default function ServiceProviderBookings() {
   return (
     <AuthGuard>
       <div className="container mx-auto my-12 px-6 py-12 text-white min-h-screen">
-        <header className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl text-orange-500 font-bold">
-            Service Provider Bookings
-          </h1>
-        </header>
-
         {loading ? (
           <p>Loading...</p>
         ) : (

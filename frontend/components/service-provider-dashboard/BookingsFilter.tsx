@@ -39,7 +39,7 @@ export default function BookingsFilter({
     <div className="relative" ref={filterDropdownRef}>
       <button
         onClick={() => setDropdownOpen((prev) => !prev)}
-        className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-1 py-2 rounded-md font-medium"
+        className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-2 py-2 rounded-md font-medium"
       >
         <Filter className="h-4 w-4" />
         {activeFilter === "Awaiting Completion" ? "Awaiting" : activeFilter}

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Query, Headers } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { CreateBookingDto, UpdateBookingDto } from './dto-booking/booking.dto';
 
@@ -6,6 +6,7 @@ export interface QueryParams {
   status?: string;
   customerId?: string;
 }
+
 @Controller('bookings')
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
@@ -56,7 +57,12 @@ export class BookingController {
   }
 
   @Patch(':id')
-  async updateBooking(@Param('id') id: string, @Body() updateBookingDto: UpdateBookingDto) {
-    return this.bookingService.update(id, updateBookingDto);
+  async updateBooking(
+    @Param('id') id: string,
+    @Body() updateBookingDto: UpdateBookingDto,
+    @Headers('x-user-role') userRole: string, // Get user role from header
+  ) {
+    // Pass the user role to the service
+    return this.bookingService.update(id, updateBookingDto, userRole);
   }
 }

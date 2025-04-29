@@ -4,6 +4,7 @@ import { Booking } from "../type/Booking";
 import DropDown from "./DropDown";
 import FilteredBookings from "./FilteredBookings";
 import { MdOutlineSync } from "react-icons/md";
+import { Loader } from "lucide-react";
 
 export type FilterOption =
   | "All"
@@ -22,10 +23,12 @@ export default function CustomerBookings({ userId }: CustomerBookingsProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filterStatus, setFilterStatus] = useState<FilterOption>("All");
+  const [refreshing, setRefreshing] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const fetchBookings = async () => {
     try {
+      setRefreshing(true);
       const response = await fetch(
         `http://localhost:3001/bookings/customer/${userId}`
       );
@@ -38,6 +41,7 @@ export default function CustomerBookings({ userId }: CustomerBookingsProps) {
       setError("Failed to load bookings");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -65,16 +69,18 @@ export default function CustomerBookings({ userId }: CustomerBookingsProps) {
 
   if (loading) {
     return (
-      <div className="rounded-lg shadow-lg p-4 h-64 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500" />
+      <div className="rounded-lg shadow-lg p-12 h-64 flex flex-col items-center justify-center">
+        <Loader className="h-10 w-10 text-orange-500 animate-spin mb-4" />
+        <p className="text-gray-300">Loading bookings...</p>
       </div>
     );
   }
+
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="mt-6 mr-4 ">
-      <div className="flex justify-between  mb-4 px-4">
+      <div className="flex justify-between px-4">
         <h2 className="text-2xl text-orange-500 font-semibold">
           Your Bookings
         </h2>
@@ -82,8 +88,13 @@ export default function CustomerBookings({ userId }: CustomerBookingsProps) {
           <button
             onClick={fetchBookings}
             className="flex items-center gap-2 text-green-500 hover:text-green-700"
+            disabled={refreshing}
           >
-            <MdOutlineSync className="w-9 h-9" />
+            {refreshing ? (
+              <Loader className="w-9 h-9 animate-spin" />
+            ) : (
+              <MdOutlineSync className="w-9 h-9" />
+            )}
           </button>
           <DropDown
             setIsDropdownOpen={setIsDropdownOpen}

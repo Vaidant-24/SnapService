@@ -10,7 +10,7 @@ import SearchField from "./SearchField";
 import SortDropdown from "./SortDropDown";
 import { getDistanceFromLatLonInKm } from "@/utility/calculateDistance";
 import { Button } from "../ui/button";
-import { PackageSearch } from "lucide-react";
+import { PackageSearch, Loader } from "lucide-react";
 
 export default function ServicesList() {
   const [userLocation, setUserLocation] = useState<{
@@ -20,7 +20,7 @@ export default function ServicesList() {
 
   const [services, setServices] = useState<Service[]>([]);
   const [filteredServices, setFilteredServices] = useState<Service[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>(["All"]); // Initialize with "All" to show dropdown immediately
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -60,12 +60,16 @@ export default function ServicesList() {
   useEffect(() => {
     (async () => {
       try {
+        setLoading(true);
         const res = await fetch("http://localhost:3001/services");
         if (!res.ok) throw new Error("Failed to fetch services");
         const data: Service[] = await res.json();
         setServices(data);
         setFilteredServices(data);
-        setCategories([...new Set(data.map((s) => s.category))]);
+
+        // Extract unique categories and add "All" if not present
+        const uniqueCategories = [...new Set(data.map((s) => s.category))];
+        setCategories(uniqueCategories);
 
         const initialCategory = searchParams.get("category");
         if (initialCategory) {
@@ -131,39 +135,40 @@ export default function ServicesList() {
   };
 
   return (
-    <div className="min-h-screen mx-8 my-12  text-white px-8 py-16">
+    <div className="min-h-screen mx-8 my-12 text-white px-8 py-16">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-orange-500">
-            Browse Services
+          <h1 className="text-3xl font-semibold text-orange-500">
+            Explore Services
           </h1>
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-12">
           <SearchField value={searchQuery} onChange={setSearchQuery} />
 
-          {categories.length > 0 && (
-            <CategoryDropdown
-              selected={selectedCategory}
-              categories={categories}
-              onSelect={setSelectedCategory}
-              isOpen={isDropdownOpen}
-              toggleOpen={() => setIsDropdownOpen(!isDropdownOpen)}
-            />
-          )}
+          <CategoryDropdown
+            selected={selectedCategory}
+            categories={categories}
+            onSelect={setSelectedCategory}
+            isOpen={isDropdownOpen}
+            toggleOpen={() => setIsDropdownOpen(!isDropdownOpen)}
+          />
 
           <SortDropdown selected={sortOption} onChange={setSortOption} />
 
           <Button
             onClick={handleNearbyServices}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+            className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-30 rounded-md"
           >
-            {userLocation ? "Clear Nearby" : "Nearby Services"}
+            {userLocation ? "Clear Nearby" : "Show Nearby"}
           </Button>
         </div>
 
         {loading ? (
-          <p className="text-center text-gray-400">Loading services...</p>
+          <div className="text-center py-12">
+            <Loader className="h-8 w-8 animate-spin mx-auto mb-4 text-orange-500" />
+            <p className="text-gray-400">Loading services...</p>
+          </div>
         ) : error ? (
           <p className="text-center text-red-500">{error}</p>
         ) : filteredServices.length > 0 ? (

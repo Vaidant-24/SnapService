@@ -6,6 +6,7 @@ import {
   CircleHelp,
   LetterText,
   BriefcaseBusiness,
+  Loader,
 } from "lucide-react";
 import { Service } from "../type/Service";
 import Link from "next/link";
@@ -14,13 +15,13 @@ import { MdOutlineSync } from "react-icons/md";
 interface ProviderServicesProps {
   services: Service[];
   handleFetchService: () => void;
-  loading: boolean;
+  refreshing: boolean;
 }
 
 export default function ProviderServices({
   services,
   handleFetchService,
-  loading,
+  refreshing,
 }: ProviderServicesProps) {
   return (
     <section className="py-4">
@@ -31,9 +32,14 @@ export default function ProviderServices({
           </h3>
           <button
             onClick={handleFetchService}
+            disabled={refreshing}
             className="flex items-center gap-2 text-green-500 hover:text-green-700"
           >
-            <MdOutlineSync className="w-9 h-9" />
+            {refreshing ? (
+              <Loader className="w-9 h-9 animate-spin" />
+            ) : (
+              <MdOutlineSync className="w-9 h-9" />
+            )}
           </button>
         </div>
 
@@ -76,15 +82,6 @@ export default function ProviderServices({
                   </div>
                 </div>
               ))}
-            </div>
-
-            <div className="mt-8 flex justify-center">
-              <Link
-                href="/service-provider-services"
-                className="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded-md"
-              >
-                View All
-              </Link>
             </div>
           </>
         ) : (

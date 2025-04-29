@@ -138,7 +138,7 @@ const Header = () => {
               <ChevronDown size={16} />
             </button>
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 rounded-md bg-gray-950 shadow-lg border border-gray-700">
+              <div className="absolute right-0 mt-2 w-48 rounded-md bg-gray-800 shadow-lg border border-gray-700">
                 <Link
                   href={profilePath}
                   className="block px-4 py-2 text-sm text-white hover:bg-gray-800"
@@ -146,13 +146,7 @@ const Header = () => {
                 >
                   Profile: {user.firstName}
                 </Link>
-                <Link
-                  href={dashboardPath}
-                  className="block px-4 py-2 text-sm text-white hover:bg-gray-800"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  Dashboard
-                </Link>
+
                 {user?.role === "customer" && (
                   <Link
                     href="/customer-approval"
@@ -165,11 +159,11 @@ const Header = () => {
 
                 {user?.role === "service_provider" && (
                   <Link
-                    href="/service-provider-Unread-reviews"
+                    href="/service-provider-unread-reviews"
                     className="block px-4 py-2 text-sm text-white hover:bg-gray-800"
                     onClick={() => setDropdownOpen(false)}
                   >
-                    Unread Reviews
+                    Reviews
                   </Link>
                 )}
 

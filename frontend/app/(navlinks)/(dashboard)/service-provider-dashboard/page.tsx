@@ -14,15 +14,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Loader } from "lucide-react";
 
 export default function ServiceProviderDashboard() {
   const { user: userData } = useAuth();
   const [open, setOpen] = useState<boolean>(false);
   const [myServices, setMyServices] = useState<Service[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchServices = async () => {
     try {
+      setRefreshing(true);
       const servicesRes = await fetch(
         `http://localhost:3001/services/provider/${userData?.userId}?limit=6`
       );
@@ -35,6 +38,7 @@ export default function ServiceProviderDashboard() {
       console.error("Fetch error:", error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -57,7 +61,10 @@ export default function ServiceProviderDashboard() {
     <AuthGuard>
       <div className="container mx-auto my-12 px-6 py-12 text-white min-h-screen">
         {loading ? (
-          <p>Loading...</p>
+          <div className="flex flex-col items-center justify-center h-64 text-orange-500">
+            <p className="mb-2 text-lg font-medium">Loading...</p>
+            <Loader className="w-9 h-9 animate-spin" />
+          </div>
         ) : (
           <>
             <section className="mb-6 flex justify-between items-center">
@@ -88,14 +95,12 @@ export default function ServiceProviderDashboard() {
               </Dialog>
             </section>
 
-            {/* Provider Services Component */}
             <ProviderServices
               services={myServices}
               handleFetchService={() => fetchServices()}
-              loading={loading}
+              refreshing={refreshing}
             />
 
-            {/* Provider Bookings Component */}
             {userData && (
               <ProviderUpcomingBookings providerId={userData?.userId} />
             )}

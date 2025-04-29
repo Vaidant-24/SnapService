@@ -1,5 +1,7 @@
-// components/services/CategoryDropdown.tsx
 "use client";
+
+import { useEffect, useRef } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface CategoryDropdownProps {
   selected: string;
@@ -16,30 +18,46 @@ export default function CategoryDropdown({
   isOpen,
   toggleOpen,
 }: CategoryDropdownProps) {
+  // Use ref for clicking outside detection
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        if (isOpen) toggleOpen();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, toggleOpen]);
+
   return (
-    <div className="relative w-full sm:w-64">
+    <div className="relative w-full sm:w-64" ref={dropdownRef}>
       <button
         onClick={toggleOpen}
-        className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-2 py-2 rounded-md flex items-center border border-orange-500"
+        className="w-full bg-orange-500 hover:bg-orange-600 text-white px-2 py-2 rounded-md flex items-center justify-between border border-orange-500"
+        type="button"
+        aria-haspopup="true"
+        aria-expanded={isOpen}
       >
-        Category: {selected}
-        <svg
-          className="w-4 h-4 ml-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d={isOpen ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"}
-          ></path>
-        </svg>
+        <span className="truncate text-sm">Category: {selected}</span>
+        {isOpen ? (
+          <ChevronUp className="h-4 w-4 ml-2 flex-shrink-0" />
+        ) : (
+          <ChevronDown className="h-4 w-4 ml-2 flex-shrink-0" />
+        )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-10 border border-gray-700">
+        <div
+          className="absolute right-0 mt-1 w-full bg-gray-800 rounded-md shadow-lg z-50 border border-gray-700 max-h-64 overflow-y-auto"
+          role="menu"
+        >
           <ul className="py-1">
             <li key="all">
               <button
@@ -52,6 +70,7 @@ export default function CategoryDropdown({
                     ? "bg-gray-700 text-white"
                     : "text-gray-300"
                 }`}
+                role="menuitem"
               >
                 All
               </button>
@@ -68,6 +87,7 @@ export default function CategoryDropdown({
                       ? "bg-gray-700 text-white"
                       : "text-gray-300"
                   }`}
+                  role="menuitem"
                 >
                   {category}
                 </button>

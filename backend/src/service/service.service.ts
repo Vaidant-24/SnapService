@@ -16,6 +16,10 @@ export class ServiceService {
     return this.serviceModel.find({ isActive: true }).populate('providerId', 'firstName lastName email phone address');
   }
 
+  async findFeaturedService() {
+    return this.serviceModel.find({ isActive: true, averageRating: { $gte: 3.5 } });
+  }
+
   async findById(serviceId: string): Promise<Service> {
     const service = await this.serviceModel
       .findById(serviceId)

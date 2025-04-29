@@ -152,7 +152,6 @@ export default function ReviewModal({
         </DialogContent>
       </Dialog>
 
-      {/* Separate button for just marking completion */}
       <Button
         onClick={handleMarkAsComplete}
         className="w-40 bg-green-700 hover:bg-green-800"

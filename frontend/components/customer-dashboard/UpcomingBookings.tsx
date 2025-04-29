@@ -8,6 +8,7 @@ import {
   Wallet,
   IndianRupee,
   PackageSearch,
+  Loader,
 } from "lucide-react";
 import { MdOutlineSync } from "react-icons/md";
 
@@ -21,9 +22,11 @@ export default function CustomerUpcomingBooking({
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchBookings = async () => {
     try {
+      setRefreshing(true);
       const response = await fetch(
         `http://localhost:3001/bookings/customer/status/${userId}`
       );
@@ -36,6 +39,7 @@ export default function CustomerUpcomingBooking({
       setError("Failed to load upcoming bookings");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -47,15 +51,17 @@ export default function CustomerUpcomingBooking({
 
   if (loading) {
     return (
-      <div className="rounded-lg shadow-lg p-4 h-64 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500" />
+      <div className="rounded-lg shadow-lg p-12 h-64 flex flex-col items-center justify-center">
+        <Loader className="h-10 w-10 text-orange-500 animate-spin mb-4" />
+        <p className="text-gray-300">Loading bookings...</p>
       </div>
     );
   }
+
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <section className=" py-4">
+    <section className="py-4">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-2xl text-orange-500 font-semibold mb-6">
@@ -64,8 +70,13 @@ export default function CustomerUpcomingBooking({
           <button
             onClick={fetchBookings}
             className="flex items-center gap-2 text-green-500 hover:text-green-700"
+            disabled={refreshing}
           >
-            <MdOutlineSync className="w-9 h-9" />
+            {refreshing ? (
+              <Loader className="w-9 h-9 animate-spin" />
+            ) : (
+              <MdOutlineSync className="w-9 h-9" />
+            )}
           </button>
         </div>
 
@@ -127,7 +138,7 @@ export default function CustomerUpcomingBooking({
 
                   <div className="flex items-center gap-2">
                     <Wallet className="text-orange-500 w-5 h-5" />
-                    <span>Method: {booking.paymentMethod}</span>
+                    <span>Payment Method: {booking.paymentMethod}</span>
                   </div>
                 </div>
               </div>
