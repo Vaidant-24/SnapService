@@ -18,6 +18,7 @@ import {
   User2Icon,
   Star,
   SquarePen,
+  PhoneIcon,
 } from "lucide-react";
 
 interface ServiceCardProps {
@@ -41,8 +42,24 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
 
       <div className="space-y-3 text-gray-300">
         <div className="flex items-start gap-2">
-          <LetterText className="text-orange-500 w-5 h-5 mt-1" />
-          <p className="text-sm">Description: {service.description}</p>
+          <LetterText className="text-orange-500 w-5 h-5 " />
+          <span className="text-sm text-gray-400">
+            Description: {service.description}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <User2Icon className="text-orange-500 w-5 h-5" />
+          <span className="text-gray-400 text-sm">
+            Provider: {providerName}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <PhoneIcon className="text-orange-500 w-5 h-5" />
+          <span className="text-gray-400 text-sm">
+            Contact: {service.providerId.phone}
+          </span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -55,11 +72,6 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
           <span className="text-gray-400 text-sm">
             Category: {service.category}
           </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <User2Icon className="text-orange-500 w-5 h-5" />
-          <p className="text-gray-400 text-sm">Provider: {providerName}</p>
         </div>
       </div>
 
@@ -88,8 +100,10 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
             </DialogHeader>
             <div className="mt-4 space-y-5">
               <div className="flex items-start gap-2">
-                <LetterText className="text-orange-500 w-5 h-5 mt-1" />
-                <p className="text-sm">Description: {service.description}</p>
+                <LetterText className="text-orange-500 w-5 h-5" />
+                <span className="text-gray-400 text-sm">
+                  Description: {service.description}
+                </span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -110,6 +124,13 @@ export default function ServiceCard({ service, onBook }: ServiceCardProps) {
                 <User2Icon className="text-orange-500 w-5 h-5" />
                 <span className="text-gray-400 text-sm">
                   Provider: {providerName}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <PhoneIcon className="text-orange-500 w-5 h-5" />
+                <span className="text-gray-400 text-sm">
+                  Contact: {service.providerId.phone}
                 </span>
               </div>
 

@@ -12,7 +12,7 @@ export default function SearchField({ value, onChange }: SearchBarProps) {
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder="Search services..."
-      className="w-full sm:w-1/2 px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+      className="w-full  px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
     />
   );
 }

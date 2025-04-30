@@ -37,7 +37,7 @@ export default function CategoryDropdown({
   }, [isOpen, toggleOpen]);
 
   return (
-    <div className="relative w-full sm:w-64" ref={dropdownRef}>
+    <div className="relative w-full " ref={dropdownRef}>
       <button
         onClick={toggleOpen}
         className="w-full bg-orange-500 hover:bg-orange-600 text-white px-2 py-2 rounded-md flex items-center justify-between border border-orange-500"
@@ -45,7 +45,7 @@ export default function CategoryDropdown({
         aria-haspopup="true"
         aria-expanded={isOpen}
       >
-        <span className="truncate text-sm">Category: {selected}</span>
+        <span className="truncate text-sm px-2">Category: {selected}</span>
         {isOpen ? (
           <ChevronUp className="h-4 w-4 ml-2 flex-shrink-0" />
         ) : (

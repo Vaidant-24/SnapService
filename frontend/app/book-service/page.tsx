@@ -11,6 +11,7 @@ import BookingForm, {
   PaymentMethod,
 } from "@/components/book-service/BookingForm";
 import { Loader } from "lucide-react";
+import { toast } from "sonner";
 
 export default function BookService() {
   const [service, setService] = useState<Service | null>(null);
@@ -107,10 +108,16 @@ export default function BookService() {
 
       if (!response.ok) throw new Error("Booking failed");
 
-      alert("Booking confirmed!");
+      toast.success("Your service booked successfully", {
+        duration: 3000,
+        action: {
+          label: "View",
+          onClick: () => router.push("/customer-bookings"),
+        },
+      });
       router.push("/customer-dashboard");
     } catch (error) {
-      alert("Failed to book service. Please try again.");
+      toast.info("Something went wrong, Please try again!");
     }
   };
 

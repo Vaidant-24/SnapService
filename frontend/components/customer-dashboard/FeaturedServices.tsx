@@ -12,6 +12,9 @@ import {
   User,
   User2Icon,
   Loader,
+  StarIcon,
+  PencilIcon,
+  PhoneIcon,
 } from "lucide-react";
 
 export default function FeaturedServices() {
@@ -99,19 +102,26 @@ export default function FeaturedServices() {
                     Provider:{" "}
                     {service.providerId?.firstName +
                       " " +
-                      service.providerId.lastName || "N/A"}
+                      service.providerId?.lastName || "N/A"}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <User2Icon className="text-orange-500 w-5 h-5" />
+                  <PhoneIcon className="text-orange-500 w-5 h-5" />
+                  <p className="text-gray-400 text-sm">
+                    Contact: {service.providerId.phone || "N/A"}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <StarIcon className="text-orange-500 w-5 h-5" />
                   <p className="text-gray-400 text-sm">
                     Rating: {service.averageRating || "N/A"}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <User2Icon className="text-orange-500 w-5 h-5" />
+                  <PencilIcon className="text-orange-500 w-5 h-5" />
                   <p className="text-gray-400 text-sm">
                     Rating Count: {service.reviewCount || "N/A"}
                   </p>

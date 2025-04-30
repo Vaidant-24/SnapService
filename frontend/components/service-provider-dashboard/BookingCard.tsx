@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { CalendarDays, Clock, Mail, Phone, MapPin } from "lucide-react";
 import InfoItem from "./InfoItem";
 import { Booking } from "../type/Booking";
@@ -22,6 +22,7 @@ export default function BookingCard({
   onViewDetails: (booking: Booking) => void;
 }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [selectValue, setSelectValue] = useState<string>("");
 
   const validTransitions: { [key: string]: string[] } = {
     Pending: ["Confirmed", "Cancelled"],
@@ -49,13 +50,20 @@ export default function BookingCard({
         body: JSON.stringify({ status: newStatus }),
       });
 
-      const updated = await res.json();
+      if (!res.ok) {
+        throw new Error(`Server responded with status: ${res.status}`);
+      }
 
+      const updatedBooking = await res.json();
+      console.log("Updated booking received:", updatedBooking);
+
+      // Update with the entire booking object returned from the server
       setBookings((prev) =>
-        prev.map((b) =>
-          b._id === booking._id ? { ...b, status: updated.status } : b
-        )
+        prev.map((b) => (b._id === booking._id ? updatedBooking : b))
       );
+
+      // Reset select value after successful update
+      setSelectValue("");
     } catch (err) {
       console.error("Error updating status:", err);
     }
@@ -136,12 +144,15 @@ export default function BookingCard({
             ref={dropdownRef}
             className="flex gap-3 items-center pt-2 flex-wrap"
           >
-            {/* Use shadcn Select */}
+            {/* Use shadcn Select with controlled value */}
             {validTransitions[booking.status.replace(/\s/g, "")]?.length >
               0 && (
               <Select
+                value={selectValue}
                 onValueChange={(selected) => {
-                  if (selected !== "") handleStatusUpdate(selected);
+                  if (selected !== "") {
+                    handleStatusUpdate(selected);
+                  }
                 }}
               >
                 <SelectTrigger className="w-[180px] bg-gray-700 text-white hover:bg-gray-600 transition-colors">

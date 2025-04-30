@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 interface ReviewModalProps {
   bookingId: string;
@@ -17,6 +19,7 @@ interface ReviewModalProps {
   customerId: string;
   serviceId: string;
   serviceName: string;
+  onComplete?: () => void; // New callback prop for refreshing parent
 }
 
 export default function ReviewModal({
@@ -25,81 +28,122 @@ export default function ReviewModal({
   customerId,
   serviceId,
   serviceName,
+  onComplete,
 }: ReviewModalProps) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const { user } = useAuth();
 
   const handleSubmit = async () => {
-    try {
-      const res = await fetch("http://localhost:3001/review", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bookingId,
-          providerId,
-          customerId,
-          serviceId,
-          rating,
-          comment: feedback,
-        }),
-      });
+    if (rating === 0) {
+      toast.error("Please select a rating");
+      return;
+    }
 
-      const bookingRes = await fetch(
-        `http://localhost:3001/bookings/${bookingId}`,
+    try {
+      setSubmitting(true);
+
+      toast.promise(
+        async () => {
+          const res = await fetch("http://localhost:3001/review", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              bookingId,
+              providerId,
+              customerId,
+              serviceId,
+              rating,
+              comment: feedback,
+            }),
+          });
+
+          if (!res.ok) throw new Error("Failed to submit review");
+
+          const bookingRes = await fetch(
+            `http://localhost:3001/bookings/${bookingId}`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                status: "Completed",
+                isRated: true,
+                rating: rating,
+                comment: feedback,
+              }),
+            }
+          );
+
+          if (!bookingRes.ok)
+            throw new Error("Failed to update booking status");
+
+          setOpen(false);
+          setRating(0);
+          setFeedback("");
+
+          // Call the callback to refresh the parent component
+          if (onComplete) onComplete();
+
+          return "Review submitted successfully";
+        },
         {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            status: "Completed",
-            isRated: true,
-            rating: rating,
-            comment: feedback,
-          }),
+          loading: "Submitting your review...",
+          success: "Thank you for your feedback!",
+          error: (err) => `Error: ${err.message}`,
         }
       );
-
-      if (!bookingRes.ok) {
-        throw new Error("Failed to update booking status");
-      }
-
-      if (!res.ok) {
-        throw new Error("Failed to submit review");
-      } else {
-        alert("Thank you for your feedback!");
-        setOpen(false);
-        setRating(0);
-        setFeedback("");
-      }
     } catch (err) {
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleMarkAsComplete = async () => {
     try {
-      const bookingRes = await fetch(
-        `http://localhost:3001/bookings/${bookingId}`,
+      setSubmitting(true);
+
+      toast.promise(
+        async () => {
+          const bookingRes = await fetch(
+            `http://localhost:3001/bookings/${bookingId}`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                "X-User-Role": user?.role || "customer",
+              },
+              body: JSON.stringify({
+                status: "Completed",
+                isRated: false,
+              }),
+            }
+          );
+
+          if (!bookingRes.ok)
+            throw new Error("Failed to update booking status");
+
+          setOpen(false);
+
+          // Call the callback to refresh the parent component
+          if (onComplete) onComplete();
+
+          return "Booking marked as completed";
+        },
         {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            status: "Completed",
-            isRated: false,
-          }),
+          loading: "Processing...",
+          success: "Successfully marked as completed!",
+          error: (err) => `Error: ${err.message}`,
         }
       );
-
-      if (!bookingRes.ok) {
-        throw new Error("Failed to update booking status");
-      } else {
-        alert("Successfully marked as completed!");
-        setOpen(false);
-        setRating(0);
-        setFeedback("");
-      }
     } catch (err) {
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -145,8 +189,9 @@ export default function ReviewModal({
             <Button
               onClick={handleSubmit}
               className="w-full mt-4 bg-green-600 hover:bg-green-700"
+              disabled={submitting}
             >
-              Submit Review
+              {submitting ? "Submitting..." : "Submit Review"}
             </Button>
           </div>
         </DialogContent>
@@ -155,8 +200,9 @@ export default function ReviewModal({
       <Button
         onClick={handleMarkAsComplete}
         className="w-40 bg-green-700 hover:bg-green-800"
+        disabled={submitting}
       >
-        Mark as Completed
+        {submitting ? "Processing..." : "Mark as Completed"}
       </Button>
     </div>
   );

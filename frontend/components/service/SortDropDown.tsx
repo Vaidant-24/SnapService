@@ -43,7 +43,7 @@ export default function SortDropdown({
     : "Sort by";
 
   return (
-    <div className="w-full sm:w-64 relative" ref={dropdownRef}>
+    <div className="w-full  relative" ref={dropdownRef}>
       {/* Custom trigger button */}
       <button
         onClick={toggleDropdown}
