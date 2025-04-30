@@ -130,14 +130,14 @@ const FilteredBookings = ({
                   <div className="flex items-start gap-2">
                     <AlertCircle className="text-orange-500 w-5 h-5 " />
                     <span className="text-gray-400 text-sm">
-                      Description: {booking.serviceId.description}
+                      Description: {booking.serviceId?.description}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <IndianRupee className="text-orange-500 w-5 h-5" />
                     <span className="text-gray-400 text-sm">
-                      Price: ₹{booking.serviceId.price}
+                      Price: ₹{booking.serviceId?.price}
                     </span>
                   </div>
 

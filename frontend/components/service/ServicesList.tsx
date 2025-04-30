@@ -8,9 +8,16 @@ import ServiceCard from "./ServiceCard";
 import CategoryDropdown from "./CategoryDropdown";
 import SearchField from "./SearchField";
 import SortDropdown from "./SortDropDown";
-import { getDistanceFromLatLonInKm } from "@/utility/calculateDistance";
 import { Button } from "../ui/button";
 import { PackageSearch, Loader, MapPin } from "lucide-react";
+import { Pagination } from "../ui/Pagination";
+
+interface PaginationData {
+  services: Service[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+}
 
 export default function ServicesList() {
   const [userLocation, setUserLocation] = useState<{
@@ -18,8 +25,12 @@ export default function ServicesList() {
     lon: number;
   } | null>(null);
 
-  const [services, setServices] = useState<Service[]>([]);
-  const [filteredServices, setFilteredServices] = useState<Service[]>([]);
+  const [paginationData, setPaginationData] = useState<PaginationData>({
+    services: [],
+    totalCount: 0,
+    totalPages: 1,
+    currentPage: 1,
+  });
   const [categories, setCategories] = useState<string[]>(["All"]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,6 +38,7 @@ export default function ServicesList() {
   const [sortOption, setSortOption] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { user } = useAuth();
   const router = useRouter();
@@ -35,7 +47,8 @@ export default function ServicesList() {
   const handleNearbyServices = () => {
     if (userLocation) {
       setUserLocation(null);
-      return;
+      setCurrentPage(1); // Reset to first page
+      fetchServices(null, 1); // Refetch without location
     } else {
       if (!navigator.geolocation) {
         alert("Geolocation is not supported by your browser");
@@ -44,10 +57,13 @@ export default function ServicesList() {
 
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => {
-          setUserLocation({
+          const newLocation = {
             lat: coords.latitude,
             lon: coords.longitude,
-          });
+          };
+          setUserLocation(newLocation);
+          setCurrentPage(1); // Reset to first page
+          fetchServices(newLocation, 1); // Fetch with new location
         },
         (err) => {
           console.error("Geolocation error:", err);
@@ -57,74 +73,142 @@ export default function ServicesList() {
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        const res = await fetch("http://localhost:3001/services");
-        if (!res.ok) throw new Error("Failed to fetch services");
-        const data: Service[] = await res.json();
-        setServices(data);
-        setFilteredServices(data);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchServices(userLocation, page);
 
-        // Extract unique categories and add "All" if not present
-        const uniqueCategories = [...new Set(data.map((s) => s.category))];
-        setCategories(uniqueCategories);
+    // Scroll to top of results
+    window.scrollTo({
+      top: document.getElementById("results-top")?.offsetTop || 0,
+      behavior: "smooth",
+    });
+  };
 
-        const initialCategory = searchParams.get("category");
-        if (initialCategory) {
-          setSelectedCategory(initialCategory);
-        }
-      } catch (err) {
-        setError("Unable to load services.");
-      } finally {
-        setLoading(false);
+  // Fetch all services with current filters
+  const fetchServices = async (location = userLocation, page = currentPage) => {
+    try {
+      setLoading(true);
+
+      // Build query parameters
+      const params = new URLSearchParams();
+
+      if (selectedCategory !== "All") {
+        params.append("category", selectedCategory);
       }
-    })();
+
+      if (searchQuery.trim() !== "") {
+        params.append("search", searchQuery);
+      }
+
+      if (sortOption) {
+        // Parse sort option
+        const [sortBy, sortOrder] = sortOption.split("-");
+        params.append("sortBy", sortBy);
+        params.append("sortOrder", sortOrder);
+      }
+
+      // Add location if available
+      if (location) {
+        params.append("lat", location.lat.toString());
+        params.append("lng", location.lon.toString());
+        params.append("radius", "10"); // 10km radius
+      }
+
+      // Add pagination parameters
+      params.append("page", page.toString());
+      params.append("limit", "8"); // 8 items per page
+
+      const queryString = params.toString() ? `?${params.toString()}` : "";
+      const res = await fetch(`http://localhost:3001/services${queryString}`);
+
+      if (!res.ok) throw new Error("Failed to fetch services");
+
+      const data = await res.json();
+
+      // Handle both response formats (for backward compatibility)
+      // If data has a 'services' property, it's using the new pagination format
+      if (data.services) {
+        setPaginationData({
+          services: data.services,
+          totalCount: data.totalCount || data.services.length,
+          totalPages: data.totalPages || 1,
+          currentPage: data.currentPage || 1,
+        });
+
+        // Extract unique categories if this is the first load
+        if (categories.length <= 1 && data.services.length > 0) {
+          const uniqueCategories = [
+            ...new Set(data.services.map((s: { category: any }) => s.category)),
+          ];
+          setCategories([...(uniqueCategories as string[])]);
+        }
+      } else {
+        // Handle old format (array of services)
+        setPaginationData({
+          services: data,
+          totalCount: data.length,
+          totalPages: 1,
+          currentPage: 1,
+        });
+
+        // Extract unique categories if this is the first load
+
+        if (categories.length <= 1 && data.length > 0) {
+          const uniqueCategories = [
+            ...new Set(data.map((s: { category: any }) => s.category)),
+          ];
+          setCategories([...(uniqueCategories as string[])]);
+        }
+      }
+    } catch (err) {
+      setError("Unable to load services.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch categories separately (only once)
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch("http://localhost:3001/services?limit=100");
+      if (!res.ok) throw new Error("Failed to fetch services");
+      const data = await res.json();
+
+      // Extract unique categories and add "All" if not present
+      const uniqueCategories = [
+        ...new Set(data.services.map((s: Service) => s.category)),
+      ];
+      setCategories(["All", ...(uniqueCategories as string[])]);
+
+      const initialCategory = searchParams.get("category");
+      if (initialCategory) {
+        setSelectedCategory(initialCategory);
+      }
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+    }
+  };
+
+  // Initial load - fetch categories
+  useEffect(() => {
+    fetchCategories();
   }, []);
 
+  // Handle filter changes
   useEffect(() => {
-    let filtered = services;
-
-    // 1. Category
-    if (selectedCategory !== "All") {
-      filtered = filtered.filter((s) => s.category === selectedCategory);
+    // Reset to first page when filters change
+    setCurrentPage(1);
+    // Only fetch if we're not in the initial loading state
+    if (!loading || paginationData.services.length > 0) {
+      fetchServices(userLocation, 1);
     }
+  }, [selectedCategory, searchQuery, sortOption]);
 
-    // 2. Search text
-    if (searchQuery.trim() !== "") {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (s) =>
-          s.name.toLowerCase().includes(q) ||
-          s.description.toLowerCase().includes(q)
-      );
-    }
-
-    // 3. Sort by price
-    if (sortOption === "price-asc") {
-      filtered = filtered.slice().sort((a, b) => a.price - b.price);
-    } else if (sortOption === "price-desc") {
-      filtered = filtered.slice().sort((a, b) => b.price - a.price);
-    }
-
-    // 4. Proximity (if userLocation is set)
-    if (userLocation) {
-      filtered = filtered.filter((service) => {
-        if (!service.location) return false;
-        const { coordinates } = service.location;
-        const distanceKm = getDistanceFromLatLonInKm(
-          userLocation.lat,
-          userLocation.lon,
-          coordinates[1],
-          coordinates[0]
-        );
-        return distanceKm <= 10;
-      });
-    }
-
-    setFilteredServices(filtered);
-  }, [services, selectedCategory, searchQuery, sortOption, userLocation]);
+  // Initial data fetch
+  useEffect(() => {
+    fetchServices();
+  }, []);
 
   const handleBookNow = (serviceId: string) => {
     if (user?.role !== "customer") {
@@ -162,7 +246,11 @@ export default function ServicesList() {
                 Nearby (10km)
                 <button
                   className="ml-2 text-gray-400 hover:text-white"
-                  onClick={() => setUserLocation(null)}
+                  onClick={() => {
+                    setUserLocation(null);
+                    setCurrentPage(1);
+                    fetchServices(null, 1);
+                  }}
                 >
                   &times;
                 </button>
@@ -173,7 +261,12 @@ export default function ServicesList() {
 
         {/* Filter controls - stacks vertically on mobile */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-          <SearchField value={searchQuery} onChange={setSearchQuery} />
+          <SearchField
+            value={searchQuery}
+            onChange={(value) => {
+              setSearchQuery(value);
+            }}
+          />
 
           <CategoryDropdown
             selected={selectedCategory}
@@ -196,13 +289,23 @@ export default function ServicesList() {
           </Button>
         </div>
 
-        {/* Results count */}
-        {!loading && !error && (
-          <p className="text-gray-400 text-sm mb-4">
-            Found {filteredServices.length}{" "}
-            {filteredServices.length === 1 ? "service" : "services"}
-          </p>
-        )}
+        {/* Results count and pagination info */}
+        <div id="results-top">
+          {!loading && !error && (
+            <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-4">
+              <p className="text-gray-400 text-sm">
+                Found {paginationData.totalCount}{" "}
+                {paginationData.totalCount === 1 ? "service" : "services"}
+              </p>
+              {paginationData.totalPages > 1 && (
+                <p className="text-gray-400 text-sm mt-1 sm:mt-0">
+                  Page {paginationData.currentPage} of{" "}
+                  {paginationData.totalPages}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Loading state */}
         {loading ? (
@@ -214,29 +317,36 @@ export default function ServicesList() {
           <div className="bg-red-900/20 border border-red-900 rounded-lg p-6 text-center">
             <p className="text-red-400">{error}</p>
             <Button
-              onClick={() => window.location.reload()}
+              onClick={() => fetchServices()}
               className="mt-4 bg-red-600 hover:bg-red-700 text-white"
             >
               Try Again
             </Button>
           </div>
-        ) : filteredServices.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {filteredServices.map((service) => (
-              <ServiceCard
-                key={service._id}
-                service={service}
-                onBook={handleBookNow}
-              />
-            ))}
-          </div>
+        ) : paginationData.services.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {paginationData.services.map((service) => (
+                <ServiceCard
+                  key={service._id}
+                  service={service}
+                  onBook={handleBookNow}
+                />
+              ))}
+            </div>
+
+            {/* Pagination component */}
+            <Pagination
+              currentPage={paginationData.currentPage}
+              totalPages={paginationData.totalPages}
+              onPageChange={handlePageChange}
+            />
+          </>
         ) : (
           <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 md:p-8 text-center shadow-md">
             <PackageSearch className="mx-auto h-10 w-10 text-gray-600 mb-3" />
             <p className="text-gray-400 text-base md:text-lg">
-              {services.length > 0
-                ? "No matching services found. Try adjusting your filters."
-                : "No services available at this time."}
+              No matching services found. Try adjusting your filters.
             </p>
           </div>
         )}

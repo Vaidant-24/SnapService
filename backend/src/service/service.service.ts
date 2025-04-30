@@ -5,6 +5,18 @@ import { Service, ServiceDocument } from 'src/schemas/service.schema';
 import { CreateServiceDto, UpdateServiceDto } from './dto-service/service.dto';
 import { Review } from 'src/schemas/review.schema';
 
+interface FilterOptions {
+  category?: string;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  lat?: number;
+  lng?: number;
+  radius?: number;
+  page?: number;
+  limit?: number;
+}
+
 @Injectable()
 export class ServiceService {
   constructor(
@@ -14,6 +26,73 @@ export class ServiceService {
 
   async findAll(): Promise<Service[]> {
     return this.serviceModel.find({ isActive: true }).populate('providerId', 'firstName lastName email phone address');
+  }
+
+  async findAllWithFilters(filters: FilterOptions): Promise<{
+    services: Service[];
+    totalCount: number;
+    totalPages: number;
+    currentPage: number;
+  }> {
+    // Build filter criteria
+    const filterCriteria: any = { isActive: true };
+
+    // Category filter
+    if (filters.category && filters.category !== 'All') {
+      filterCriteria.category = filters.category;
+    }
+
+    // Search filter
+    if (filters.search) {
+      filterCriteria.$or = [
+        { name: { $regex: filters.search, $options: 'i' } },
+        { description: { $regex: filters.search, $options: 'i' } },
+      ];
+    }
+
+    // Location filter (if lat and lng are provided)
+    if (filters.lat && filters.lng && filters.radius) {
+      // Use $geoWithin instead of $near as recommended by MongoDB
+      filterCriteria.location = {
+        $geoWithin: {
+          $centerSphere: [
+            [filters.lng, filters.lat],
+            filters.radius / 6378.1, // Convert km to radians (Earth radius in km)
+          ],
+        },
+      };
+    }
+
+    // Get total count for pagination
+    const totalCount = await this.serviceModel.countDocuments(filterCriteria);
+
+    // Calculate pagination values
+    const page = filters.page || 1;
+    const limit = filters.limit || 10;
+    const skip = (page - 1) * limit;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    // Create query and apply sorting, pagination
+    let query = this.serviceModel
+      .find(filterCriteria)
+      .populate('providerId', 'firstName lastName email phone address')
+      .skip(skip)
+      .limit(limit);
+
+    // Apply sorting
+    if (filters.sortBy) {
+      const sortOrder = filters.sortOrder === 'desc' ? -1 : 1;
+      query = query.sort({ [filters.sortBy]: sortOrder });
+    }
+
+    const services = await query.exec();
+
+    return {
+      services,
+      totalCount,
+      totalPages,
+      currentPage: page,
+    };
   }
 
   async findFeaturedService() {
@@ -66,14 +145,18 @@ export class ServiceService {
     return deletedService;
   }
 
-  async findNearbyServices(lng: number, lat: number, radius: number) {
+  async findNearbyServices(lng: number, lat: number, radius: number = 5) {
+    // Modified to use $geoWithin instead of $near
     return this.serviceModel.find({
       location: {
-        $near: {
-          $geometry: { type: 'Point', coordinates: [lng, lat] },
-          $maxDistance: radius,
+        $geoWithin: {
+          $centerSphere: [
+            [lng, lat],
+            radius / 6378.1, // Convert km to radians (Earth radius in km)
+          ],
         },
       },
+      isActive: true,
     });
   }
 

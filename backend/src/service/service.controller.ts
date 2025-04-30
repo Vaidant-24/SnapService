@@ -1,3 +1,4 @@
+// service.controller.ts
 import { Controller, Get, Post, Body, Param, Put, Delete, Query } from '@nestjs/common';
 import { ServiceService } from './service.service';
 import { CreateServiceDto, UpdateServiceDto } from './dto-service/service.dto';
@@ -29,8 +30,28 @@ export class ServiceController {
   }
 
   @Get()
-  async getAllServices() {
-    return this.serviceService.findAll();
+  async getAllServices(
+    @Query('category') category?: string,
+    @Query('search') search?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: string,
+    @Query('lat') lat?: number,
+    @Query('lng') lng?: number,
+    @Query('radius') radius?: number,
+    @Query('page') page = '1',
+    @Query('limit') limit = '8',
+  ) {
+    return this.serviceService.findAllWithFilters({
+      category,
+      search,
+      sortBy,
+      sortOrder,
+      lat,
+      lng,
+      radius: radius || 10,
+      page: Number(page),
+      limit: Number(limit),
+    });
   }
 
   @Get(':id')
