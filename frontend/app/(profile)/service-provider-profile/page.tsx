@@ -1,16 +1,23 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import AuthGuard from "@/components/auth/AuthGuard";
+import { User } from "@/components/type/User";
+import { PencilIcon } from "lucide-react";
+import { toast } from "sonner";
 
 const ServiceProviderProfile = () => {
-  const [provider, setProvider] = useState<any>(null);
+  const [provider, setProvider] = useState<User>({} as User);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState<any>({});
   const [message, setMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("profile");
+  const [uploading, setUploading] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
   const [avgRating, setAvgRating] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -19,8 +26,6 @@ const ServiceProviderProfile = () => {
           credentials: "include",
         });
         const data = await res.json();
-        console.log("profile data: ", data);
-
         setProvider(data);
         setFormData(data);
         fetchReviews(data.userId); // Fetch reviews for the provider
@@ -37,8 +42,6 @@ const ServiceProviderProfile = () => {
         if (!res.ok) throw new Error("Failed to fetch reviews");
 
         const data = await res.json();
-        console.log("review data: ", data);
-
         setReviews(data);
 
         const avg =
@@ -55,8 +58,6 @@ const ServiceProviderProfile = () => {
     fetchProfile();
   }, []);
 
-  // console.log("provider reviews: ", reviews);
-
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -65,36 +66,65 @@ const ServiceProviderProfile = () => {
 
   const handleSave = async () => {
     try {
+      let uploadedImageUrl = provider.profileImage;
+
+      if (selectedFile) {
+        setUploading(true);
+        const uploadData = new FormData();
+        uploadData.append("file", selectedFile);
+
+        const uploadRes = await fetch(
+          "http://localhost:3001/user/upload-profile-pic",
+          {
+            method: "POST",
+            credentials: "include",
+            body: uploadData,
+          }
+        );
+
+        if (!uploadRes.ok) throw new Error("Failed to upload image");
+
+        const result = await uploadRes.json();
+        uploadedImageUrl = result.profileImage;
+        setUploading(false);
+      }
+
       const res = await fetch("http://localhost:3001/user/profile", {
         method: "PATCH",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, profileImage: uploadedImageUrl }),
       });
 
       if (!res.ok) throw new Error("Failed to update");
 
       const updated = await res.json();
       setProvider(updated);
+      setFormData(updated);
       setEditMode(false);
+      toast.success("Profile updated successfully!");
       setMessage("Profile updated successfully!");
+
+      setSelectedFile(null);
+      setPreviewUrl(null);
     } catch (err) {
       console.error(err);
+      toast.error("Error updating profile.");
       setMessage("Error updating profile.");
     }
   };
 
   const handleCancel = () => {
-    setFormData(provider); // reset to original
+    setFormData(provider);
     setEditMode(false);
     setMessage(null);
+    setSelectedFile(null);
+    setPreviewUrl(null);
   };
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
+      toast.info("Geolocation is not supported by your browser.");
       return;
     }
 
@@ -110,24 +140,40 @@ const ServiceProviderProfile = () => {
           },
         }));
 
-        alert("Location detected successfully!");
+        toast.success("Location set successfully!");
       },
       (error) => {
         console.error("Geolocation error:", error);
-        alert("Failed to detect location.");
+        toast.info("Failed to detect location.");
       }
     );
   };
 
+  const handleProfileImageClick = () => {
+    if (editMode && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file)); // For local preview
+  };
+
   return (
     <AuthGuard>
-      <div className="max-w-4xl mx-auto mt-28 mb-20  p-6 bg-gray-900 text-white rounded-lg shadow-md">
+      <div className="max-w-4xl mx-auto my-28 mb-18 p-6 bg-gray-900 text-white rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Service Provider Profile</h1>
+          <h1 className="text-2xl font-bold text-orange-500">
+            Service Provider Profile
+          </h1>
           {!editMode ? (
             <button
               onClick={() => setEditMode(true)}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-semibold"
+              className="bg-orange-500 hover:bg-orange-600 text-white text-center px-2 py-2 rounded"
             >
               Edit Profile
             </button>
@@ -180,7 +226,44 @@ const ServiceProviderProfile = () => {
           <div className="flex gap-6">
             {/* Avatar Card */}
             <div className="bg-gray-800 rounded-lg p-6 w-1/3 text-center">
-              <div className="w-24 h-24 mx-auto rounded-full bg-gray-600 mb-4" />
+              <div
+                onClick={handleProfileImageClick}
+                className={`w-24 h-24 mx-auto rounded-full mb-4 overflow-hidden relative ${
+                  editMode ? "cursor-pointer hover:opacity-80" : ""
+                }`}
+                style={{
+                  background: previewUrl
+                    ? `url(${previewUrl}) center/cover no-repeat`
+                    : provider.profileImage
+                    ? `url(${provider.profileImage}) center/cover no-repeat`
+                    : "url('avatar.svg') center/cover no-repeat",
+                }}
+              >
+                {editMode && (
+                  <>
+                    {/* Overlay Label */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 hover:opacity-100 transition-opacity">
+                      <span className="text-white text-sm">
+                        {uploading ? "Uploading..." : "Change Photo"}
+                      </span>
+                    </div>
+
+                    {/* Pencil Icon badge on profile picture */}
+                    <div className="absolute -top-0 -right-0 bg-orange-500 p-1 rounded-full border-2 border-gray-800">
+                      <PencilIcon className="text-orange w-5 h-5" />
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
+
               <h2 className="text-xl font-semibold">
                 {provider.firstName + " " + provider.lastName}
               </h2>
@@ -248,14 +331,8 @@ const ServiceProviderProfile = () => {
                     onClick={handleDetectLocation}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
                   >
-                    📍 Detect My Location
+                    📍 Set My Location
                   </button>
-                  {formData.location.coordinates && (
-                    <p className="mt-2 text-sm text-green-400">
-                      Location set to: [Lng: {formData.location?.coordinates[0]}
-                      , Lat: {formData.location?.coordinates[1]}]
-                    </p>
-                  )}
                 </div>
               )}
             </div>

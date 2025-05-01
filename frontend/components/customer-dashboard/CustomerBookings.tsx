@@ -84,7 +84,7 @@ export default function CustomerBookings({ userId }: CustomerBookingsProps) {
         <h2 className="text-2xl text-orange-500 font-semibold">
           Your Bookings
         </h2>
-        <div className="flex justify-between items-center mb-4 gap-6">
+        <div className="flex justify-between items-center mb-4 ml-8 gap-12">
           <button
             onClick={fetchBookings}
             className="flex items-center gap-2 text-green-500 hover:text-green-700"

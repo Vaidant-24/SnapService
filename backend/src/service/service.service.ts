@@ -121,9 +121,9 @@ export class ServiceService {
 
     const services = await query.exec();
 
-    if (!services || services.length === 0) {
-      throw new NotFoundException('No services found for the given provider ID');
-    }
+    // if (!services || services.length === 0) {
+    //   throw new NotFoundException('No services found for the given provider ID');
+    // }
 
     return services;
   }

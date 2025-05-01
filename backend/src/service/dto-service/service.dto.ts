@@ -26,7 +26,7 @@ export class CreateServiceDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => GeoLocationDto)
-  location?: GeoLocationDto;
+  location: GeoLocationDto;
 
   @IsOptional()
   @IsNumber()
@@ -60,7 +60,7 @@ export class UpdateServiceDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => GeoLocationDto)
-  location?: GeoLocationDto;
+  location: GeoLocationDto;
 
   @IsOptional()
   @IsNumber()

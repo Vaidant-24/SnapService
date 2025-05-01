@@ -42,7 +42,12 @@ export class ReviewService {
   }
 
   async getReviewsByProvider(providerId: string): Promise<Review[]> {
-    return await this.reviewModel.find({ providerId }).populate('customerId', 'firstName lastName ').limit(6).exec();
+    return await this.reviewModel
+      .find({ providerId })
+      .populate('customerId', 'firstName lastName ')
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .exec();
   }
 
   async markAllReviewsAsRead(providerId: string): Promise<{ modifiedCount: number }> {

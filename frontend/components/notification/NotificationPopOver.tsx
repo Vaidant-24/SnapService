@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { FaBell } from "react-icons/fa";
 import { Notification } from "../type/Notification";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export const NotificationPopover = ({
   notifications,
@@ -12,10 +14,34 @@ export const NotificationPopover = ({
   count: number;
   onMarkAllAsRead: () => Promise<void>;
 }) => {
+  const { user } = useAuth();
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const router = useRouter();
+  interface notificationType {
+    type: "BookingUpdate" | "AwaitingApproval" | "ReviewSubmitted" | "System";
+  }
 
-  const handleNotificationClick = (notifId: string) => {
-    setPopoverOpen(false);
+  const handleNotificationClick = (
+    notifId: string,
+    { type }: notificationType
+  ) => {
+    if (user?.role === "customer") {
+      if (type === "BookingUpdate") {
+        router.push("/customer-bookings");
+        setPopoverOpen(false);
+      } else if (type === "AwaitingApproval") {
+        router.push("/customer-approval");
+        setPopoverOpen(false);
+      }
+    } else if (user?.role === "service_provider") {
+      if (type === "BookingUpdate") {
+        router.push("/service-provider-bookings");
+        setPopoverOpen(false);
+      } else if (type === "ReviewSubmitted") {
+        router.push("/service-provider-unread-reviews");
+        setPopoverOpen(false);
+      }
+    }
   };
 
   return (
@@ -54,7 +80,9 @@ export const NotificationPopover = ({
               <li
                 key={notif._id}
                 className="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md cursor-pointer"
-                onClick={() => handleNotificationClick(notif._id)}
+                onClick={() =>
+                  handleNotificationClick(notif._id, { type: notif.type })
+                }
               >
                 {notif.message}
               </li>

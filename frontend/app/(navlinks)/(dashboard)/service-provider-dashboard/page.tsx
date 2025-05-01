@@ -77,7 +77,7 @@ export default function ServiceProviderDashboard() {
 
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                  <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-semibold">
+                  <button className="bg-orange-500 hover:bg-orange-600 text-white mx-4 px-4 py-2 rounded font-semibold">
                     Add Service
                   </button>
                 </DialogTrigger>
@@ -95,15 +95,15 @@ export default function ServiceProviderDashboard() {
               </Dialog>
             </section>
 
+            {userData && (
+              <ProviderUpcomingBookings providerId={userData?.userId} />
+            )}
+
             <ProviderServices
               services={myServices}
               handleFetchService={() => fetchServices()}
               refreshing={refreshing}
             />
-
-            {userData && (
-              <ProviderUpcomingBookings providerId={userData?.userId} />
-            )}
           </>
         )}
       </div>

@@ -59,23 +59,15 @@ export default function ProviderUpcomingBookings({
     return new Date(dateStr).toLocaleDateString("en-US", options);
   };
 
-  // if (loading) {
-  //   return (
-  //     <div className="rounded-lg shadow-lg p-4 h-64 flex items-center justify-center">
-  //       <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500" />
-  //     </div>
-  //   );
-  // }
-
   return (
-    <div className="rounded-lg shadow-lg py-4 my-8">
+    <div className="rounded-lg shadow-lg py-4 my-8 mx-4">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-3xl text-orange-500 font-semibold">
           Upcoming Bookings
         </h3>
         <button
           onClick={fetchUpcomingBookings}
-          className="flex items-center gap-2 text-green-500 hover:text-green-700"
+          className="flex items-center gap-2 mx-4 text-green-500 hover:text-green-700"
         >
           {refreshing ? (
             <Loader className="w-9 h-9 animate-spin" />
@@ -90,7 +82,7 @@ export default function ProviderUpcomingBookings({
           {upcomingBookings.map((booking) => (
             <div
               key={booking._id}
-              className="bg-gray-800 rounded-md px-4 py-4 border border-gray-800"
+              className="bg-gray-800 rounded-md px-4 my-8 py-4 border border-gray-800"
             >
               <div className="flex justify-between items-start">
                 <div>

@@ -9,9 +9,9 @@ const HowItWorks = () => {
   ];
 
   return (
-    <div className="mt-8 max-w-4xl mx-auto grid sm:grid-cols-3 gap-6 text-white text-center">
+    <div className="mt-8 max-w-4xl mx-auto grid sm:grid-cols-3 gap-6 text-gray-900 text-center">
       {steps.map((step, i) => (
-        <div key={i} className="bg-white/5 p-4 rounded-xl shadow-md">
+        <div key={i} className="bg-white p-4 rounded-xl shadow-md">
           <h4 className="font-bold text-lg text-orange-400 mb-2">
             {step.title}
           </h4>

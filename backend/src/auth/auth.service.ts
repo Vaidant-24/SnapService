@@ -24,6 +24,7 @@ export class AuthService {
 
     // Create new user
     const createdUser = new this.userModel(createUserDto);
+    console.log('new user: ', createdUser);
 
     await createdUser.save();
 
@@ -87,6 +88,7 @@ export class AuthService {
       phone: user.phone,
       address: user.address,
       location: user.location,
+      profileImage: user.profileImage,
       experience: user.experience,
       description: user.description,
       createdAt: user.createdAt,

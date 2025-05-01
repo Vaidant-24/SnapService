@@ -3,6 +3,7 @@ export interface Geolocation {
   coordinates: [number, number]; // [longitude, latitude]
 }
 export type User = {
+  serviceCategory: string;
   userId: string;
   firstName: string;
   lastName: string;
@@ -11,7 +12,8 @@ export type User = {
   createdAt: string;
   email: string;
   role: "customer" | "service_provider";
-  location: Geolocation;
+  location?: Geolocation;
+  profileImage?: string;
   phone?: string;
   address?: string;
 };

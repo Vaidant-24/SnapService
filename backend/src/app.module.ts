@@ -15,6 +15,7 @@ import { ReviewModule } from './review/review.module';
 import { NotificationsGateway } from './socketIO/notifications.gateway';
 import { NotificationModule } from './notification/notification.module';
 import { Review, ReviewSchema } from './schemas/review.schema';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { Review, ReviewSchema } from './schemas/review.schema';
 
       inject: [ConfigService],
     }),
+    CloudinaryModule,
   ],
   providers: [ServiceService, BookingService, UserService, NotificationsGateway],
   controllers: [ServiceController, BookingController, UserController],

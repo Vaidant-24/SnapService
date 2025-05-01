@@ -148,7 +148,7 @@ export default function ReviewModal({
   };
 
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex flex-row gap-3 w-full">
       {/* Button to open the Rate & Review dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>

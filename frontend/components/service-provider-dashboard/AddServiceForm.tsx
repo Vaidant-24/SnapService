@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"; // Make sure shadcn <Select> is properly imported
+import { toast } from "sonner";
 
 type AddServiceFormProps = {
   onServiceAdded: (service: Service) => void;
@@ -65,6 +66,11 @@ export default function AddServiceForm({
       return;
     }
 
+    if (!userData?.location) {
+      toast.info("Please update your location and try again!");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const response = await fetch("http://localhost:3001/services", {
@@ -82,13 +88,13 @@ export default function AddServiceForm({
       if (!response.ok) throw new Error("Failed to add service");
 
       const created = await response.json();
-      setSubmitMessage("✅ Service added successfully!");
+      setSubmitMessage("Service added successfully!");
       setNewService({ name: "", description: "", price: "", category: "" });
       onServiceAdded(created);
       onCancel();
     } catch (err) {
       console.error(err);
-      setSubmitMessage("❌ Error adding service.");
+      setSubmitMessage("Error adding service.");
     } finally {
       setSubmitting(false);
     }

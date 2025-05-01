@@ -1,4 +1,6 @@
-import { IsEmail, IsNotEmpty, IsEnum, IsOptional, MinLength, IsNumber } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsEnum, IsOptional, MinLength, IsNumber, ValidateNested } from 'class-validator';
+import { GeoLocationDto } from './service-provider-dto';
+import { Type } from 'class-transformer';
 
 export class CreateUserDto {
   @IsNotEmpty()

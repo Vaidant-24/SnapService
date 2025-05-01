@@ -123,7 +123,7 @@ export class BookingService {
         case 'Awaiting Completion':
           if (customerId) {
             await this.notificationService.createNotification({
-              type: 'BookingUpdate',
+              type: 'AwaitingApproval',
               message: 'Your booking is Awaiting Completion',
               senderId: providerId,
               serviceId: updatedBooking.serviceId.toString(),

@@ -33,7 +33,7 @@ export default function ProviderServices({
           <button
             onClick={handleFetchService}
             disabled={refreshing}
-            className="flex items-center gap-2 text-green-500 hover:text-green-700"
+            className="flex items-center gap-2 mx-4 text-green-500 hover:text-green-700"
           >
             {refreshing ? (
               <Loader className="w-9 h-9 animate-spin" />

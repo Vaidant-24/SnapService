@@ -21,4 +21,8 @@ export class BaseUserUpdateDto {
   @IsOptional()
   @IsString()
   address?: string;
+
+  @IsOptional()
+  @IsString()
+  profileImage?: string;
 }

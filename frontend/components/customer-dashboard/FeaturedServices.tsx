@@ -68,7 +68,7 @@ export default function FeaturedServices() {
           {services.slice(0, 6).map((service) => (
             <div
               key={service._id}
-              className="bg-gray-800 rounded-xl p-10 border border-gray-800 duration-300 shadow-lg"
+              className="bg-gray-800 rounded-xl p-8 border border-gray-800 duration-300 shadow-lg"
             >
               <div className="mb-4">
                 <h4 className="text-lg text-white font-semibold flex items-center gap-2">

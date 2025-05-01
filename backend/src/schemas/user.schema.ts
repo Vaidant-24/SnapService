@@ -34,14 +34,12 @@ export class User {
     type: {
       type: String,
       enum: ['Point'],
-      default: 'Point',
     },
     coordinates: {
       type: [Number], // [longitude, latitude]
-      required: true,
     },
   })
-  location: {
+  location?: {
     type: 'Point';
     coordinates: [number, number];
   };

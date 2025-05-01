@@ -1,18 +1,40 @@
-"use client";
+// SearchField.tsx
+import React, { useMemo, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import debounce from "lodash/debounce";
 
-interface SearchBarProps {
+interface SearchFieldProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-export default function SearchField({ value, onChange }: SearchBarProps) {
+const SearchField: React.FC<SearchFieldProps> = ({ value, onChange }) => {
+  // Create debounced version of the onChange function
+  const debouncedOnChange = useMemo(() => debounce(onChange, 400), [onChange]);
+
+  useEffect(() => {
+    // Cleanup on unmount
+    return () => {
+      debouncedOnChange.cancel();
+    };
+  }, [debouncedOnChange]);
+
   return (
-    <input
-      type="text"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder="Search services..."
-      className="w-full  px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-    />
+    <div className="relative w-full max-w-md">
+      <Search
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+        size={18}
+      />
+      <Input
+        type="text"
+        placeholder="Search services..."
+        className="pl-10 pr-4 py-2 w-full"
+        defaultValue={value}
+        onChange={(e) => debouncedOnChange(e.target.value)}
+      />
+    </div>
   );
-}
+};
+
+export default SearchField;

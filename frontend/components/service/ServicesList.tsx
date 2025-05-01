@@ -11,6 +11,7 @@ import SortDropdown from "./SortDropDown";
 import { Button } from "../ui/button";
 import { PackageSearch, Loader, MapPin } from "lucide-react";
 import { Pagination } from "../ui/Pagination";
+import { toast } from "sonner";
 
 interface PaginationData {
   services: Service[];
@@ -51,7 +52,7 @@ export default function ServicesList() {
       fetchServices(null, 1); // Refetch without location
     } else {
       if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser");
+        toast.error("Please allow access to Location!");
         return;
       }
 

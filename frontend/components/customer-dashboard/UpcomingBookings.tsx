@@ -63,8 +63,8 @@ export default function CustomerUpcomingBooking({
   return (
     <section className="py-4">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-2xl text-orange-500 font-semibold mb-6">
+        <div className="flex justify-between items-center mb-10">
+          <h3 className="text-2xl text-orange-500 font-semibold ">
             Upcoming Bookings
           </h3>
           <button
@@ -85,7 +85,7 @@ export default function CustomerUpcomingBooking({
             {bookings.map((booking) => (
               <div
                 key={booking._id}
-                className="bg-gray-800 rounded-xl p-10 border border-gray-800 shadow-lg"
+                className="bg-gray-800 rounded-xl p-8 border border-gray-800 shadow-lg"
               >
                 <h4 className="text-lg text-white font-semibold flex items-center gap-2 mb-4">
                   {booking.serviceId.name}

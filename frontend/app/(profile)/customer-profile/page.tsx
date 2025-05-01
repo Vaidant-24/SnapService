@@ -1,14 +1,21 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import AuthGuard from "@/components/auth/AuthGuard";
+import { User } from "@/components/type/User";
+import { PencilIcon } from "lucide-react";
+import { toast } from "sonner";
 
 const CustomerProfile = () => {
-  const [customer, setCustomer] = useState<any>(null);
+  const [customer, setCustomer] = useState<User>({} as User);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState<any>({});
   const [message, setMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("profile");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -35,21 +42,44 @@ const CustomerProfile = () => {
 
   const handleSave = async () => {
     try {
+      let uploadedImageUrl = customer.profileImage;
+
+      if (selectedFile) {
+        const uploadData = new FormData();
+        uploadData.append("file", selectedFile);
+
+        const uploadRes = await fetch(
+          "http://localhost:3001/user/upload-profile-pic",
+          {
+            method: "POST",
+            credentials: "include",
+            body: uploadData,
+          }
+        );
+
+        if (!uploadRes.ok) throw new Error("Failed to upload image");
+
+        const result = await uploadRes.json();
+        uploadedImageUrl = result.profileImage;
+      }
+
       const res = await fetch("http://localhost:3001/user/profile", {
         method: "PATCH",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, profileImage: uploadedImageUrl }),
       });
 
       if (!res.ok) throw new Error("Failed to update");
 
       const updated = await res.json();
       setCustomer(updated);
+      setFormData(updated);
       setEditMode(false);
       setMessage("Profile updated successfully!");
+
+      setSelectedFile(null);
+      setPreviewUrl(null);
     } catch (err) {
       console.error(err);
       setMessage("Error updating profile.");
@@ -60,6 +90,8 @@ const CustomerProfile = () => {
     setFormData(customer);
     setEditMode(false);
     setMessage(null);
+    setSelectedFile(null);
+    setPreviewUrl(null);
   };
 
   const handleDetectLocation = () => {
@@ -80,13 +112,27 @@ const CustomerProfile = () => {
           },
         }));
 
-        alert("Location detected successfully!");
+        toast.success("Location set successfully!");
       },
       (error) => {
         console.error("Geolocation error:", error);
-        alert("Failed to detect location.");
+        toast.info("Failed to detect location.");
       }
     );
+  };
+
+  const handleProfileImageClick = () => {
+    if (editMode && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file)); // For local preview
   };
 
   return (
@@ -132,27 +178,45 @@ const CustomerProfile = () => {
           >
             Profile Information
           </button>
-          <button
-            onClick={() => setActiveTab("stats")}
-            className={`px-4 py-2 rounded ${
-              activeTab === "stats"
-                ? "bg-gray-800 text-white"
-                : "bg-gray-700 text-gray-300"
-            }`}
-          >
-            Stats & History
-          </button>
         </div>
-
-        {message && (
-          <p className="mb-4 text-sm text-center text-green-400">{message}</p>
-        )}
 
         {activeTab === "profile" && customer && (
           <div className="flex gap-6">
             {/* Avatar Card */}
             <div className="bg-gray-800 rounded-lg p-6 w-1/3 text-center">
-              <div className="w-24 h-24 mx-auto rounded-full bg-gray-600 mb-4" />
+              <div
+                onClick={handleProfileImageClick}
+                className={`w-24 h-24 mx-auto rounded-full mb-4 overflow-hidden relative ${
+                  editMode ? "cursor-pointer hover:opacity-80" : ""
+                }`}
+                style={{
+                  background: previewUrl
+                    ? `url(${previewUrl}) center/cover no-repeat`
+                    : customer.profileImage
+                    ? `url(${customer.profileImage}) center/cover no-repeat`
+                    : "url('avatar.svg') center/cover no-repeat",
+                }}
+              >
+                {editMode && (
+                  <>
+                    {/* Overlay Label */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 hover:opacity-100 transition-opacity">
+                      <span className="text-white text-sm">
+                        {uploading ? "Uploading..." : "Change Photo"}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
+
               <h2 className="text-xl font-semibold">
                 {customer.firstName + " " + customer.lastName}
               </h2>
@@ -196,23 +260,11 @@ const CustomerProfile = () => {
                     onClick={handleDetectLocation}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
                   >
-                    📍 Detect My Location
+                    📍 Set My Location
                   </button>
-                  {formData.location && (
-                    <p className="mt-2 text-sm text-green-400">
-                      Location set to: [Lng: {formData.location.coordinates[0]},
-                      Lat: {formData.location.coordinates[1]}]
-                    </p>
-                  )}
                 </div>
               )}
             </div>
-          </div>
-        )}
-
-        {activeTab === "stats" && (
-          <div className="bg-gray-800 p-6 rounded text-gray-400">
-            <p>Booking history, reviews, or usage stats will appear here.</p>
           </div>
         )}
       </div>

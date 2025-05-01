@@ -111,7 +111,7 @@ export default function NotificationsPage() {
                       {booking.providerDetails.lastName}
                     </p>
                   </div>
-                  <span className="text-lg text-yellow-400 font-bold">
+                  <span className="text-md text-yellow-400 font-bold">
                     Awaiting Your Approval
                   </span>
                 </div>

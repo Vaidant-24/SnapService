@@ -77,7 +77,7 @@ export default function ProviderBookings({
           <h3 className="text-2xl text-orange-500 font-semibold">
             Manage Bookings
           </h3>
-          <div className="flex items-center gap-6 ">
+          <div className="flex items-center ml-8 gap-12 ">
             <button
               onClick={fetchBookings}
               className="flex items-center gap-2 text-green-500 hover:text-green-600"
