@@ -86,25 +86,28 @@ export default function BookService() {
     // console.log("userData", userData);
 
     try {
-      const response = await fetch("http://localhost:3001/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          customerId: customer.userId,
-          serviceId,
-          providerDetails: service?.providerId,
-          customerName: customer.firstName + " " + customer.lastName,
-          customerEmail: customer.email,
-          customerPhone: phone,
-          customerAddress: address,
-          paymentMethod: paymentMethod,
-          serviceName: service?.name,
-          date,
-          time,
-          status: "Pending",
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/bookings`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            customerId: customer.userId,
+            serviceId,
+            providerDetails: service?.providerId,
+            customerName: customer.firstName + " " + customer.lastName,
+            customerEmail: customer.email,
+            customerPhone: phone,
+            customerAddress: address,
+            paymentMethod: paymentMethod,
+            serviceName: service?.name,
+            date,
+            time,
+            status: "Pending",
+          }),
+        }
+      );
 
       if (!response.ok) throw new Error("Booking failed");
 

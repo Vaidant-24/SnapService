@@ -73,17 +73,20 @@ export default function AddServiceForm({
 
     setSubmitting(true);
     try {
-      const response = await fetch("http://localhost:3001/services", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          ...newService,
-          price: Number(price),
-          providerId: userData?.userId,
-          location: userData?.location,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/services`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            ...newService,
+            price: Number(price),
+            providerId: userData?.userId,
+            location: userData?.location,
+          }),
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to add service");
 

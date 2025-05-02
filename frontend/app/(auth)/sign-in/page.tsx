@@ -21,14 +21,17 @@ export default function Login() {
     const password = formData.get("password");
 
     try {
-      const response = await fetch("http://localhost:3001/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: "include", // Important for cookies
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+          credentials: "include", // Important for cookies
+        }
+      );
 
       const data = await response.json();
       // console.log("--debug--", data);
@@ -40,7 +43,7 @@ export default function Login() {
       switch (data.user.role) {
         case "customer":
           setUser(data.user);
-          router.push("/customer-dashboard");
+          router.push("/services");
           break;
         case "service_provider":
           setUser(data.user);

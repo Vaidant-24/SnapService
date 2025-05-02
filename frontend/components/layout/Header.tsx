@@ -178,6 +178,20 @@ const Header = () => {
                   </Link>
                 )}
 
+                {user?.role === "customer" && (
+                  <Link
+                    href="/services"
+                    className={`block px-4 py-2 text-sm ${
+                      isActive("/customer-approval")
+                        ? "text-orange-500 bg-gray-700"
+                        : "text-white hover:bg-gray-800"
+                    }`}
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    Services
+                  </Link>
+                )}
+
                 {user?.role === "service_provider" && (
                   <Link
                     href="/service-provider-unread-reviews"
@@ -258,7 +272,7 @@ const Header = () => {
             <Link
               href={profilePath}
               className={mobileLinkStyle(profilePath)}
-              onClick={() => setDropdownOpen(false)}
+              onClick={toggleMenu}
             >
               Profile: {user.firstName}
             </Link>
@@ -268,7 +282,7 @@ const Header = () => {
             <Link
               href={profilePath}
               className={mobileLinkStyle(profilePath)}
-              onClick={() => setDropdownOpen(false)}
+              onClick={toggleMenu}
             >
               Profile: {user.firstName}
             </Link>
@@ -283,7 +297,7 @@ const Header = () => {
               Dashboard
             </Link>
           )}
-          {user?.role !== "service_provider" && (
+          {user?.role === "customer" && (
             <Link
               href="/services"
               onClick={toggleMenu}

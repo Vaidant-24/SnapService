@@ -53,13 +53,14 @@ export default function BookingForm({
     const now = new Date();
     setMinDate(now);
 
-    const currentTimeStr = now.toTimeString().slice(0, 5); // "HH:MM"
     const todayStr = now.toISOString().split("T")[0];
 
     if (date === todayStr) {
-      setMinTime(currentTimeStr);
+      const threeHoursLater = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+      const timeStr = threeHoursLater.toTimeString().slice(0, 5); // "HH:MM"
+      setMinTime(timeStr);
     } else {
-      setMinTime("");
+      setMinTime(""); // No restriction if not today
     }
   }, [date]);
 

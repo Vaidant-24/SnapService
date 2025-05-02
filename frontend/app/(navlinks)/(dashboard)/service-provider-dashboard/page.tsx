@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Loader } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function ServiceProviderDashboard() {
   const { user: userData } = useAuth();
@@ -22,12 +23,19 @@ export default function ServiceProviderDashboard() {
   const [myServices, setMyServices] = useState<Service[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (userData && userData.role !== "service_provider") {
+      router.push("/unauthorized");
+    }
+  }, [userData, router]);
 
   const fetchServices = async () => {
     try {
       setRefreshing(true);
       const servicesRes = await fetch(
-        `http://localhost:3001/services/provider/${userData?.userId}?limit=6`
+        `http://localhost:3001/services/provider/${userData?.userId}`
       );
       if (!servicesRes.ok) throw new Error("Failed to fetch services");
 
@@ -45,7 +53,9 @@ export default function ServiceProviderDashboard() {
   useEffect(() => {
     if (!userData) return;
 
-    fetchServices();
+    if (userData.role === "service_provider") {
+      fetchServices();
+    }
   }, [userData]);
 
   const handleServiceAdded = (newService: Service) => {

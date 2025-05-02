@@ -33,14 +33,14 @@ export class NotificationsGateway implements OnGatewayInit, OnGatewayConnection,
     const userId = client.handshake.query.userId as string;
     if (userId) {
       client.join(userId);
-      console.log(`Client ${client.id} joined room ${userId}`);
+      // console.log(`Client ${client.id} joined room ${userId}`);
     } else {
       console.warn(`Client ${client.id} did not provide userId in query`);
     }
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+    // console.log(`Client disconnected: ${client.id}`);
   }
 
   emitToUser(userId: string, event: NotificationEvent, message: string) {
@@ -48,7 +48,7 @@ export class NotificationsGateway implements OnGatewayInit, OnGatewayConnection,
       message,
       timestamp: new Date(),
     });
-    console.log(`Emitted event ${event} to user ${userId}`);
+    // console.log(`Emitted event ${event} to user ${userId}`);
   }
 
   customerBookingCompletionApproval(customerId: string) {

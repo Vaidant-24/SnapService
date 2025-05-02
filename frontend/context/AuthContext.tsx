@@ -47,9 +47,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const verifyUser = async () => {
       try {
-        const res = await fetch("http://localhost:3001/auth/verify", {
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify`,
+          {
+            credentials: "include",
+          }
+        );
         if (!res.ok) throw new Error("Unauthorized");
         const data = await res.json();
         setUser(data.user);
@@ -64,7 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const logout = async () => {
-    await fetch("http://localhost:3001/auth/logout", {
+    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
@@ -75,13 +78,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const fetchNotifications = async () => {
     try {
       const res1 = await fetch(
-        `http://localhost:3001/notifications/user/${user?.userId}/unread`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/notifications/user/${user?.userId}/unread`
       );
       const unread = await res1.json();
       setUnreadNotifications(unread);
 
       const res2 = await fetch(
-        `http://localhost:3001/notifications/user/${user?.userId}/unread/count`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/notifications/user/${user?.userId}/unread/count`
       );
       const count = await res2.json();
       setNotificationsCount(count || 0);
@@ -93,7 +96,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const markAllAsRead = async () => {
     try {
       const res = await fetch(
-        `http://localhost:3001/notifications/user/${user?.userId}/mark-all-read`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/notifications/user/${user?.userId}/mark-all-read`,
         {
           method: "PATCH",
         }
@@ -110,7 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const CountNotifications = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3001/notifications/user/${user?.userId}/unread/count`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/notifications/user/${user?.userId}/unread/count`
         );
         const data = await res.json();
 
@@ -123,7 +126,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const fetchUnreadNotifications = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3001/notifications/user/${user?.userId}/unread`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/notifications/user/${user?.userId}/unread`
         );
         const data = await res.json();
 

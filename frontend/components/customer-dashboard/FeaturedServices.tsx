@@ -27,7 +27,7 @@ export default function FeaturedServices() {
     const fetchServices = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3001/services/featured-services"
+          `${process.env.NEXT_PUBLIC_BASE_URL}/services/featured-services`
         );
         if (!response.ok) throw new Error("Failed to fetch services");
         const data = await response.json();

@@ -12,18 +12,16 @@ const ServiceInfo = ({ service }: ServiceInfoProps) => {
         Service Information
       </h2>
       <p>
-        <span className="font-semibold">Name:</span> {service.name}
+        <span className="">Name:</span> {service.name}
       </p>
       <p>
-        <span className="font-semibold">Description:</span>{" "}
-        {service.description}
+        <span className="">Description:</span> {service.description}
       </p>
       <p>
-        <span className="font-semibold">Category:</span> {service.category}
+        <span className="">Category:</span> {service.category}
       </p>
       <p>
-        <span className="font-semibold text-orange-400">Price:</span> ₹
-        {service.price}
+        <span className="">Price:</span> ₹{service.price}
       </p>
     </div>
   );

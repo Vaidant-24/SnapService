@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { CreateBookingDto, UpdateBookingDto } from './dto-booking/booking.dto';
 import { Booking, BookingDocument } from 'src/schemas/booking.schema';
 import { QueryParams } from './booking.controller';
-import { NotificationsGateway, NotificationEvent } from 'src/socketIO/notifications.gateway';
+import { NotificationsGateway, NotificationEvent } from 'src/socket-io/notifications.gateway';
 import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()

@@ -3,8 +3,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import AuthGuard from "@/components/auth/AuthGuard";
 import { User } from "@/components/type/User";
-import { PencilIcon } from "lucide-react";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { Loader } from "lucide-react";
 
 const CustomerProfile = () => {
   const [customer, setCustomer] = useState<User>({} as User);
@@ -16,23 +18,36 @@ const CustomerProfile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { user: userData } = useAuth();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await fetch("http://localhost:3001/auth/profile", {
-          credentials: "include",
-        });
-        const data = await res.json();
-        setCustomer(data);
-        setFormData(data);
-      } catch (err) {
-        console.error("Failed to fetch customer profile:", err);
-      }
-    };
+    if (userData && userData.role !== "customer") {
+      router.push("/unauthorized");
+    }
+  }, [userData, router]);
 
-    fetchProfile();
-  }, []);
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch("http://localhost:3001/auth/profile", {
+        credentials: "include",
+      });
+      const data = await res.json();
+      setCustomer(data);
+      setFormData(data);
+    } catch (err) {
+      console.error("Failed to fetch customer profile:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (userData?.userId && userData.role === "customer") {
+      fetchProfile();
+    }
+  }, [userData]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -134,6 +149,18 @@ const CustomerProfile = () => {
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file)); // For local preview
   };
+
+  if (!userData || userData.role !== "customer" || loading) {
+    return (
+      <AuthGuard>
+        <div className="rounded-lg shadow-lg my-12 h-64 flex flex-col items-center justify-center">
+          <Loader className="h-10 w-10 text-orange-500 animate-spin mb-4" />
+          <p className="text-gray-300">Loading Profile...</p>
+          <Toaster position="top-right" richColors />
+        </div>
+      </AuthGuard>
+    );
+  }
 
   return (
     <AuthGuard>

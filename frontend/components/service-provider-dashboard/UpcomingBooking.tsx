@@ -30,7 +30,7 @@ export default function ProviderUpcomingBookings({
       setLoading(true);
 
       const res = await fetch(
-        `http://localhost:3001/bookings/provider/status/${providerId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/bookings/provider/status/${providerId}`
       );
       if (!res.ok) throw new Error("Failed to fetch bookings");
 

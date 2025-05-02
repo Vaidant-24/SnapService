@@ -30,24 +30,27 @@ export default function Register() {
     const description = formData.get("description");
 
     try {
-      const response = await fetch("http://localhost:3001/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email,
-          password,
-          phone,
-          address,
-          role,
-          experience: parseInt((experience as string) || "0"),
-          description,
-        }),
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            firstName,
+            lastName,
+            email,
+            password,
+            phone,
+            address,
+            role,
+            experience: parseInt((experience as string) || "0"),
+            description,
+          }),
+          credentials: "include",
+        }
+      );
 
       const data = await response.json();
 

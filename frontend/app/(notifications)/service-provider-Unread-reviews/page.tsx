@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { MdOutlineSync } from "react-icons/md";
 import AuthGuard from "@/components/auth/AuthGuard";
+import { useRouter } from "next/navigation";
+import { Toaster } from "sonner";
 
 interface Review {
   _id: string;
@@ -28,16 +30,23 @@ export default function ProviderReviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [marking, setMarking] = useState(false);
-  const { user } = useAuth();
+  const { user: userData } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (userData && userData.role !== "service_provider") {
+      router.push("/unauthorized");
+    }
+  }, [userData, router]);
 
   const fetchUnreadReviews = async () => {
-    if (!user?.userId) return;
+    if (!userData?.userId) return;
 
     try {
       setRefreshing(true);
       const res = await fetch(
-        `http://localhost:3001/review/provider-unread/${user.userId}`
+        `http://localhost:3001/review/provider-unread/${userData.userId}`
       );
       const data: Review[] = await res.json();
 
@@ -57,16 +66,19 @@ export default function ProviderReviews() {
 
   useEffect(() => {
     fetchUnreadReviews();
-  }, [user]);
+  }, [userData]);
 
   const handleMarkAllAsRead = async () => {
-    if (!user?.userId) return;
+    if (!userData?.userId) return;
     setMarking(true);
 
     try {
-      await fetch(`http://localhost:3001/review/mark-read/${user.userId}`, {
-        method: "PATCH",
-      });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/review/mark-read/${userData?.userId}`,
+        {
+          method: "PATCH",
+        }
+      );
 
       // Update state to reflect all reviews as read
       setReviews((prev) => prev.map((review) => ({ ...review, isRead: true })));
@@ -77,12 +89,13 @@ export default function ProviderReviews() {
     }
   };
 
-  if (loading) {
+  if (!userData || userData.role !== "service_provider" || loading) {
     return (
       <AuthGuard>
-        <div className="rounded-lg shadow-lg my-12  h-64 flex flex-col items-center justify-center">
+        <div className="rounded-lg shadow-lg my-12 h-64 flex flex-col items-center justify-center">
           <Loader className="h-10 w-10 text-orange-500 animate-spin mb-4" />
-          <p className="text-gray-300">Loading Reviews...</p>
+          <p className="text-gray-300">Loading reviews...</p>
+          <Toaster position="top-right" richColors />
         </div>
       </AuthGuard>
     );

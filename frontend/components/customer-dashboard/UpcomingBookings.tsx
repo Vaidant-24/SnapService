@@ -28,7 +28,7 @@ export default function CustomerUpcomingBooking({
     try {
       setRefreshing(true);
       const response = await fetch(
-        `http://localhost:3001/bookings/customer/status/${userId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/bookings/customer/status/${userId}`
       );
       if (!response.ok) throw new Error("Failed to fetch bookings");
       const data = await response.json();

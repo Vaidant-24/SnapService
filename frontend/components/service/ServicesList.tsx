@@ -117,10 +117,12 @@ export default function ServicesList() {
 
       // Add pagination parameters
       params.append("page", page.toString());
-      params.append("limit", "8"); // 8 items per page
+      params.append("limit", "9");
 
       const queryString = params.toString() ? `?${params.toString()}` : "";
-      const res = await fetch(`http://localhost:3001/services${queryString}`);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/services${queryString}`
+      );
 
       if (!res.ok) throw new Error("Failed to fetch services");
 
@@ -172,7 +174,9 @@ export default function ServicesList() {
   // Fetch categories separately (only once)
   const fetchCategories = async () => {
     try {
-      const res = await fetch("http://localhost:3001/services?limit=100");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/services?limit=100`
+      );
       if (!res.ok) throw new Error("Failed to fetch services");
       const data = await res.json();
 
@@ -180,7 +184,7 @@ export default function ServicesList() {
       const uniqueCategories = [
         ...new Set(data.services.map((s: Service) => s.category)),
       ];
-      setCategories(["All", ...(uniqueCategories as string[])]);
+      setCategories([...(uniqueCategories as string[])]);
 
       const initialCategory = searchParams.get("category");
       if (initialCategory) {

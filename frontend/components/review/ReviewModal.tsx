@@ -47,23 +47,26 @@ export default function ReviewModal({
 
       toast.promise(
         async () => {
-          const res = await fetch("http://localhost:3001/review", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              bookingId,
-              providerId,
-              customerId,
-              serviceId,
-              rating,
-              comment: feedback,
-            }),
-          });
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/review`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                bookingId,
+                providerId,
+                customerId,
+                serviceId,
+                rating,
+                comment: feedback,
+              }),
+            }
+          );
 
           if (!res.ok) throw new Error("Failed to submit review");
 
           const bookingRes = await fetch(
-            `http://localhost:3001/bookings/${bookingId}`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/bookings/${bookingId}`,
             {
               method: "PATCH",
               headers: {
@@ -110,7 +113,7 @@ export default function ReviewModal({
       toast.promise(
         async () => {
           const bookingRes = await fetch(
-            `http://localhost:3001/bookings/${bookingId}`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/bookings/${bookingId}`,
             {
               method: "PATCH",
               headers: {

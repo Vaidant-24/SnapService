@@ -15,18 +15,27 @@ import { useAuth } from "@/context/AuthContext";
 import { MdOutlineSync } from "react-icons/md";
 import { Toaster, toast } from "sonner";
 import AuthGuard from "@/components/auth/AuthGuard";
+import { useRouter } from "next/navigation";
 
 export default function NotificationsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const { user: customer } = useAuth();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const router = useRouter();
+
+  // Redirect if role is not customer
+  useEffect(() => {
+    if (customer && customer.role !== "customer") {
+      router.push("/unauthorized");
+    }
+  }, [customer, router]);
 
   const fetchAwaiting = async () => {
     try {
       setRefreshing(true);
       const res = await fetch(
-        `http://localhost:3001/bookings/filterByStatus?status=Awaiting Completion&customerId=${customer?.userId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/bookings/filterByStatus?status=Awaiting Completion&customerId=${customer?.userId}`
       );
 
       if (!res.ok) {
@@ -45,7 +54,7 @@ export default function NotificationsPage() {
   };
 
   useEffect(() => {
-    if (customer?.userId) {
+    if (customer?.userId && customer.role === "customer") {
       fetchAwaiting();
     }
   }, [customer]);
@@ -54,7 +63,7 @@ export default function NotificationsPage() {
     fetchAwaiting();
   };
 
-  if (loading) {
+  if (!customer || customer.role !== "customer" || loading) {
     return (
       <AuthGuard>
         <div className="rounded-lg shadow-lg my-12 h-64 flex flex-col items-center justify-center">
@@ -69,7 +78,6 @@ export default function NotificationsPage() {
   return (
     <AuthGuard>
       <div className="min-h-screen container mx-auto mt-24 px-4">
-        {/* Toast container */}
         <Toaster position="top-right" richColors />
 
         <div className="flex justify-between mx-8 px-4 items-center mb-4">

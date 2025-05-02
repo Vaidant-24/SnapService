@@ -3,8 +3,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import AuthGuard from "@/components/auth/AuthGuard";
 import { User } from "@/components/type/User";
-import { PencilIcon } from "lucide-react";
-import { toast } from "sonner";
+import { Loader, PencilIcon } from "lucide-react";
+import { toast, Toaster } from "sonner";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const ServiceProviderProfile = () => {
   const [provider, setProvider] = useState<User>({} as User);
@@ -18,6 +20,15 @@ const ServiceProviderProfile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { user: userData } = useAuth();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (userData && userData.role !== "service_provider") {
+      router.push("/unauthorized");
+    }
+  }, [userData, router]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -31,6 +42,8 @@ const ServiceProviderProfile = () => {
         fetchReviews(data.userId); // Fetch reviews for the provider
       } catch (err) {
         console.error("Failed to fetch provider profile:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -162,6 +175,18 @@ const ServiceProviderProfile = () => {
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file)); // For local preview
   };
+
+  if (!userData || userData.role !== "service_provider" || loading) {
+    return (
+      <AuthGuard>
+        <div className="rounded-lg shadow-lg my-12 h-64 flex flex-col items-center justify-center">
+          <Loader className="h-10 w-10 text-orange-500 animate-spin mb-4" />
+          <p className="text-gray-300">Loading Profile...</p>
+          <Toaster position="top-right" richColors />
+        </div>
+      </AuthGuard>
+    );
+  }
 
   return (
     <AuthGuard>
