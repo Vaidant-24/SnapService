@@ -7,8 +7,37 @@ import { Loader, PencilIcon } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { z } from "zod";
 
 const ServiceProviderProfile = () => {
+  const serviceProviderProfileSchema = z.object({
+    firstName: z
+      .string()
+      .min(1, "First name is required")
+      .regex(/^[A-Za-z\s]+$/, "First name must contain only letters")
+      .optional(),
+    lastName: z
+      .string()
+      .min(1, "Last name is required")
+      .regex(/^[A-Za-z\s]+$/, "Last name must contain only letters")
+      .optional(),
+    email: z.string().email("Invalid email address").optional(),
+    phone: z
+      .string()
+      .regex(/^\d{10}$/, "Phone must be 10 digits")
+      .optional(),
+    address: z.string().min(1, "Address is required").optional(),
+    profileImage: z.string().url().optional(),
+    location: z
+      .object({
+        type: z.literal("Point"),
+        coordinates: z.tuple([z.number(), z.number()]),
+      })
+      .optional(),
+
+    description: z.string().optional(),
+  });
+
   const [provider, setProvider] = useState<User>({} as User);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState<any>({});
@@ -102,6 +131,12 @@ const ServiceProviderProfile = () => {
         setUploading(false);
       }
 
+      // 🔍 Validate formData before PATCH request
+      const validatedData = serviceProviderProfileSchema.parse({
+        ...formData,
+        profileImage: uploadedImageUrl,
+      });
+
       const res = await fetch("http://localhost:3001/user/profile", {
         method: "PATCH",
         credentials: "include",
@@ -121,9 +156,12 @@ const ServiceProviderProfile = () => {
       setSelectedFile(null);
       setPreviewUrl(null);
     } catch (err) {
-      console.error(err);
-      toast.error("Error updating profile.");
-      setMessage("Error updating profile.");
+      if (err instanceof z.ZodError) {
+        const errorMessages = err.errors.map((e) => e.message).join(", ");
+        toast.error(`Validation failed: ${errorMessages}`);
+      } else {
+        toast.error("Error updating profile.");
+      }
     }
   };
 
@@ -292,9 +330,7 @@ const ServiceProviderProfile = () => {
               <h2 className="text-xl font-semibold">
                 {provider.firstName + " " + provider.lastName}
               </h2>
-              <p className="text-orange-400">
-                {provider.serviceCategory || "Not set"}
-              </p>
+
               <p className="text-sm text-gray-400 mt-2">
                 Member since {new Date(provider.createdAt).toLocaleDateString()}
               </p>

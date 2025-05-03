@@ -7,6 +7,7 @@ import { toast, Toaster } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { Loader } from "lucide-react";
+import { z } from "zod";
 
 const CustomerProfile = () => {
   const [customer, setCustomer] = useState<User>({} as User);
@@ -21,6 +22,32 @@ const CustomerProfile = () => {
   const { user: userData } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+
+  const customerProfileSchema = z.object({
+    firstName: z
+      .string()
+      .min(1, "First name is required")
+      .regex(/^[A-Za-z\s]+$/, "First name must contain only letters")
+      .optional(),
+    lastName: z
+      .string()
+      .min(1, "Last name is required")
+      .regex(/^[A-Za-z\s]+$/, "Last name must contain only letters")
+      .optional(),
+    email: z.string().email("Invalid email address").optional(),
+    phone: z
+      .string()
+      .regex(/^\d{10}$/, "Phone must be 10 digits")
+      .optional(),
+    address: z.string().min(1, "Address is required").optional(),
+    profileImage: z.string().url().optional(),
+    location: z
+      .object({
+        type: z.literal("Point"),
+        coordinates: z.tuple([z.number(), z.number()]),
+      })
+      .optional(),
+  });
 
   useEffect(() => {
     if (userData && userData.role !== "customer") {
@@ -78,11 +105,17 @@ const CustomerProfile = () => {
         uploadedImageUrl = result.profileImage;
       }
 
+      // 🔍 Validate formData before PATCH request
+      const validatedData = customerProfileSchema.parse({
+        ...formData,
+        profileImage: uploadedImageUrl,
+      });
+
       const res = await fetch("http://localhost:3001/user/profile", {
         method: "PATCH",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, profileImage: uploadedImageUrl }),
+        body: JSON.stringify(validatedData),
       });
 
       if (!res.ok) throw new Error("Failed to update");
@@ -92,12 +125,18 @@ const CustomerProfile = () => {
       setFormData(updated);
       setEditMode(false);
       setMessage("Profile updated successfully!");
+      toast.success("Profile updated!");
 
       setSelectedFile(null);
       setPreviewUrl(null);
-    } catch (err) {
-      console.error(err);
-      setMessage("Error updating profile.");
+    } catch (err: any) {
+      // console.error(err);
+      if (err instanceof z.ZodError) {
+        const errorMessages = err.errors.map((e) => e.message).join(", ");
+        toast.error(`Validation failed: ${errorMessages}`);
+      } else {
+        toast.error("Error updating profile.");
+      }
     }
   };
 

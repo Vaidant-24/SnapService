@@ -7,47 +7,60 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const formSchema = z.object({
+  firstName: z
+    .string()
+    .min(1, "First name is required")
+    .regex(/^[A-Za-z\s]+$/, "First name must contain only letters"),
+
+  lastName: z
+    .string()
+    .min(1, "Last name is required")
+    .regex(/^[A-Za-z\s]+$/, "Last name must contain only letters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  phone: z.string().regex(/^\d{10}$/, "Phone must be 10 digits"),
+  address: z.string().min(1, "Address is required"),
+  role: z.enum(["customer", "service_provider"]),
+
+  description: z.string().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState("customer");
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { role: "customer" },
+  });
 
-    const formData = new FormData(e.target as HTMLFormElement);
-    const firstName = formData.get("firstName");
-    const lastName = formData.get("lastName");
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const phone = formData.get("phone");
-    const address = formData.get("address");
-    const experience = formData.get("experience");
-    const description = formData.get("description");
+  const role = watch("role");
+
+  const onSubmit = async (values: FormValues) => {
+    setError("");
+    setLoading(true);
 
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            firstName,
-            lastName,
-            email,
-            password,
-            phone,
-            address,
-            role,
-            experience: parseInt((experience as string) || "0"),
-            description,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
           credentials: "include",
         }
       );
@@ -69,90 +82,111 @@ export default function Register() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center  mt-20 p-4 sm:p-8">
+    <div className="flex min-h-screen items-center justify-center mt-20 p-4 sm:p-8">
       <div className="w-full max-w-lg rounded-lg bg-gray-900 p-6 sm:p-10 shadow-md">
-        {/* Responsive Form */}
         <h1 className="mb-6 text-center text-2xl sm:text-3xl font-bold text-orange-500">
           Create an Account
         </h1>
+
         {error && (
           <div className="mb-4 rounded-md bg-red-800 bg-opacity-50 p-4 text-red-400">
             {error}
           </div>
         )}
-        <form onSubmit={handleSubmit}>
+
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-400">
               First Name
             </label>
             <input
-              name="firstName"
-              type="text"
-              required
+              {...register("firstName")}
               className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"
             />
+            {errors.firstName && (
+              <p className="text-red-400 text-sm">{errors.firstName.message}</p>
+            )}
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-400">
               Last Name
             </label>
             <input
-              name="lastName"
-              type="text"
-              required
+              {...register("lastName")}
               className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"
             />
+            {errors.lastName && (
+              <p className="text-red-400 text-sm">{errors.lastName.message}</p>
+            )}
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-400">
               Email
             </label>
             <input
-              name="email"
+              {...register("email")}
               type="email"
-              required
               className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"
             />
+            {errors.email && (
+              <p className="text-red-400 text-sm">{errors.email.message}</p>
+            )}
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-400">
               Password
             </label>
             <input
-              name="password"
+              {...register("password")}
               type="password"
-              required
               className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"
             />
+            {errors.password && (
+              <p className="text-red-400 text-sm">{errors.password.message}</p>
+            )}
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-400">
               Phone
             </label>
             <input
-              name="phone"
+              {...register("phone")}
               type="tel"
-              required
               className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"
             />
+            {errors.phone && (
+              <p className="text-red-400 text-sm">{errors.phone.message}</p>
+            )}
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-400">
               Address
             </label>
             <input
-              name="address"
-              type="text"
-              required
+              {...register("address")}
               className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"
             />
+            {errors.address && (
+              <p className="text-red-400 text-sm">{errors.address.message}</p>
+            )}
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-400">
               Role
             </label>
-            <Select value={role} onValueChange={setRole}>
-              <SelectTrigger className="mt-1  w-full rounded-md bg-gray-800 p-3 text-white">
+            <Select
+              value={role}
+              onValueChange={(value) =>
+                setValue("role", value as "customer" | "service_provider")
+              }
+            >
+              <SelectTrigger className="mt-1 w-full rounded-md bg-gray-800 p-3 text-white">
                 <span>
                   {role === "customer" ? "Customer" : "Service Provider"}
                 </span>
@@ -165,29 +199,36 @@ export default function Register() {
               </SelectContent>
             </Select>
           </div>
+
           {role === "service_provider" && (
             <>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-400">
-                  Experience
+                  Experience (in years)
                 </label>
                 <input
-                  name="experience"
                   type="number"
                   className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"
                 />
               </div>
+
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-400">
                   Description
                 </label>
                 <textarea
-                  name="description"
+                  {...register("description")}
                   className="mt-1 block w-full rounded-md bg-gray-800 p-3 text-white"
                 />
+                {errors.description && (
+                  <p className="text-red-400 text-sm">
+                    {errors.description.message}
+                  </p>
+                )}
               </div>
             </>
           )}
+
           <button
             type="submit"
             disabled={loading}
